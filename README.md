@@ -9,4 +9,4 @@ An app that allows users to perform common statistical calculations through a in
 
 #### Run
 1. Run the app using `bash run.sh`
-2. Navigate your browser to https://localhost:<port you specified in config.py>
+2. Navigate your browser to https://localhost:\<port you specified in config.py\>
