@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>The Power Calculator</title>
+
+    {% include 'includes/basic-meta.html' %}
+    {% include 'includes/base-scripts.html' %}
+
+    <!-- Page Specific Styling -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style/index.css') }}">
+
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static',filename='script/custom/indexOnLoad.js') }}"></script>
+
+</head>
+
+<body>
+    {% include 'includes/spinner.html' %}
+    <!-- Content -->
+    {% include 'modules/navbar.html' %}
+    <div class="container-fluid">
+        <div class="row" id="initial-view">
+            <div id="primary-image"></div>
+            <div class="col-md-12" id="text-overlay">
+                <div class="row text-overlay-row">
+                    <h1 id="primary-header">The Power Calculator</h1>
+                </div>
+                <div class="row text-overlay-row">
+                    <h2 id="tag-line">Helping you calculate and understand statistics</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'modules/footer.html' %}
+</body>
+
+</html>

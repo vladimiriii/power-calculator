@@ -1,0 +1,70 @@
+/* Header Section */
+#initial-view {
+    min-height: 60vh;
+}
+
+.navbar {
+    margin-bottom: 0px
+}
+
+#primary-image {
+    width: 100%;
+    min-height: 550px;
+    background-image: url("../img/abstract-1022206.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0.5;
+    z-index: 1;
+}
+
+#text-overlay {
+    width: 100%;
+    min-height: 650px;
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+.text-overlay-row {
+    display: inline;
+    text-align: center;
+}
+
+#primary-header {
+    padding-top: 10vh;
+    font-size: 120px;
+}
+
+#tag-line {
+  font-size: 30px;
+}
+
+/* Text Sections */
+.landing-page-col {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+/* Vertical Alignment for Phones and Tablets */
+@media screen and (max-width: 992px) {
+
+    #primary-header {
+        font-size: 80px;
+    }
+
+    .modal-dialog {
+        width:95%;
+    }
+}
+
+@media screen and (max-width: 350px) {
+    #primary-header {
+        font-size: 50px;
+    }
+
+    #tag-line {
+      font-size: 20px;
+    }
+}

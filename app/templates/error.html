@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Error | Open Flashcards</title>
+
+	{% include 'includes/basic-meta.html' %}
+    {% include 'includes/base-scripts.html' %}
+
+	<!-- Page Specific Styling -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style/error.css') }}">
+
+</head>
+<body>
+	<!-- Content -->
+	<div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <img id="error-img" src="{{ url_for('static',filename='img/error.png') }}">
+            </div>
+		</div>
+        <div class="row">
+			<div class="col-md-12">
+            	<h1 class="error-text">Oops... something went wrong!</h1>
+			</div>
+        </div>
+        <div class="row error-links-div">
+			<div class="col-md-12">
+                <h3 class="error-link"><a href="./">Home</a></h3>
+                <h3 class="error-link"><a href="./logout">Logout</a></h3>
+            </div>
+        </div>
+    </div>
+	<!-- Footer -->
+	{% include 'modules/footer.html' %}
+</body>
+</html>
