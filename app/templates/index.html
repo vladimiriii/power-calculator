@@ -9,6 +9,7 @@
 
     <!-- Page Specific Styling -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style/index.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style/calculator.css') }}">
 
     <!-- Custom JavaScript -->
     <script src="{{ url_for('static',filename='script/custom/indexOnLoad.js') }}"></script>
@@ -29,10 +30,76 @@
                 <div class="row text-overlay-row">
                     <h2 id="tag-line">Helping you calculate and understand statistics</h2>
                 </div>
+                <div class="row text-overlay-row">
+                    <div class="col-md-12">
+                        <a href="#calculator">
+                            <button type="button" class="btn btn-lg btn-success" id="login-btn">Get started!</button>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
+        <div class="row" id="calculator">
+            <div class="col-md-8 offset-md-2">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4 class="question">How many groups do you have?</h4>
+                        <p class="question-explainer">How many treatment and/or control groups are in the study?</p>
+                    </div>
+                    <div class="col-md-3 offset-md-1">
+                        <div id="group-select" class="form-group question-select">
+                            <select id="group-list" class="form-control eco-select">
+                                <option value='1'>1</option>
+                                <option value='2'>2</option>
+                                <option value='3+'>3</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4 class="question">Are the groups independent or related?</h4>
+                        <p class="question-explainer">E.g. Is the study a before and after study (related), or two different groups (independent)?</p>
+                    </div>
+                    <div class="col-md-3 offset-md-1">
+                        <div id="group-select" class="form-group question-select">
+                            <select id="group-list" class="form-control eco-select">
+                                <option value='independent'>Independent</option>
+                                <option value='related'>Related</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4 class="question">Can we assume the sample means are normally distributed?</h4>
+                        <p class="question-explainer">In most cases where n > 60, this is a safe assumption to make
+                            due to the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem">central limit theorem</a>.
+                        </p>
+                    </div>
+                    <div class="col-md-3 offset-md-1">
+                        <div id="normality-select" class="form-group question-select">
+                            <select id="normality-list" class="form-control eco-select">
+                                <option value='yes'>Yes</option>
+                                <option value='no'>No</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4 class="question">Can we assume equal variance?</h4>
+                        <p class="question-explainer">You typically default to this assumption unless you have a strong reason to believe otherwise.</p>
+                    </div>
+                    <div class="col-md-3 offset-md-1">
+                        <div id="equal-variance-select" class="form-group question-select">
+                            <select id="euqal-variance-list" class="form-control eco-select">
+                                <option value='yes'>Yes</option>
+                                <option value='no'>No</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -40,3 +107,20 @@
 </body>
 
 </html>
+
+<!-- <div class="row">
+    <div class="col-md-8">
+        <h4 class="question">What do you want to estimate?</h4>
+        <p class="question-explainer">Select the statistic you are interested in finding out.</p>
+    </div>
+    <div class="col-md-3 offset-md-1">
+        <div id="target-select" class="form-group question-select">
+            <select id="target-list" class="form-control eco-select">
+                <option value='power'>Statitical Power</option>
+                <option value='sample'>Sample Size</option>
+                <option value='effect'>Effect Size</option>
+                <option value='p'>p value</option>
+            </select>
+        </div>
+    </div>
+</div> -->

@@ -20,7 +20,7 @@
 
 #text-overlay {
     width: 100%;
-    min-height: 650px;
+    min-height: 550px;
     position: absolute;
     z-index: 2;
     left: 50%;
@@ -41,7 +41,6 @@
   font-size: 30px;
 }
 
-/* Text Sections */
 .landing-page-col {
     padding-top: 20px;
     padding-bottom: 20px;
