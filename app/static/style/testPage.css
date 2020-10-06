@@ -1,0 +1,13 @@
+.toolbar {
+    background-color: rgb(255, 245, 220);
+}
+
+#go-btn {
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.optionHeader {
+    margin-bottom: 5px;
+    margin-top: 20px;
+}

@@ -54,9 +54,9 @@ const testMap = [
         "name": "ANOVA – One way",
         "url": "./one-way-anova",
         "attributes": {
-            "groups": ["2", "3+"],
+            "groups": ["3+"],
             "independence": ["independent"],
-            "normality": ["yes", "no"],
+            "normality": ["yes"],
             "equal-variance": ["yes", "no"]
         }
     },
@@ -64,9 +64,9 @@ const testMap = [
         "name": "ANOVA – Two way",
         "url": "./one-way-anova",
         "attributes": {
-            "groups": ["2", "3+"],
+            "groups": ["3+"],
             "independence": ["independent"],
-            "normality": ["yes", "no"],
+            "normality": ["yes"],
             "equal-variance": ["yes", "no"]
         }
     }

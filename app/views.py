@@ -8,6 +8,7 @@ from app.lib import t_test
 
 # Define the blueprint:
 basic_page = Blueprint('basic_page', __name__)
+test_page = Blueprint('test_page', __name__)
 api_endpoint = Blueprint('api_endpoint', __name__)
 
 
@@ -24,6 +25,11 @@ def terms_conditions_page():
 @basic_page.route('/privacy-policy', methods=['GET'])
 def privacy_policy_page():
     return render_template('privacy-policy.html')
+
+
+@test_page.route('/t-test-two-independent-samples', methods=['GET'])
+def t_test_two_ind():
+    return render_template('t-test-two-ind.html')
 
 
 @api_endpoint.route('/t-test-ind', methods=['GET'])

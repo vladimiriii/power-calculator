@@ -17,10 +17,12 @@ def create_app():
 def init_modules(app):
     # Import a module / component using its blueprint handler variable
     from app.views import basic_page
+    from app.views import test_page
     from app.views import api_endpoint
 
     # Register blueprint(s)
     app.register_blueprint(basic_page)
+    app.register_blueprint(test_page)
     app.register_blueprint(api_endpoint)
 
 

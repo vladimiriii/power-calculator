@@ -37,7 +37,7 @@ function generateLinks(tests, div) {
     $("#" + div).empty();
     for (let i = 0; i < tests.length; ++i) {
         $("#" + div).append(
-            '<p class="test-link"><a href="' + tests[i]['name'] + '" target="_blank">' + tests[i]['name'] + '</a></p>'
+            '<p class="test-link"><a href="' + tests[i]['url'] + '">' + tests[i]['name'] + '</a></p>'
         );
     }
 }

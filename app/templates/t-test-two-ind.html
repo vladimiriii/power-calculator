@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>The Power Calculator – t-test with Two Independent Sample</title>
+
+    {% include 'includes/basic-meta.html' %}
+    {% include 'includes/base-scripts.html' %}
+
+    <!-- Page Specific Styling -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style/testPage.css') }}">
+
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static',filename='script/custom/ttest2indFunctions.js') }}"></script>
+    <script src="{{ url_for('static',filename='script/custom/fieldMap.js') }}"></script>
+    <script src="{{ url_for('static',filename='script/custom/ttest2indOnLoad.js') }}"></script>
+
+</head>
+
+<body>
+    {% include 'includes/spinner.html' %}
+    <!-- Content -->
+    {% include 'modules/navbar.html' %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Student's t-test – Two Independent Samples</h1>
+                <p>Some explanation of Student's t-test blah blah blah. Lorem ipsum dolor sit amet, nobis dicant essent vim ei, eos ne alii oportere eloquentiam. Eu sit mazim docendi. Tota detraxit prodesset duo cu. Ne vel albucius appetere, sea melius repudiare philosophia ne. Est ad postea tacimates iudicabit. Vix id legere scripserit, animal atomorum interpretaris ad his. Tritani persius perpetua per at, id case philosophia pro.</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 toolbar">
+                <h2>Options</h2>
+                <p>What do you want to estimate?
+                <div id="target-select" class="form-group question-select">
+                    <select id="target-list" class="form-control eco-select">
+                        <option value='sampleSize'>Minimum Sample Size</option>
+                        <option value='power'>Statistical Power</option>
+                        <option value='pValue'>p value</option>
+                    </select>
+                </div>
+                <div class="row">
+                    <div class="col-md-12" id="options"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12" style="text-align: center">
+                        <button type="button" class="btn btn-lg btn-success" id="go-btn">Calculate</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <h2>Results</h1>
+            </div>
+        </div>
+    </div>
+    {% include 'modules/footer.html' %}
+</body>
+
+</html>
+
+<!-- <div class="row">
+    <div class="col-md-8">
+        <h4 class="question">What do you want to estimate?</h4>
+        <p class="question-explainer">Select the statistic you are interested in finding out.</p>
+    </div>
+    <div class="col-md-3 offset-md-1">
+        <div id="target-select" class="form-group question-select">
+            <select id="target-list" class="form-control eco-select">
+                <option value='power'>Statitical Power</option>
+                <option value='sample'>Sample Size</option>
+                <option value='effect'>Effect Size</option>
+                <option value='p'>p value</option>
+            </select>
+        </div>
+    </div>
+</div> -->
