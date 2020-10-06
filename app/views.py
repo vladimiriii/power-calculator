@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, json, render_template, redirect, url_for, 
 import os
 import sys
 
-from app.lib import t_test_methods as ttest
+from app.lib import t_test
 
 
 # Define the blueprint:
