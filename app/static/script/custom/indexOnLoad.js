@@ -1,5 +1,7 @@
 $(document).ready(function(){
 
-    console.log("Ready to go!");
+    generateLinks(testMap, "complete-test-list");
+
+    $("#recommend-btn").click(recommendTests);
 
 });

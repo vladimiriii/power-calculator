@@ -13,6 +13,8 @@
 
     <!-- Custom JavaScript -->
     <script src="{{ url_for('static',filename='script/custom/indexOnLoad.js') }}"></script>
+    <script src="{{ url_for('static',filename='script/custom/indexFunctions.js') }}"></script>
+    <script src="{{ url_for('static',filename='script/custom/testMap.js') }}"></script>
 
 </head>
 
@@ -32,26 +34,34 @@
                 </div>
                 <div class="row text-overlay-row">
                     <div class="col-md-12">
-                        <a href="#calculator">
-                            <button type="button" class="btn btn-lg btn-success" id="login-btn">Get started!</button>
+                        <a href="#setup-questions">
+                            <button type="button" class="btn btn-lg btn-primary">Help me find the right test</button>
+                        </a>
+                    </div>
+                </div>
+                <div class="row text-overlay-row">
+                    <div class="col-md-12">
+                        <a href="#all-tests">
+                            <button type="button" class="btn btn-lg btn-success">I know what I'm looking for</button>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row" id="calculator">
+        <div class="row" id="setup-questions">
             <div class="col-md-8 offset-md-2">
+                <h2>Test Finder</h3>
                 <div class="row">
                     <div class="col-md-8">
                         <h4 class="question">How many groups do you have?</h4>
                         <p class="question-explainer">How many treatment and/or control groups are in the study?</p>
                     </div>
                     <div class="col-md-3 offset-md-1">
-                        <div id="group-select" class="form-group question-select">
-                            <select id="group-list" class="form-control eco-select">
+                        <div id="groups-select" class="form-group question-select">
+                            <select id="groups-list" class="form-control eco-select">
                                 <option value='1'>1</option>
                                 <option value='2'>2</option>
-                                <option value='3+'>3</option>
+                                <option value='3+'>3 or more</option>
                             </select>
                         </div>
                     </div>
@@ -62,10 +72,11 @@
                         <p class="question-explainer">E.g. Is the study a before and after study (related), or two different groups (independent)?</p>
                     </div>
                     <div class="col-md-3 offset-md-1">
-                        <div id="group-select" class="form-group question-select">
-                            <select id="group-list" class="form-control eco-select">
+                        <div id="independence-select" class="form-group question-select">
+                            <select id="independence-list" class="form-control eco-select">
                                 <option value='independent'>Independent</option>
                                 <option value='related'>Related</option>
+                                <option value='na'>Not Applicable</option>
                             </select>
                         </div>
                     </div>
@@ -74,7 +85,7 @@
                     <div class="col-md-8">
                         <h4 class="question">Can we assume the sample means are normally distributed?</h4>
                         <p class="question-explainer">In most cases where n > 60, this is a safe assumption to make
-                            due to the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem">central limit theorem</a>.
+                            due to the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target="_blank">central limit theorem</a>.
                         </p>
                     </div>
                     <div class="col-md-3 offset-md-1">
@@ -93,13 +104,37 @@
                     </div>
                     <div class="col-md-3 offset-md-1">
                         <div id="equal-variance-select" class="form-group question-select">
-                            <select id="euqal-variance-list" class="form-control eco-select">
+                            <select id="equal-variance-list" class="form-control eco-select">
                                 <option value='yes'>Yes</option>
                                 <option value='no'>No</option>
+                                <option value='na'>Not Applicable</option>
                             </select>
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-12" style="text-align: center">
+                        <button type="button" class="btn btn-lg btn-success" id="recommend-btn">Recommend Tests</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h3>Recommended Tests</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8 offset-md-2" id="filtered-test-list">
+            </div>
+        </div>
+        <div class="row" id="all-tests">
+            <div class="col-md-8 offset-md-2">
+                <h2>All Tests</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8 offset-md-2" id="complete-test-list">
             </div>
         </div>
     </div>

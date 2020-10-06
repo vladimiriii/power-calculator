@@ -12,5 +12,14 @@
     margin-top: 55px;
 }
 
+#recommend-btn {
+    margin-top: 40px;
+}
+
+.test-link {
+    font-size: 15px;
+}
+
 @media screen and (max-width: 350px) {
+
 }
