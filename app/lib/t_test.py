@@ -5,6 +5,35 @@ import pandas as pd
 from app.lib import utils
 
 
+def calculate_statistics(inputs):
+    sample_fields = inputs['sampleFields']
+    if all_sample_info_provided(sample_fields):
+        results = calculate_sample_size_from_means(mu_1=float(sample_fields[0]['mean']),
+                                                   mu_2=float(sample_fields[1]['mean']),
+                                                   sigma_1=float(sample_fields[0]['stdDev']),
+                                                   sigma_2=float(sample_fields[1]['stdDev']),
+                                                   alpha=float(inputs['alpha']),
+                                                   power=float(inputs['power']),
+                                                   q_1=0.5)
+    else:
+        results = calculate_sample_size_from_cohens_d(d=float(inputs['effectSize']),
+                                                      alpha=float(inputs['alpha']),
+                                                      power=float(inputs['power']),
+                                                      q_1=0.5)
+
+    return results
+
+
+def all_sample_info_provided(sample_inputs):
+    all_provided = True
+    for sample in sample_inputs:
+        for key in sample:
+            if sample[key] == "":
+                all_provided = False
+                break
+    return all_provided
+
+
 def calculate_sample_size_from_cohens_d(d, alpha, power, q_1=0.5):
     q_2 = 1 - q_1
     p = (1/q_1 + 1/q_2)
@@ -32,7 +61,7 @@ def calculate_sample_size_from_cohens_d(d, alpha, power, q_1=0.5):
         "two_sided_test": {"total_samples": n_two_sided, "group_1": math.ceil(n_two_sided * q_1), "group_2": math.ceil(n_two_sided * (1 - q_1))}
     }
 
-    return pd.DataFrame(results)
+    return results
 
 
 def calculate_sample_size_from_means(mu_1, mu_2, sigma_1, sigma_2, alpha, power, q_1=0.5):
@@ -62,7 +91,7 @@ def calculate_sample_size_from_means(mu_1, mu_2, sigma_1, sigma_2, alpha, power,
         "two_sided_test": {"total_samples": n_two_sided, "group_1": math.ceil(n_two_sided * q_1), "group_2": math.ceil(n_two_sided * (1 - q_1))}
     }
 
-    return pd.DataFrame(results)
+    return results
 
 
 def independent_two_sample_test_stats(n_1, n_2, mu_1, mu_2, sigma_1, sigma_2):

@@ -32,7 +32,8 @@ def t_test_two_ind():
     return render_template('t-test-two-ind.html')
 
 
-@api_endpoint.route('/t-test-ind', methods=['GET'])
+@api_endpoint.route('/t-test-2-sample-ind-calc', methods=['POST'])
 def t_test_ind():
-    array = {"foo": "foo"}
-    return jsonify(array)
+    input = json.loads(request.data)
+    results = t_test.calculate_statistics(input)
+    return jsonify(results)

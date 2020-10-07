@@ -1,7 +1,7 @@
 function updateInputs() {
     const target = $("#target-list").val();
     $("#options").empty()
-    addOptionFields(target, 2);
+    addOptionFields(target, groups);
 }
 
 
