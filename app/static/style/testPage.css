@@ -7,7 +7,12 @@
     margin-bottom: 40px;
 }
 
-.optionHeader {
+.box-header {
+    margin-bottom: 5px;
+    margin-top: 20px;
+}
+
+.option-header {
     margin-bottom: 5px;
     margin-top: 20px;
 }

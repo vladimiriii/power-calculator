@@ -14,12 +14,12 @@ def calculate_statistics(inputs):
                                                    sigma_2=float(sample_fields[1]['stdDev']),
                                                    alpha=float(inputs['alpha']),
                                                    power=float(inputs['power']),
-                                                   q_1=0.5)
+                                                   enrolment_ratio=float(inputs['enrolmentRatio']))
     else:
         results = calculate_sample_size_from_cohens_d(d=float(inputs['effectSize']),
                                                       alpha=float(inputs['alpha']),
                                                       power=float(inputs['power']),
-                                                      q_1=0.5)
+                                                      enrolment_ratio=float(inputs['enrolmentRatio']))
 
     return results
 
@@ -34,7 +34,8 @@ def all_sample_info_provided(sample_inputs):
     return all_provided
 
 
-def calculate_sample_size_from_cohens_d(d, alpha, power, q_1=0.5):
+def calculate_sample_size_from_cohens_d(d, alpha, power, enrolment_ratio):
+    q_1 = enrolment_ratio / (1 + enrolment_ratio)
     q_2 = 1 - q_1
     p = (1/q_1 + 1/q_2)
     d_squared = d**2
@@ -56,15 +57,17 @@ def calculate_sample_size_from_cohens_d(d, alpha, power, q_1=0.5):
     if n_two_sided % 2 == 1:
         n_two_sided = n_two_sided + 1
 
-    results = {
-        "one_sided_test": {"total_samples": n_one_sided, "group_1": math.ceil(n_one_sided * q_1), "group_2": math.ceil(n_one_sided * (1 - q_1))},
-        "two_sided_test": {"total_samples": n_two_sided, "group_1": math.ceil(n_two_sided * q_1), "group_2": math.ceil(n_two_sided * (1 - q_1))}
-    }
+    results = [
+        {"label": "Group 1", "one_sided_test": math.ceil(n_one_sided * q_1), "two_sided_test": math.ceil(n_two_sided * q_1)},
+        {"label": "Group 2", "one_sided_test": math.ceil(n_one_sided * (1 - q_1)), "two_sided_test": math.ceil(n_two_sided * (1 - q_1))},
+        {"label": "All Samples", "one_sided_test": math.ceil(n_one_sided), "two_sided_test": math.ceil(n_two_sided)}
+    ]
 
     return results
 
 
-def calculate_sample_size_from_means(mu_1, mu_2, sigma_1, sigma_2, alpha, power, q_1=0.5):
+def calculate_sample_size_from_means(mu_1, mu_2, sigma_1, sigma_2, alpha, power, enrolment_ratio):
+    q_1 = enrolment_ratio / (1 + enrolment_ratio)
     q_2 = 1 - q_1
     combined_sigma = (sigma_1**2 + sigma_2**2)
     mu_diff = (mu_1 - mu_2)**2
@@ -86,10 +89,11 @@ def calculate_sample_size_from_means(mu_1, mu_2, sigma_1, sigma_2, alpha, power,
     if n_two_sided % 2 == 1:
         n_two_sided = n_two_sided + 1
 
-    results = {
-        "one_sided_test": {"total_samples": n_one_sided, "group_1": math.ceil(n_one_sided * q_1), "group_2": math.ceil(n_one_sided * (1 - q_1))},
-        "two_sided_test": {"total_samples": n_two_sided, "group_1": math.ceil(n_two_sided * q_1), "group_2": math.ceil(n_two_sided * (1 - q_1))}
-    }
+    results = [
+        {"label": "Group 1", "one_sided_test": math.ceil(n_one_sided * q_1), "two_sided_test": math.ceil(n_two_sided * q_1)},
+        {"label": "Group 2", "one_sided_test": math.ceil(n_one_sided * (1 - q_1)), "two_sided_test": math.ceil(n_two_sided * (1 - q_1))},
+        {"label": "All Samples", "one_sided_test": math.ceil(n_one_sided), "two_sided_test": math.ceil(n_two_sided)}
+    ]
 
     return results
 

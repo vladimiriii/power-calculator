@@ -55,18 +55,22 @@ function calculateEstimates(inputs) {
 
 
 function displayResults(results) {
-    $("#results").empty();
-    let header = "<h3>One Sided Test</h3>";
-    $("#results").append(header);
-    for (key in results['one_sided_test']) {
-        let newLine = "<p>" + key + ": " + String(results['one_sided_test'][key]) + "</p>";
-        $("#results").append(newLine);
+    $("#results-table").empty();
+
+    let table = '<table class="table table-bordered"><thead><tr>';
+    table += '<th scope="col">Group</th>';
+    table += '<th scope="col">One Sided Test</th>';
+    table += '<th scope="col">Two Sided Test</th>';
+    table += '</tr></thead><tbody>';
+
+    for (let i = 0; i < results.length; ++i) {
+        table += '<tr>';
+        table += '<th scope="row">' + results[i]['label'].toLocaleString(undefined, {minimumFractionDigits: 0}) + '</th>';
+        table += '<td>' + results[i]['one_sided_test'].toLocaleString(undefined, {minimumFractionDigits: 0}) + '</td>';
+        table += '<td>' + results[i]['two_sided_test'].toLocaleString(undefined, {minimumFractionDigits: 0}) + '</td>';
+        table += '</tr>';
     }
 
-    header = "<h3>Two Sided Test</h3>";
-    $("#results").append(header);
-    for (key in results['two_sided_test']) {
-        let newLine = "<p>" + key + ": " + String(results['two_sided_test'][key]) + "</p>";
-        $("#results").append(newLine);
-    }
+    table += '</tbody></table>'
+    $("#results-table").append(table);
 }

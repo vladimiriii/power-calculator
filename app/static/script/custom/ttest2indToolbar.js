@@ -6,7 +6,7 @@ function updateInputs() {
 
 
 function addOptionFields(target, groups) {
-    const headerClass = "optionHeader";
+    const headerClass = "option-header";
     const generalFields = optionMap[target]["generalFields"];
     const sampleFields = optionMap[target]["sampleFields"];
 
@@ -45,14 +45,4 @@ function addOptionFields(target, groups) {
             $("#options").append(label);
         }
     }
-}
-
-
-function calculateEstimate() {
-
-}
-
-
-function determineInputs() {
-
 }

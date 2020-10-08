@@ -14,6 +14,11 @@ const fieldMap = {
             "default": 0.5,
             "step": "any"
     },
+    "enrolmentRatio": {
+            "label": 'Enrolment Ratio (n<sub>1</sub> / n<sub>2</sub>):',
+            "default": 1,
+            "step": "any"
+    },
     "mean": {
             "label": 'Sample Mean:',
             "step": "any"
@@ -30,7 +35,7 @@ const fieldMap = {
 
 const optionMap = {
     "sampleSize": {
-        "generalFields": ["alpha", "power", "effectSize"],
+        "generalFields": ["alpha", "power", "effectSize", "enrolmentRatio"],
         "sampleFields": ["mean", "stdDev"]
     },
     "power": {
