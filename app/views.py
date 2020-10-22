@@ -3,7 +3,8 @@ from flask import Blueprint, jsonify, json, render_template, redirect, url_for, 
 import os
 import sys
 
-from app.lib import t_test
+from app.lib import statistics
+from app.lib import charts
 
 
 # Define the blueprint:
@@ -35,5 +36,7 @@ def t_test_two_ind():
 @api_endpoint.route('/t-test-2-sample-ind-calc', methods=['POST'])
 def t_test_ind():
     input = json.loads(request.data)
-    results = t_test.calculate_statistics(input)
-    return jsonify(results)
+    stats_data = statistics.t_test.calculate_statistics(input)
+    chart_one_data = charts.t_test.generate_power_chart_data(input)
+    chart_two_data = charts.t_test.generate_effect_size_chart_data(input)
+    return jsonify({"chartOne": chart_one_data, "chartTwo": chart_two_data, "statistics": stats_data})

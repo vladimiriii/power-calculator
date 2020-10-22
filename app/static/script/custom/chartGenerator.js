@@ -3,24 +3,16 @@ let configTwo = null;
 let chartOne = null;
 let chartTwo = null;
 
-const sampleData = {
-    title: "Chart 1",
-    xAxisLabel: "Month",
-    yAxisLabel: "Score",
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-    dataset: [
-        {
-            label: "Lower Powers",
-            data: [0, 10, 5, 2, null, null, null]
-        },
-        {
-            label: "Higher Powers",
-            data: [null, null, null, 2, 20, 30, 45]
-        }
-    ]
-}
 
 const chartColors = [
+    {
+        "line": "#d9486e",
+        "background": "#e3bfc8"
+    },
+    {
+        "line": "#325d88",
+        "background": "#d3dee8"
+    },
     {
         "line": "#d9486e",
         "background": "#e3bfc8"
@@ -61,6 +53,12 @@ function createChartConfig() {
 				}],
 				yAxes: [{
 					display: true,
+                    ticks: {
+                        beginAtZero: true,
+                        callback: function(value, index, values) {
+                            return Number(value).toLocaleString();
+                    }
+                    },
 					scaleLabel: {
 						display: true,
                         labelString: ""
@@ -69,6 +67,18 @@ function createChartConfig() {
 			},
             legend: {
                 display: false
+            },
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                        if (label) {
+                            label += ': ';
+                        };
+                        label += Number(tooltipItem.yLabel).toLocaleString();
+                        return label;
+                    }
+                }
             }
         }
     };
@@ -77,7 +87,7 @@ function createChartConfig() {
 
 function generateChart(id, config) {
     const div = $('#' + id)[0].getContext('2d');
-    return new Chart(div, config)
+    return new Chart(div, config);
 }
 
 

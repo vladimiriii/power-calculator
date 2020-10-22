@@ -7,7 +7,7 @@ from app.lib import utils
 
 def calculate_statistics(inputs):
     sample_fields = inputs['sampleFields']
-    if all_sample_info_provided(sample_fields):
+    if utils.all_sample_info_provided(sample_fields):
         results = calculate_sample_size_from_means(mu_1=float(sample_fields[0]['mean']),
                                                    mu_2=float(sample_fields[1]['mean']),
                                                    sigma_1=float(sample_fields[0]['stdDev']),
@@ -22,16 +22,6 @@ def calculate_statistics(inputs):
                                                       enrolment_ratio=float(inputs['enrolmentRatio']))
 
     return results
-
-
-def all_sample_info_provided(sample_inputs):
-    all_provided = True
-    for sample in sample_inputs:
-        for key in sample:
-            if sample[key] == "":
-                all_provided = False
-                break
-    return all_provided
 
 
 def calculate_sample_size_from_cohens_d(d, alpha, power, enrolment_ratio):

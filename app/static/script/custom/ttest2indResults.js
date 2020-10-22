@@ -2,11 +2,10 @@ async function getEstimates() {
     $("#spinner").show();
 
     const inputs = getInputs();
-    const data = await calculateEstimates(inputs);
-    displayResults(data);
-
-    updateChart(chartOne, configOne, sampleData);
-    updateChart(chartTwo, configTwo, sampleData);
+    const response = await calculateEstimates(inputs);
+    displayResults(response['statistics']);
+    updateChart(chartOne, configOne, response['chartOne']);
+    updateChart(chartTwo, configTwo, response['chartTwo']);
 
     $("#spinner").hide();
 }
