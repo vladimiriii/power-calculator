@@ -7,6 +7,7 @@
 
     {% include 'includes/basic-meta.html' %}
     {% include 'includes/base-scripts.html' %}
+    {% include 'includes/chart-scripts.html' %}
 
     <!-- Page Specific Styling -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style/testPage.css') }}">
@@ -51,12 +52,40 @@
                 </div>
             </div>
             <div class="col-md-9">
-                <h2 class="box-header">Results</h1>
                 <div class="row">
-                    <div class="col-md-5" id="results-table"></div>
-                    <div class="col-md-7" id="results-chart-1"></div>
+                    <div class="col-md-5">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3 class="box-header">Results</h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12" id="results-table"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-7 chart-div" id="results-chart-1">
+                        <canvas id="chart-1"></canvas>
+                    </div>
                 </div>
-
+                <div class="row">
+                    <div class="col-md-7 chart-div" id="results-chart-2">
+                        <canvas id="chart-2"></canvas>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3 class="box-header">Key Formulas</h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc imperdiet at nulla eget sagittis. Sed et mi quis arcu dictum condimentum at scelerisque sem. Sed nulla lacus, facilisis id faucibus quis, ornare in mauris. Duis dolor ante, feugiat id lacinia sollicitudin, blandit in nisi. Nullam lorem leo, tempus eu congue sit amet, faucibus et leo. Donec fringilla sollicitudin sollicitudin. Etiam mollis maximus mauris. Mauris sit amet venenatis ex. Nullam convallis eros magna, non maximus felis iaculis sit amet. Cras dictum viverra dignissim. Vivamus faucibus faucibus velit.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

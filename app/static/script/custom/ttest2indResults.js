@@ -5,6 +5,9 @@ async function getEstimates() {
     const data = await calculateEstimates(inputs);
     displayResults(data);
 
+    updateChart(chartOne, configOne, sampleData);
+    updateChart(chartTwo, configTwo, sampleData);
+
     $("#spinner").hide();
 }
 
