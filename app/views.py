@@ -6,7 +6,6 @@ import sys
 from app.lib import statistics
 from app.lib import charts
 
-
 # Define the blueprint:
 basic_page = Blueprint('basic_page', __name__)
 test_page = Blueprint('test_page', __name__)
@@ -39,4 +38,10 @@ def t_test_ind():
     stats_data = statistics.t_test.calculate_statistics(input)
     chart_one_data = charts.t_test.generate_power_chart_data(input)
     chart_two_data = charts.t_test.generate_effect_size_chart_data(input)
-    return jsonify({"chartOne": chart_one_data, "chartTwo": chart_two_data, "statistics": stats_data})
+    chart_three_data = charts.t_test.generate_distributions_chart_data(input, stats_data)
+    return jsonify({
+        "chartOne": chart_one_data,
+        "chartTwo": chart_two_data,
+        "chartThree": chart_three_data,
+        "statistics": stats_data
+    })

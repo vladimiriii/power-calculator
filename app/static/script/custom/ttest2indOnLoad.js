@@ -9,8 +9,10 @@ $(document).ready(function(){
     Chart.defaults.global.defaultFontFamily = 'Roboto';
     configOne = createChartConfig();
     configTwo = createChartConfig();
+    configThree = createChartConfig();
     chartOne = generateChart('chart-1', configOne);
     chartTwo = generateChart('chart-2', configTwo);
+    chartThree = generateChart('chart-3', configThree);
 
 
     $("#target-list").change(updateInputs);

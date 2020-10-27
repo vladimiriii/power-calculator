@@ -4,8 +4,9 @@ async function getEstimates() {
     const inputs = getInputs();
     const response = await calculateEstimates(inputs);
     displayResults(response['statistics']);
-    updateChart(chartOne, configOne, response['chartOne']);
-    updateChart(chartTwo, configTwo, response['chartTwo']);
+    updateChart(chartOne, configOne, response['chartOne'], 'standard');
+    updateChart(chartTwo, configTwo, response['chartTwo'], 'standard');
+    updateChart(chartThree, configThree, response['chartThree'], 'distributions');
 
     $("#spinner").hide();
 }

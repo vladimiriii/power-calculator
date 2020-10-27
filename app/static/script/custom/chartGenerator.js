@@ -1,27 +1,9 @@
 let configOne = null;
 let configTwo = null;
+let configThree = null;
 let chartOne = null;
 let chartTwo = null;
-
-
-const chartColors = [
-    {
-        "line": "#d9486e",
-        "background": "#e3bfc8"
-    },
-    {
-        "line": "#325d88",
-        "background": "#d3dee8"
-    },
-    {
-        "line": "#d9486e",
-        "background": "#e3bfc8"
-    },
-    {
-        "line": "#325d88",
-        "background": "#d3dee8"
-    }
-];
+let chartThree = null;
 
 
 function createChartConfig() {
@@ -91,21 +73,25 @@ function generateChart(id, config) {
 }
 
 
-function generateDatasets(data) {
+function generateDatasets(data, colorScheme) {
     for (let i = 0; i < data.length; ++i) {
-        data[i]['backgroundColor'] = chartColors[i]['background'];
-        data[i]['borderColor'] = chartColors[i]['line'];
+        data[i]['backgroundColor'] = chartColors[colorScheme][i]['background'];
+        data[i]['borderColor'] = chartColors[colorScheme][i]['line'];
     }
     return data;
 }
 
 
-function updateChart(chart, config, chartData) {
+function updateChart(chart, config, chartData, colorScheme) {
     config['options']['title']['text'] = chartData['title'];
     config['options']['scales']['xAxes'][0]['scaleLabel']['labelString'] = chartData['xAxisLabel'];
     config['options']['scales']['yAxes'][0]['scaleLabel']['labelString'] = chartData['yAxisLabel'];
     config['data']['labels'] = chartData['labels'];
-    config['data']['datasets'] = generateDatasets(chartData['dataset']);
+    config['data']['datasets'] = generateDatasets(chartData['dataset'], colorScheme);
+
+    if ("hidePoints" in chartData) {
+        config['options']['elements']['point']['radius'] = 0;
+    }
 	chart.update();
 }
     // const div = $('#' + id)[0].getContext('2d');
