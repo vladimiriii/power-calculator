@@ -14,7 +14,6 @@ $(document).ready(function(){
     chartTwo = generateChart('chart-2', configTwo);
     chartThree = generateChart('chart-3', configThree);
 
-
     $("#target-list").change(updateInputs);
     $("#go-btn").click(getEstimates);
 

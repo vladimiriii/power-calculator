@@ -8,11 +8,16 @@
 }
 
 .box-header {
-    margin-bottom: 5px;
-    margin-top: 20px;
+    margin-top: 0px;
+    margin-bottom: 10px;
 }
 
 .option-header {
     margin-bottom: 5px;
     margin-top: 20px;
+}
+
+.results-row {
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
