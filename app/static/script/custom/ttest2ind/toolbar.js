@@ -17,9 +17,25 @@ function addOptionFields(target, groups) {
     for (let i = 0; i < generalFields.length; ++i) {
         let f = generalFields[i];
         let label = "";
+
+        let min_clause = "";
+        if ('min' in fieldMap[f]) {
+            min_clause = ' min="' + String(fieldMap[f]["min"]) + '" ';
+        }
+
+        let max_clause = "";
+        if ('max' in fieldMap[f]) {
+            max_clause = ' max="' + String(fieldMap[f]["max"]) + '" ';
+        }
+
+        let required = "";
+        if (fieldMap[f]['required']) {
+            required = " required";
+        }
+
         label += '<form onSubmit="return false;">';
         label += '<label for="' + f + '">' + fieldMap[f]['label'] + '</label>';
-        label += '<input type="number" id="' + f + '" step=' + String(fieldMap[f]['step']) + ' value=' + String(fieldMap[f]['default']) + '>';
+        label += '<input type="number" id="' + f + '" step=' + String(fieldMap[f]['step']) + ' value=' + String(fieldMap[f]['default']) + min_clause + max_clause + required + '>';
         label += "</form>";
         $("#options").append(label);
     }

@@ -127,11 +127,6 @@ def generate_distributions_chart_data(inputs, sample_sizes):
                 HA_powered.append(None)
                 HA_unpowered.append(t.pdf(value, df=n, loc=HA_mean, scale=se))
 
-    # Fill in one extra value so there isn't a gap
-    H0_significant[H0_significant.index(None)] = H0_not_significant[H0_significant.index(None)]
-    H0_significant[-1 * (1 + H0_significant[::-1].index(None))] = H0_not_significant[-1 * (1 + H0_significant[::-1].index(None))]
-    HA_unpowered[HA_unpowered.index(None)] = HA_powered[HA_unpowered.index(None)]
-
     if HA_mean < H0_mean:
         power = t.cdf(alpha_lower, df=n, loc=HA_mean, scale=se)
     else:
@@ -184,22 +179,34 @@ def generate_effect_size_chart_data(inputs):
     else:
         effect_size = float(inputs['effectSize'])
 
-    effect_sizes = list(np.arange(max(0.002, effect_size - 0.1), effect_size + 0.102, 0.002))
+    step = 0.002
+    window = 0.1
+    window_min = effect_size - window
+    window_max = effect_size + window + step
+    effect_sizes = list(np.arange(window_min, window_max, step))
+    # effect_sizes = [None if -0.004 < x < 0.006 else x for x in x_labels]
+
     one_sided_sample_sizes = []
     two_sided_sample_sizes = []
     for d in effect_sizes:
-        results = calculate_sample_size_from_cohens_d(d=d,
-                                                      alpha=float(inputs['alpha']),
-                                                      power=float(inputs['power']),
-                                                      enrolment_ratio=float(inputs['enrolmentRatio']))
-        one_sided_sample_sizes.append(results[-1]['one_sided_test'])
-        two_sided_sample_sizes.append(results[-1]['two_sided_test'])
+        if d is not None:
+            results = calculate_sample_size_from_cohens_d(d=d,
+                                                          alpha=float(inputs['alpha']),
+                                                          power=float(inputs['power']),
+                                                          enrolment_ratio=float(inputs['enrolmentRatio']))
+            one_sided_sample_sizes.append(results[-1]['one_sided_test'])
+            two_sided_sample_sizes.append(results[-1]['two_sided_test'])
+        else:
+            one_sided_sample_sizes.append(None)
+            two_sided_sample_sizes.append(None)
 
     # Split into higher and lower
-    os_lower = [round(val, 3) if round(es, 3) <= effect_size else None for es, val in zip(effect_sizes, one_sided_sample_sizes)]
-    os_higher = [round(val, 3) if round(es, 3) >= effect_size else None for es, val in zip(effect_sizes, one_sided_sample_sizes)]
-    ts_lower = [round(val, 3) if round(es, 3) <= effect_size else None for es, val in zip(effect_sizes, two_sided_sample_sizes)]
-    ts_higher = [round(val, 3) if round(es, 3) >= effect_size else None for es, val in zip(effect_sizes, two_sided_sample_sizes)]
+    max_value = 1000000
+    actual_x = abs(round(effect_size, 3))
+    os_lower = [round(y, 3) if -actual_x <= round(x, 3) <= actual_x and y <= max_value else None for x, y in zip(effect_sizes, one_sided_sample_sizes)]
+    os_higher = [round(y, 3) if round(x, 3) <= -actual_x or round(x, 3) >= actual_x and y <= max_value else None for x, y in zip(effect_sizes, one_sided_sample_sizes)]
+    ts_lower = [round(y, 3) if -actual_x <= round(x, 3) <= actual_x and y <= max_value else None for x, y in zip(effect_sizes, two_sided_sample_sizes)]
+    ts_higher = [round(y, 3) if round(x, 3) <= -actual_x or round(x, 3) >= actual_x and y <= max_value else None for x, y in zip(effect_sizes, two_sided_sample_sizes)]
 
     chart_data = {
         "title": "Sample Size vs Effect Size (α: {}, 1 - β: {})".format(inputs['alpha'], inputs['power']),

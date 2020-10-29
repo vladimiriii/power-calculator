@@ -22,4 +22,4 @@ def calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2):
 
 
 def determine_decimal_points(x):
-    return int(round(max(2 + (-1 * math.log(x, 10)), 0), 0))
+    return int(round(max(2 + (-1 * math.log(abs(x), 10)), 0), 0))
