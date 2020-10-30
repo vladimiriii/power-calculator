@@ -2,7 +2,7 @@ const fieldMap = {
     "alpha": {
             "label": "Significance Level (α):",
             "default": 0.05,
-            "step": 0.01,
+            "step": 0.005,
             "min": 0.01,
             "max": 0.2,
             "required": true
@@ -10,7 +10,7 @@ const fieldMap = {
     "power": {
             "label": "Statistical Power (1 - β):",
             "default": 0.8,
-            "step": 0.01,
+            "step": 0.005,
             "min": 0.5,
             "max": 1,
             "required": true
@@ -44,7 +44,7 @@ const fieldMap = {
 }
 
 const optionMap = {
-    "sampleSize": {
+    "sample-size": {
         "generalFields": ["alpha", "power", "effectSize", "enrolmentRatio"],
         "sampleFields": ["mean", "stdDev"]
     },
@@ -52,8 +52,12 @@ const optionMap = {
         "generalFields": ["alpha", "effectSize"],
         "sampleFields": ["mean", "stdDev", "n"]
     },
-    "pValue": {
+    "p-value": {
         "generalFields": ["effectSize"],
         "sampleFields": ["mean", "stdDev", "n"]
     },
+    "min-effect": {
+        "generalFields": ["alpha", 'power'],
+        "sampleFields": ["mean", "stdDev", "n"]
+    }
 }

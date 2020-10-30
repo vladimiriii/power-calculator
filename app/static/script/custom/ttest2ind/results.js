@@ -3,6 +3,7 @@ async function getEstimates() {
 
     const inputs = getInputs();
     const response = await calculateEstimates(inputs);
+    console.log(response);
     displayResults(response['statistics']);
     updateChart(chartOne, configOne, response['chartOne'], 'standard');
     updateChart(chartTwo, configTwo, response['chartTwo'], 'standard');

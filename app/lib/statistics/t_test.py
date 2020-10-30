@@ -7,28 +7,41 @@ from app.lib import utils
 
 def calculate_statistics(inputs):
     sample_fields = inputs['sampleFields']
-    if utils.all_sample_info_provided(sample_fields):
-        results = calculate_sample_size_from_means(mu_1=float(sample_fields[0]['mean']),
-                                                   mu_2=float(sample_fields[1]['mean']),
-                                                   sigma_1=float(sample_fields[0]['stdDev']),
-                                                   sigma_2=float(sample_fields[1]['stdDev']),
-                                                   alpha=float(inputs['alpha']),
-                                                   power=float(inputs['power']),
-                                                   enrolment_ratio=float(inputs['enrolmentRatio']))
-    else:
-        results = calculate_sample_size_from_cohens_d(d=float(inputs['effectSize']),
-                                                      alpha=float(inputs['alpha']),
-                                                      power=float(inputs['power']),
-                                                      enrolment_ratio=float(inputs['enrolmentRatio']))
+    if inputs['target'] == "sample-size":
+        if utils.all_sample_info_provided(sample_fields):
+            results = calculate_sample_size_from_means(mu_1=float(sample_fields[0]['mean']),
+                                                       mu_2=float(sample_fields[1]['mean']),
+                                                       sigma_1=float(sample_fields[0]['stdDev']),
+                                                       sigma_2=float(sample_fields[1]['stdDev']),
+                                                       alpha=float(inputs['alpha']),
+                                                       power=float(inputs['power']),
+                                                       enrolment_ratio=float(inputs['enrolmentRatio']))
+        else:
+            results = calculate_sample_size_from_cohens_d(d=float(inputs['effectSize']),
+                                                          alpha=float(inputs['alpha']),
+                                                          power=float(inputs['power']),
+                                                          enrolment_ratio=float(inputs['enrolmentRatio']))
+    elif inputs['target'] == "power":
+        if utils.all_sample_info_provided(sample_fields):
+            results = calculate_power_from_means(mu_1=float(sample_fields[0]['mean']),
+                                                 sigma_1=float(sample_fields[0]['stdDev']),
+                                                 n_1=float(sample_fields[0]['n']),
+                                                 mu_2=float(sample_fields[1]['mean']),
+                                                 sigma_2=float(sample_fields[1]['stdDev']),
+                                                 n_2=float(sample_fields[1]['n']),
+                                                 alpha=float(inputs['alpha']))
+        else:
+            results = calculate_power_from_cohens_d(d=float(inputs['effectSize']),
+                                                    n_1=float(sample_fields[0]['n']),
+                                                    n_2=float(sample_fields[1]['n']),
+                                                    alpha=float(inputs['alpha']))
 
     return results
 
 
 def calculate_sample_size_from_cohens_d(d, alpha, power, enrolment_ratio):
-    q_1 = enrolment_ratio / (1 + enrolment_ratio)
-    q_2 = 1 - q_1
-    p = (1/q_1 + 1/q_2)
     d_squared = d**2 if d != 0 else 0.00000000001
+    power = power if power < 1 else 0.99999999999
 
     # Calculate with Normal distribution
     z_a_one_sided = norm.ppf(1 - alpha)
@@ -38,26 +51,30 @@ def calculate_sample_size_from_cohens_d(d, alpha, power, enrolment_ratio):
     z_total_os = (z_a_one_sided + z_b_one_sided)**2
     z_total_ts = (z_a_two_sided + z_b_one_sided)**2
 
-    n_one_sided = math.ceil(p * z_total_os / d_squared)
-    n_two_sided = math.ceil(p * z_total_ts / d_squared)
-
-    # Round and convert to even number
-    if n_one_sided % 2 == 1:
-        n_one_sided = n_one_sided + 1
-    if n_two_sided % 2 == 1:
-        n_two_sided = n_two_sided + 1
+    n_1_os = math.ceil((1 + enrolment_ratio) * z_total_os / d_squared)
+    n_1_ts = math.ceil((1 + enrolment_ratio) * z_total_ts / d_squared)
 
     return [
-        {"label": "Group 1", "one_sided_test": math.ceil(n_one_sided * q_1), "two_sided_test": math.ceil(n_two_sided * q_1)},
-        {"label": "Group 2", "one_sided_test": math.ceil(n_one_sided * (1 - q_1)), "two_sided_test": math.ceil(n_two_sided * (1 - q_1))},
-        {"label": "All Samples", "one_sided_test": math.ceil(n_one_sided), "two_sided_test": math.ceil(n_two_sided)}
+        {
+            "label": "Group 1",
+            "one_sided_test": n_1_os,
+            "two_sided_test": n_1_ts
+        },
+        {
+            "label": "Group 2",
+            "one_sided_test": math.ceil(n_1_os / enrolment_ratio),
+            "two_sided_test": math.ceil(n_1_ts / enrolment_ratio)
+        },
+        {
+            "label": "All Samples",
+            "one_sided_test": n_1_os + math.ceil(n_1_os / enrolment_ratio),
+            "two_sided_test": n_1_ts + math.ceil(n_1_ts / enrolment_ratio)
+        }
     ]
 
 
 def calculate_sample_size_from_means(mu_1, mu_2, sigma_1, sigma_2, alpha, power, enrolment_ratio):
-    q_1 = enrolment_ratio / (1 + enrolment_ratio)
-    q_2 = 1 - q_1
-    combined_sigma = (sigma_1**2 + sigma_2**2)
+    combined_sigma = (sigma_1**2 + enrolment_ratio * sigma_2**2)
     mu_diff = (mu_1 - mu_2)**2
 
     # Calculate with Normal distribution
@@ -68,22 +85,55 @@ def calculate_sample_size_from_means(mu_1, mu_2, sigma_1, sigma_2, alpha, power,
     z_total_os = (z_a_one_sided + z_b_one_sided)**2
     z_total_ts = (z_a_two_sided + z_b_one_sided)**2
 
-    n_one_sided = math.ceil(2 * combined_sigma * z_total_os / mu_diff)
-    n_two_sided = math.ceil(2 * combined_sigma * z_total_ts / mu_diff)
+    n_1_os = math.ceil(combined_sigma * z_total_os / mu_diff)
+    n_1_ts = math.ceil(combined_sigma * z_total_ts / mu_diff)
 
-    # Round and convert to even number
-    if n_one_sided % 2 == 1:
-        n_one_sided = n_one_sided + 1
-    if n_two_sided % 2 == 1:
-        n_two_sided = n_two_sided + 1
-
-    results = [
-        {"label": "Group 1", "one_sided_test": math.ceil(n_one_sided * q_1), "two_sided_test": math.ceil(n_two_sided * q_1)},
-        {"label": "Group 2", "one_sided_test": math.ceil(n_one_sided * (1 - q_1)), "two_sided_test": math.ceil(n_two_sided * (1 - q_1))},
-        {"label": "All Samples", "one_sided_test": math.ceil(n_one_sided), "two_sided_test": math.ceil(n_two_sided)}
+    return [
+        {
+            "label": "Group 1",
+            "one_sided_test": n_1_os,
+            "two_sided_test": n_1_ts
+        },
+        {
+            "label": "Group 2",
+            "one_sided_test": math.ceil(n_1_os / enrolment_ratio),
+            "two_sided_test": math.ceil(n_1_ts / enrolment_ratio)
+        },
+        {
+            "label": "All Samples",
+            "one_sided_test": n_1_os + math.ceil(n_1_os / enrolment_ratio),
+            "two_sided_test": n_1_ts + math.ceil(n_1_ts / enrolment_ratio)
+        }
     ]
 
-    return results
+
+def calculate_power_from_means(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2, alpha):
+    diff = abs(mu_1 - mu_2)
+    denominator = (sigma_1**2 / n_1 + sigma_2**2 / n_2)**0.5
+    Z_os = t.ppf(1 - alpha, df=n_1 + n_2)
+    Z_ts = t.ppf(1 - alpha/2, df=n_1 + n_2)
+    power_os = t.cdf(-Z_os + diff/denominator, n_1 + n_2)
+    power_ts = t.cdf(-Z_ts + diff/denominator, n_1 + n_2)
+
+    return [{
+        "label": "Statistical Power (1 - β)",
+        "one_sided_test": power_os,
+        "two_sided_test": power_ts
+    }]
+
+
+def calculate_power_from_cohens_d(d, n_1, n_2, alpha):
+    denominator = (1 / n_1 + 1 / n_2)**0.5
+    Z_os = t.ppf(1 - alpha, df=n_1 + n_2)
+    Z_ts = t.ppf(1 - alpha/2, df=n_1 + n_2)
+    power_os = t.cdf(-Z_os + abs(d)/denominator, n_1 + n_2)
+    power_ts = t.cdf(-Z_ts + abs(d)/denominator, n_1 + n_2)
+
+    return [{
+        "label": "Statistical Power (1 - β)",
+        "one_sided_test": power_os,
+        "two_sided_test": power_ts
+    }]
 
 
 def independent_two_sample_test_stats(n_1, n_2, mu_1, mu_2, sigma_1, sigma_2):
