@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, jsonify, json, render_template, redirect, url_for, request
+from flask import Blueprint, jsonify, json, render_template, redirect, url_for, request, Response
 import os
 import sys
 
@@ -34,11 +34,13 @@ def t_test_two_ind():
 
 @api_endpoint.route('/t-test-2-sample-ind-calc', methods=['POST'])
 def t_test_ind():
-    input = json.loads(request.data)
-    stats_data = statistics.t_test.calculate_statistics(input)
-    chart_data = charts.t_test.generate_chart_data(input, stats_data)
-
-    return jsonify({
-        "statistics": stats_data,
-        **chart_data
-    })
+    try:
+        input = json.loads(request.data)
+        stats_data = statistics.t_test.calculate_statistics(input)
+        chart_data = charts.t_test.generate_chart_data(input, stats_data)
+        return jsonify({
+            "statistics": stats_data,
+            **chart_data
+        })
+    except Exception as e:
+        return Response("{'error': '" + str(e) + "'}", status=400, mimetype='application/json')

@@ -2,12 +2,19 @@ async function getEstimates() {
     $("#spinner").show();
 
     const inputs = getInputs();
-    const response = await calculateEstimates(inputs);
-    console.log(response);
-    displayResults(response['statistics']);
-    updateChart(chartOne, configOne, response['chartOne'], 'standard');
-    updateChart(chartTwo, configTwo, response['chartTwo'], 'standard');
-    updateChart(chartThree, configThree, response['chartThree'], 'distributions');
+    try {
+        const response = await calculateEstimates(inputs);
+        displayResults(response['statistics']);
+        updateChart(chartOne, configOne, response['chartOne'], 'standard');
+        updateChart(chartTwo, configTwo, response['chartTwo'], 'standard');
+        updateChart(chartThree, configThree, response['chartThree'], 'distributions');
+    } catch {
+        $("#error-modal-header").empty();
+        $("#error-modal-body").empty();
+        $("#error-modal-header").text("Something Went Wrong!");
+        $("#error-modal-body").text("We couldn't process your request. Please check you have provided all the required inputs and try again.");
+        $("#error-modal").modal('show');
+    }
 
     $("#spinner").hide();
 }
