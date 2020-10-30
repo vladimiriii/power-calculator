@@ -104,28 +104,20 @@ def generate_distributions_chart_data(inputs, sample_sizes):
     HA_unpowered = []
     for value in x_axis_values:
         # Null Hypothesis
+        H0_not_significant.append(t.pdf(value, df=n, loc=H0_mean, scale=se))
         if value < alpha_lower or value > alpha_upper:
             H0_significant.append(t.pdf(value, df=n, loc=H0_mean, scale=se))
-            H0_not_significant.append(None)
         else:
             H0_significant.append(None)
-            H0_not_significant.append(t.pdf(value, df=n, loc=H0_mean, scale=se))
 
         # Alternative Hypothesis
-        if HA_mean < H0_mean:
-            if value < alpha_lower:
-                HA_powered.append(t.pdf(value, df=n, loc=HA_mean, scale=se))
-                HA_unpowered.append(None)
-            else:
-                HA_powered.append(None)
-                HA_unpowered.append(t.pdf(value, df=n, loc=HA_mean, scale=se))
-        elif HA_mean >= H0_mean:
-            if value > alpha_upper:
-                HA_powered.append(t.pdf(value, df=n, loc=HA_mean, scale=se))
-                HA_unpowered.append(None)
-            else:
-                HA_powered.append(None)
-                HA_unpowered.append(t.pdf(value, df=n, loc=HA_mean, scale=se))
+        HA_powered.append(t.pdf(value, df=n, loc=HA_mean, scale=se))
+        if HA_mean < H0_mean and value > alpha_lower:
+            HA_unpowered.append(t.pdf(value, df=n, loc=HA_mean, scale=se))
+        elif HA_mean >= H0_mean and value < alpha_upper:
+            HA_unpowered.append(t.pdf(value, df=n, loc=HA_mean, scale=se))
+        else:
+            HA_unpowered.append(None)
 
     if HA_mean < H0_mean:
         power = t.cdf(alpha_lower, df=n, loc=HA_mean, scale=se)
@@ -144,26 +136,18 @@ def generate_distributions_chart_data(inputs, sample_sizes):
             {
                 "label": "H0 - Significant",
                 "data": H0_significant,
-                "backgroundColor": None,
-                "borderColor": "#f4320c"
             },
             {
                 "label": "H0",
                 "data": H0_not_significant,
-                "backgroundColor": None,
-                "borderColor": "#fc5a50"
             },
             {
                 "label": "HA - Powered",
                 "data": HA_powered,
-                "backgroundColor": None,
-                "borderColor": "#661aee"
             },
             {
                 "label": "HA",
                 "data": HA_unpowered,
-                "backgroundColor": None,
-                "borderColor": "#6488ea"
             }
         ]
     }
