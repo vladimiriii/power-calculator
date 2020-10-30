@@ -16,7 +16,7 @@ const fieldMap = {
             "required": true
     },
     "effectSize": {
-            "label": 'Effect Size (<a href="https://en.wikipedia.org/wiki/Effect_size#Cohen\'s_d" target="_blank">cohen\'s d</a>):',
+            "label": 'Effect Size (<a href="https://en.wikipedia.org/wiki/Effect_size#Cohen\'s_d" target="_blank">Cohen\'s d</a>):',
             "default": 0.5,
             "step": "any",
             "required": false

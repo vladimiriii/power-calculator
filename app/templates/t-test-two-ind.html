@@ -27,14 +27,14 @@
     {% include 'modules/navbar.html' %}
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-9">
                 <h1>Student's <i>t</i>-test – Two Independent Samples</h1>
-                <p>Student's <i>t</i>-test for two independent samples is a test that is used when you have:</p>
+                <p>Student's <i>t</i>-test for two independent samples is a test that is used when:</p>
                 <ol>
-                    <li>Two <a href="https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables">independent and identically distributed samples</a> (e.g. a treatment group and a control group, not the same group before and after some treatment).</li>
+                    <li>You have two <a href="https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables">independent and identically distributed</a> samples (e.g. a treatment group and a control group, not a <a href="/">before and after treatment comparison</a>, and not <a href="/">more than 2 groups</a>).</li>
                     <li>You want to assess if a treatment led to some measureable difference in the groups (e.g. giving the treatment group a low fat diet led to a reduction in average weight).</li>
-                    <li>You can reasonably assume (or you have confirmed) that the sample means (not the underlying datapoints themselves) are normally distributed (see <a href="https://en.wikipedia.org/wiki/Central_limit_theorem">Central Limit Theorem</a>).</li>
-                    <li>You do not know the standard deviation of the underlying populations.</li>
+                    <li>You can reasonably assume (or you have confirmed) that the sample means (not the underlying data) are normally distributed (see <a href="https://en.wikipedia.org/wiki/Central_limit_theorem">Central Limit Theorem</a>).</li>
+                    <li>You do not know the standard deviation of the underlying populations. If you do, you can instead use a <a href="/"><i>z</i>-test</a>.</li>
                 </ol>
                 <p>If this is the type of test you are conducting, or have already completed, you can use this calculator to:</p>
                 <ol>
@@ -43,6 +43,9 @@
                     <li>Calculate the p-value of a completed test.</li>
                     <li>Estimate the smallest effect size you can detect (at a given power level) based on your sample size.</li>
                 </ol>
+            </div>
+            <div class="col-md-3">
+                {% include 'modules/purchase-btn.html' %}
             </div>
         </div>
         <div class="row">
@@ -89,7 +92,7 @@
                     <div class="col-md-6">
                         <div class="row">
                             <div class="col-md-12">
-                                <h3 class="box-header">Understanding</h3>
+                                <h3 class="box-header">Key Formulae</h3>
                                 <p>
                                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc imperdiet at nulla eget sagittis. Sed et mi quis arcu dictum condimentum at scelerisque sem. Sed nulla lacus, facilisis id faucibus quis, ornare in mauris. Duis dolor ante, feugiat id lacinia sollicitudin, blandit in nisi. Nullam lorem leo, tempus eu congue sit amet, faucibus et leo. Donec fringilla sollicitudin sollicitudin. Etiam mollis maximus mauris. Mauris sit amet venenatis ex. Nullam convallis eros magna, non maximus felis iaculis sit amet. Cras dictum viverra dignissim. Vivamus faucibus faucibus velit.
                                 </p>
@@ -106,15 +109,15 @@
                     <div class="col-md-5">
                         <div class="row">
                             <div class="col-md-12">
-                                <h3 class="box-header">Key Formulae</h3>
+                                <h3 class="box-header">Key Terms</h3>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <ul id="understanding">
-                                    <li><strong>Significance Level (α)</strong>: In order to reject the null hypothesis (H<sub>0</sub>: θ = 0; where θ = |μ<sub>1</sub> - μ<sub>2</sub>|), we must observe a difference in sample means that falls in the α most extreme differences in sample means that we would expect to see if we repeatedly drew samples from the same distribution. Values in these regions would lead to a Type I error and are highlighted in red in the chart below.</li>
-                                    <li><strong>Statistical Power (1 - β)</strong>: Assuming the alternate hypothesis is true (H<sub>A</sub>: θ = x; where x is the expected difference in population means), repeated sampling would cause us to correctly reject the null hypothesis at a rate of 1 - β. This equates to a false negative (Type II error) rate of β. The sample mean differences that would lead to a Type II error are highlighted in blue in the chart below.</li>
-                                    <li><strong>Effect Size (Cohen's d)</strong>: A standardized measure of the difference in the underlying population means, or the size of the true effect of the treatment. The difference in means is standardized by dividing by the standard deviation.</li>
+                                    <li><strong>Significance Level (α)</strong>: In order to reject the null hypothesis (H<sub>0</sub>: θ = 0; where θ = |μ<sub>1</sub> - μ<sub>2</sub>|), we must observe a difference in sample means that falls in the α most extreme differences in sample means that we would expect to see if the null hypothesis is true. Values in these regions are highlighted in red in the chart to the right.</li>
+                                    <li><strong>Statistical Power (1 - β)</strong>: Assuming the alternate hypothesis is true (H<sub>A</sub>: θ = x; where x is the expected difference in population means), repeated sampling would cause us to correctly reject the null hypothesis at a rate of 1 - β. This equates to a false negative (Type II error) rate of β. The sample mean differences that would lead to a Type II error are highlighted in blue in the chart to the right.</li>
+                                    <li><strong>Effect Size (Cohen's d)</strong>: A standardized measure of the difference in the group means (can be sample or population means depending on the context). The difference in means is divided by the standard deviation to make the number comparable across different experiments.</li>
                                 </ul>
                             </div>
                         </div>

@@ -23,6 +23,14 @@ h2, h3, h4, h5 {
   margin-bottom: 30px;
 }
 
+div.purchase-btn {
+    margin: 30px 30px 30px 30px;
+    border-radius: 20px;
+    background-color: #7f95b5;
+    text-align: center;
+    padding: 30px 30px 30px 30px;
+}
+
 /* Footer */
 .page-footer {
     text-align: center;
