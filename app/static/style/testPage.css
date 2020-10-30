@@ -1,5 +1,12 @@
 .toolbar {
-    background-color: rgb(255, 245, 220);
+    background-color: #f5f2e7;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 20px;
+}
+
+.results {
+    background-color: #f1eff7;
 }
 
 #go-btn {
