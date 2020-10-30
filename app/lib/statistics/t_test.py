@@ -28,7 +28,7 @@ def calculate_sample_size_from_cohens_d(d, alpha, power, enrolment_ratio):
     q_1 = enrolment_ratio / (1 + enrolment_ratio)
     q_2 = 1 - q_1
     p = (1/q_1 + 1/q_2)
-    d_squared = d**2
+    d_squared = d**2 if d != 0 else 0.00000000001
 
     # Calculate with Normal distribution
     z_a_one_sided = norm.ppf(1 - alpha)
@@ -47,13 +47,11 @@ def calculate_sample_size_from_cohens_d(d, alpha, power, enrolment_ratio):
     if n_two_sided % 2 == 1:
         n_two_sided = n_two_sided + 1
 
-    results = [
+    return [
         {"label": "Group 1", "one_sided_test": math.ceil(n_one_sided * q_1), "two_sided_test": math.ceil(n_two_sided * q_1)},
         {"label": "Group 2", "one_sided_test": math.ceil(n_one_sided * (1 - q_1)), "two_sided_test": math.ceil(n_two_sided * (1 - q_1))},
         {"label": "All Samples", "one_sided_test": math.ceil(n_one_sided), "two_sided_test": math.ceil(n_two_sided)}
     ]
-
-    return results
 
 
 def calculate_sample_size_from_means(mu_1, mu_2, sigma_1, sigma_2, alpha, power, enrolment_ratio):

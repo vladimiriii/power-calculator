@@ -189,16 +189,12 @@ def generate_effect_size_chart_data(inputs):
     one_sided_sample_sizes = []
     two_sided_sample_sizes = []
     for d in effect_sizes:
-        if d is not None:
-            results = calculate_sample_size_from_cohens_d(d=d,
-                                                          alpha=float(inputs['alpha']),
-                                                          power=float(inputs['power']),
-                                                          enrolment_ratio=float(inputs['enrolmentRatio']))
-            one_sided_sample_sizes.append(results[-1]['one_sided_test'])
-            two_sided_sample_sizes.append(results[-1]['two_sided_test'])
-        else:
-            one_sided_sample_sizes.append(None)
-            two_sided_sample_sizes.append(None)
+        results = calculate_sample_size_from_cohens_d(d=d,
+                                                      alpha=float(inputs['alpha']),
+                                                      power=float(inputs['power']),
+                                                      enrolment_ratio=float(inputs['enrolmentRatio']))
+        one_sided_sample_sizes.append(results[-1]['one_sided_test'])
+        two_sided_sample_sizes.append(results[-1]['two_sided_test'])
 
     # Split into higher and lower
     max_value = 1000000
