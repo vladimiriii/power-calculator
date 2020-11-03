@@ -1,12 +1,26 @@
 .toolbar {
-    background-color: #f5f2e7;
+    background-color: #f1eff7;
     padding-left: 20px;
     padding-right: 20px;
-    padding-top: 20px;
+    padding-top: 30px;
+    margin-top: 40px;
+}
+
+.option-col {
+    padding-left: 50px;
+}
+
+.option-row {
+    margin-bottom: 5px;
+}
+
+.option-header {
+    margin-top: 10px;
+    margin-bottom: 5px;
 }
 
 .results {
-    background-color: #f1eff7;
+    margin-bottom: 60px;
 }
 
 #go-btn {
@@ -19,12 +33,9 @@
     margin-bottom: 10px;
 }
 
-.option-header {
-    margin-bottom: 5px;
-    margin-top: 20px;
-}
+
 
 .results-row {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 50px;
+    padding-bottom: 0px;
 }

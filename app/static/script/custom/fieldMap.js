@@ -45,19 +45,43 @@ const fieldMap = {
 
 const optionMap = {
     "sample-size": {
-        "generalFields": ["alpha", "power", "effectSize", "enrolmentRatio"],
-        "sampleFields": ["mean", "stdDev"]
+        "compulsoryFields": {
+            "oneOf": ["alpha", "power", "enrolmentRatio"],
+            "perGroup": []
+        },
+        "orFields": {
+            "oneOf": ["effectSize"],
+            "perGroup": ["mean", "stdDev"]
+        }
     },
     "power": {
-        "generalFields": ["alpha", "effectSize"],
-        "sampleFields": ["mean", "stdDev", "n"]
+        "compulsoryFields": {
+            "oneOf": ["alpha"],
+            "perGroup": ["n"]
+        },
+        "orFields": {
+            "oneOf": ["effectSize"],
+            "perGroup": ["mean", "stdDev"]
+        }
     },
     "p-value": {
-        "generalFields": ["effectSize"],
-        "sampleFields": ["mean", "stdDev", "n"]
+        "compulsoryFields": {
+            "oneOf": [],
+            "perGroup": ["n"]
+        },
+        "orFields": {
+            "oneOf": ["effectSize"],
+            "perGroup": ["mean", "stdDev"]
+        }
     },
     "min-effect": {
-        "generalFields": ["alpha", 'power'],
-        "sampleFields": ["mean", "stdDev", "n"]
+        "compulsoryFields": {
+            "oneOf": ['alpha', 'power'],
+            "perGroup": ["n"]
+        },
+        "orFields": {
+            "oneOf": [],
+            "perGroup": []
+        }
     }
 }

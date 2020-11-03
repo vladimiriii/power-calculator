@@ -16,7 +16,6 @@
     <script src="{{ url_for('static',filename='script/custom/ttest2ind/onLoad.js') }}"></script>
     <script src="{{ url_for('static',filename='script/custom/ttest2ind/toolbar.js') }}"></script>
     <script src="{{ url_for('static',filename='script/custom/ttest2ind/results.js') }}"></script>
-    <script src="{{ url_for('static',filename='script/custom/ttest2ind/text.js') }}"></script>
     <script src="{{ url_for('static',filename='script/custom/fieldMap.js') }}"></script>
 
 </head>
@@ -27,7 +26,12 @@
     {% include 'modules/navbar.html' %}
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-9">
+            <div class="col-md-10 offset-md-1">
+                {% include 'modules/purchase-banner.html' %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10 offset-md-1">
                 <h1>Student's <i>t</i>-test – Two Independent Samples</h1>
                 <p>Student's <i>t</i>-test for two independent samples is a test that is used when:</p>
                 <ol>
@@ -44,24 +48,28 @@
                     <li>Estimate the smallest effect size you can detect (at a given power level) based on your sample size.</li>
                 </ol>
             </div>
-            <div class="col-md-3">
-                {% include 'modules/purchase-btn.html' %}
-            </div>
         </div>
         <div class="row">
-            <div class="col-md-3 toolbar">
-                <h2 class="box-header">Options</h2>
-                <p>What do you want to estimate?
-                <div id="target-select" class="form-group question-select">
-                    <select id="target-list" class="form-control eco-select">
-                        <option value='sample-size'>Minimum Sample Size</option>
-                        <option value='power'>Statistical Power</option>
-                        <option value='p-value'>p value</option>
-                        <option value='min-effect'>Minimum Effect Size</option>
-                    </select>
+            <div class="col-md-10 offset-md-1 toolbar">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="box-header">Options</h2>
+                    </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12" id="options"></div>
+                    <div class="col-md-3">
+                        <p>What do you want to estimate?
+                        <div id="target-select" class="form-group question-select">
+                            <select id="target-list" class="form-control eco-select">
+                                <option value='sample-size'>Minimum Sample Size</option>
+                                <option value='power'>Statistical Power</option>
+                                <option value='p-value'>p value</option>
+                                <option value='min-effect'>Minimum Detectable Effect Size</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4 option-col" id="compulsoryFields"></div>
+                    <div class="col-md-5 option-col" id="orFields"></div>
                 </div>
                 <div class="row">
                     <div class="col-md-12" style="text-align: center">
@@ -69,7 +77,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-9 results">
+        </div>
+        <div class="row">
+            <div class="col-md-10 offset-md-1 results">
                 <div class="row results-row">
                     <div class="col-md-5">
                         <div class="row">
@@ -98,11 +108,6 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12">
-
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="row results-row">
@@ -128,26 +133,14 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-10 offset-md-1">
+                {% include 'modules/purchase-banner.html' %}
+            </div>
+        </div>
     </div>
     {% include 'modules/footer.html' %}
     {% include 'modules/error-modal.html' %}
 </body>
 
 </html>
-
-<!-- <div class="row">
-    <div class="col-md-8">
-        <h4 class="question">What do you want to estimate?</h4>
-        <p class="question-explainer">Select the statistic you are interested in finding out.</p>
-    </div>
-    <div class="col-md-3 offset-md-1">
-        <div id="target-select" class="form-group question-select">
-            <select id="target-list" class="form-control eco-select">
-                <option value='power'>Statitical Power</option>
-                <option value='sample'>Sample Size</option>
-                <option value='effect'>Effect Size</option>
-                <option value='p'>p value</option>
-            </select>
-        </div>
-    </div>
-</div> -->

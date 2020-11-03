@@ -1,0 +1,27 @@
+div.purchase-banner {
+    background-image: url("../img/abstract-1022206.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    text-align: center;
+    padding: 50px 30px 50px 30px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+div.purchase-banner h2 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+
+}
+
+a.pb {
+    color: black;
+}
+
+div.purchase-banner:hover {
+    opacity: 0.5;
+}
+
+a.pb:hover {
+    text-decoration: none;
+}
