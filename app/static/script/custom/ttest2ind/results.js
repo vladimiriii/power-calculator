@@ -8,6 +8,13 @@ async function getEstimates() {
         updateChart(chartOne, configOne, response['chartOne'], 'standard');
         updateChart(chartTwo, configTwo, response['chartTwo'], 'standard');
         updateChart(chartThree, configThree, response['chartThree'], 'distributions');
+
+        // Scroll to results section
+        const offset = $("#results-container").offset();
+        $('html, body').animate({
+            scrollTop: offset.top,
+            scrollLeft: offset.left
+        });
     } catch {
         $("#error-modal-header").empty();
         $("#error-modal-body").empty();
