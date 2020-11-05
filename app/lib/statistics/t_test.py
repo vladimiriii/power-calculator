@@ -48,6 +48,12 @@ def calculate_statistics(inputs):
             results = caclulate_p_value_from_cohens_d(d=float(inputs['effectSize']),
                                                       n_1=float(sample_fields[0]['n']),
                                                       n_2=float(sample_fields[1]['n']))
+    elif inputs['target'] == "min-effect":
+        if utils.all_sample_info_provided(sample_fields):
+            results = caclulate_min_effect_size(n_1=float(sample_fields[0]['n']),
+                                                n_2=float(sample_fields[1]['n']),
+                                                alpha=float(inputs['alpha']),
+                                                power=float(inputs['power']))
 
     return results
 
@@ -57,7 +63,7 @@ def calculate_sample_size_from_cohens_d(d, alpha, power, enrolment_ratio):
     power = power if power < 1 else 0.99999999999
     alpha = alpha if alpha != 0 else 0.0000000001
 
-    # Calculate with Normal distribution
+    # Calculate with Normal distribution because we don't know the df for a t distribution
     z_a_one_sided = norm.ppf(1 - alpha)
     z_a_two_sided = norm.ppf(1 - alpha/2)
     z_b_one_sided = norm.ppf(power)
@@ -178,4 +184,27 @@ def caclulate_p_value_from_cohens_d(d, n_1, n_2):
         "label": "p value",
         "one_sided_test": one_sided_p,
         "two_sided_test": two_sided_p
+    }]
+
+
+def caclulate_min_effect_size(n_1, n_2, alpha, power):
+    power = power if power < 1 else 0.99999999999
+    alpha = alpha if alpha != 0 else 0.0000000001
+    enrolment_ratio = n_1 / n_2
+
+    # Calculate with Normal distribution
+    z_a_one_sided = t.ppf(1 - alpha, df=n_1 + n_2)
+    z_a_two_sided = t.ppf(1 - alpha/2, df=n_1 + n_2)
+    z_b_one_sided = t.ppf(power, df=n_1 + n_2)
+
+    z_total_os = (z_a_one_sided + z_b_one_sided)**2
+    z_total_ts = (z_a_two_sided + z_b_one_sided)**2
+
+    d_os = ((1 + enrolment_ratio) * z_total_os / n_1)**0.5
+    d_ts = ((1 + enrolment_ratio) * z_total_ts / n_1)**0.5
+
+    return [{
+        "label": "Minimum effect size",
+        "one_sided_test": d_os,
+        "two_sided_test": d_ts
     }]

@@ -10,13 +10,16 @@ def generate_chart_data(inputs, stats):
     sample_fields = inputs['sampleFields']
 
     # Extract data points
-    if utils.all_sample_info_provided(sample_fields):
-        d = utils.calculate_cohens_d(mu_1=float(sample_fields[0]['mean']),
-                                     mu_2=float(sample_fields[1]['mean']),
-                                     sigma_1=float(sample_fields[0]['stdDev']),
-                                     sigma_2=float(sample_fields[1]['stdDev']))
+    if inputs['target'] != 'min-effect':
+        if utils.all_sample_info_provided(sample_fields):
+            d = utils.calculate_cohens_d(mu_1=float(sample_fields[0]['mean']),
+                                         mu_2=float(sample_fields[1]['mean']),
+                                         sigma_1=float(sample_fields[0]['stdDev']),
+                                         sigma_2=float(sample_fields[1]['stdDev']))
+        else:
+            d = float(inputs['effectSize'])
     else:
-        d = float(inputs['effectSize'])
+        d = stats[0]["two_sided_test"]
 
     if inputs['target'] == 'sample-size':
         alpha = float(inputs['alpha'])
@@ -24,18 +27,24 @@ def generate_chart_data(inputs, stats):
         n_2 = stats[1]["two_sided_test"]
         enrolment_ratio = float(inputs['enrolmentRatio'])
         power = float(inputs['power'])
-    elif inputs['target'] in 'power':
+    elif inputs['target'] == 'power':
         alpha = float(inputs['alpha'])
         n_1 = float(sample_fields[0]["n"])
         n_2 = float(sample_fields[1]["n"])
         enrolment_ratio = n_1 / n_2
         power = stats[0]["two_sided_test"]
-    elif inputs['target'] in 'p-value':
+    elif inputs['target'] == 'p-value':
         n_1 = float(sample_fields[0]["n"])
         n_2 = float(sample_fields[1]["n"])
         enrolment_ratio = n_1 / n_2
         alpha = stats[0]["two_sided_test"]
         power = 0.2
+    elif inputs['target'] == 'min-effect':
+        n_1 = float(sample_fields[0]["n"])
+        n_2 = float(sample_fields[1]["n"])
+        enrolment_ratio = n_1 / n_2
+        alpha = float(inputs['alpha'])
+        power = float(inputs['power'])
 
     # Generate Charts
     chart_data['chartOne'] = generate_power_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
@@ -195,7 +204,7 @@ def generate_distributions_chart_data(d, alpha, n_1, n_2):
     decimal_points = utils.determine_decimal_points(x_max)
 
     return {
-        "title": "Distributions (effect size: {}, α: {:0.3f}, power (1 - β): {:.1%})".format(round(d, utils.determine_decimal_points(d)), alpha, power),
+        "title": "Distributions (effect size: {:0.3f}, α: {:0.3f}, power (1 - β): {:.1%})".format(round(d, utils.determine_decimal_points(d)), alpha, power),
         "xAxisLabel": "Difference in sample means",
         "yAxisLabel": "Density",
         "labels": [round(x, decimal_points) for x in x_axis_values],
