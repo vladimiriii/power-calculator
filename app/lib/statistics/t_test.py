@@ -36,12 +36,26 @@ def calculate_statistics(inputs):
                                                     n_2=float(sample_fields[1]['n']),
                                                     alpha=float(inputs['alpha']))
 
+    elif inputs['target'] == "p-value":
+        if utils.all_sample_info_provided(sample_fields):
+            results = caclulate_p_value_from_means(mu_1=float(sample_fields[0]['mean']),
+                                                   sigma_1=float(sample_fields[0]['stdDev']),
+                                                   n_1=float(sample_fields[0]['n']),
+                                                   mu_2=float(sample_fields[1]['mean']),
+                                                   sigma_2=float(sample_fields[1]['stdDev']),
+                                                   n_2=float(sample_fields[1]['n']))
+        else:
+            results = caclulate_p_value_from_cohens_d(d=float(inputs['effectSize']),
+                                                      n_1=float(sample_fields[0]['n']),
+                                                      n_2=float(sample_fields[1]['n']))
+
     return results
 
 
 def calculate_sample_size_from_cohens_d(d, alpha, power, enrolment_ratio):
     d_squared = d**2 if d != 0 else 0.00000000001
     power = power if power < 1 else 0.99999999999
+    alpha = alpha if alpha != 0 else 0.0000000001
 
     # Calculate with Normal distribution
     z_a_one_sided = norm.ppf(1 - alpha)
@@ -136,7 +150,7 @@ def calculate_power_from_cohens_d(d, n_1, n_2, alpha):
     }]
 
 
-def independent_two_sample_test_stats(n_1, n_2, mu_1, mu_2, sigma_1, sigma_2):
+def caclulate_p_value_from_means(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2):
     n_root = (1/n_1 + 1/n_2)**0.5
     sd_pooled = utils.calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
     standard_error = sd_pooled * n_root
@@ -146,14 +160,22 @@ def independent_two_sample_test_stats(n_1, n_2, mu_1, mu_2, sigma_1, sigma_2):
     one_sided_p = 1 - t.cdf(df=(n_1 + n_2 - 2), x=t_stat)
     two_sided_p = 2 * (1 - t.cdf(df=(n_1 + n_2 - 2), x=t_stat))
 
-    return {"t-stat": t_stat, "p-value (one-sided)": one_sided_p, "p-value (two-sided)": two_sided_p}
+    return [{
+        "label": "p value",
+        "one_sided_test": one_sided_p,
+        "two_sided_test": two_sided_p
+    }]
 
 
-def independent_two_sample_test_effect_size(n_1, n_2, d):
+def caclulate_p_value_from_cohens_d(d, n_1, n_2):
     n_root = (1/n_1 + 1/n_2)**0.5
     t_stat = d/n_root
 
     one_sided_p = 1 - t.cdf(df=(n_1 + n_2 - 2), x=t_stat)
     two_sided_p = 2 * (1 - t.cdf(df=(n_1 + n_2 - 2), x=t_stat))
 
-    return {"t-stat": t_stat, "p-value (one-sided)": one_sided_p, "p-value (two-sided)": two_sided_p}
+    return [{
+        "label": "p value",
+        "one_sided_test": one_sided_p,
+        "two_sided_test": two_sided_p
+    }]

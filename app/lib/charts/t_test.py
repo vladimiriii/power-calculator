@@ -10,7 +10,6 @@ def generate_chart_data(inputs, stats):
     sample_fields = inputs['sampleFields']
 
     # Extract data points
-    alpha = float(inputs['alpha'])
     if utils.all_sample_info_provided(sample_fields):
         d = utils.calculate_cohens_d(mu_1=float(sample_fields[0]['mean']),
                                      mu_2=float(sample_fields[1]['mean']),
@@ -20,15 +19,23 @@ def generate_chart_data(inputs, stats):
         d = float(inputs['effectSize'])
 
     if inputs['target'] == 'sample-size':
+        alpha = float(inputs['alpha'])
         n_1 = stats[0]["two_sided_test"]
         n_2 = stats[1]["two_sided_test"]
         enrolment_ratio = float(inputs['enrolmentRatio'])
         power = float(inputs['power'])
-    elif inputs['target'] == 'power':
+    elif inputs['target'] in 'power':
+        alpha = float(inputs['alpha'])
         n_1 = float(sample_fields[0]["n"])
         n_2 = float(sample_fields[1]["n"])
         enrolment_ratio = n_1 / n_2
         power = stats[0]["two_sided_test"]
+    elif inputs['target'] in 'p-value':
+        n_1 = float(sample_fields[0]["n"])
+        n_2 = float(sample_fields[1]["n"])
+        enrolment_ratio = n_1 / n_2
+        alpha = stats[0]["two_sided_test"]
+        power = 0.2
 
     # Generate Charts
     chart_data['chartOne'] = generate_power_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
@@ -57,7 +64,7 @@ def generate_power_chart_data(d, alpha, power, enrolment_ratio):
     ts_higher = [round(val, 2) if round(pow, 2) >= power else None for pow, val in zip(power_range, two_sided_sample_sizes)]
 
     return {
-        "title": "Sample Size vs Power (effect size: {:0.3f}, α: {})".format(d, alpha),
+        "title": "Sample Size vs Power (effect size: {:0.3f}, α: {:0.3f})".format(d, alpha),
         "xAxisLabel": "Statistical Power (1 - β)",
         "yAxisLabel": "Sample Size",
         "labels": ["{:0.3f}".format(p) for p in power_range],
@@ -108,7 +115,7 @@ def generate_effect_size_chart_data(d, alpha, power, enrolment_ratio):
     ts_higher = [round(y, 3) if round(x, 3) <= -actual_x or round(x, 3) >= actual_x and y <= max_value else None for x, y in zip(effect_sizes, two_sided_sample_sizes)]
 
     chart_data = {
-        "title": "Sample Size vs Effect Size (α: {}, power (1 - β): {:.1%})".format(alpha, power),
+        "title": "Sample Size vs Effect Size (α: {:0.3f}, power (1 - β): {:.1%})".format(alpha, power),
         "xAxisLabel": "Effect Size",
         "yAxisLabel": "Sample Size",
         "labels": ["{:0.3f}".format(es) for es in effect_sizes],
@@ -188,7 +195,7 @@ def generate_distributions_chart_data(d, alpha, n_1, n_2):
     decimal_points = utils.determine_decimal_points(x_max)
 
     return {
-        "title": "Distributions (effect size: {}, α: {}, power (1 - β): {:.1%})".format(round(d, utils.determine_decimal_points(d)), alpha, power),
+        "title": "Distributions (effect size: {}, α: {:0.3f}, power (1 - β): {:.1%})".format(round(d, utils.determine_decimal_points(d)), alpha, power),
         "xAxisLabel": "Difference in sample means",
         "yAxisLabel": "Density",
         "labels": [round(x, decimal_points) for x in x_axis_values],
