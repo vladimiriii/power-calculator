@@ -15,6 +15,13 @@ $(document).ready(function(){
     chartThree = generateChart('chart-3', configThree);
 
     $("#target-list").change(updateInputs);
-    $("#go-btn").click(getEstimates);
+    $("#go-btn").click(function() {
+        getEstimates();
+        const offset = $("#results-container").offset();
+        $('html, body').animate({
+            scrollTop: offset.top,
+            scrollLeft: offset.left
+        });
+    });
 
 });
