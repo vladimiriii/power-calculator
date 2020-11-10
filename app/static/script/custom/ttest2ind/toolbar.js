@@ -47,7 +47,7 @@ function addOptionFields(target, div, orField) {
             $("#" + div).append('<h4 class="' + headerClass + '"> — OR —</h4>');
         }
         for (let j = 1; j <= groups; ++j) {
-            $("#" + div).append("<h4 class=" + headerClass + ">Sample " + String(j) + "</h4>");
+            $("#" + div).append("<h4 class=" + headerClass + ">Group " + String(j) + "</h4>");
             for (let i = 0; i < perGroupFields.length; ++i) {
                 let f = perGroupFields[i];
                 let label = "";

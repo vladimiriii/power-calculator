@@ -29,11 +29,11 @@ const fieldMap = {
             "required": true
     },
     "mean": {
-            "label": 'Sample Mean:',
+            "label": 'Mean: ',
             "step": "any"
     },
     "stdDev": {
-            "label": 'Standard Deviation:',
+            "label": 'Standard Deviation: ',
             "step": "any"
     },
     "n": {
