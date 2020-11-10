@@ -127,6 +127,20 @@ def calculate_sample_size_from_means(mu_1, mu_2, sigma_1, sigma_2, alpha, power,
     ]
 
 
+def calculate_power_from_cohens_d(d, n_1, n_2, alpha):
+    denominator = (1 / n_1 + 1 / n_2)**0.5
+    Z_os = t.ppf(1 - alpha, df=n_1 + n_2)
+    Z_ts = t.ppf(1 - alpha/2, df=n_1 + n_2)
+    power_os = t.cdf(-Z_os + abs(d)/denominator, n_1 + n_2)
+    power_ts = t.cdf(-Z_ts + abs(d)/denominator, n_1 + n_2)
+
+    return [{
+        "label": "Statistical Power (1 - β)",
+        "one_sided_test": power_os,
+        "two_sided_test": power_ts
+    }]
+
+
 def calculate_power_from_means(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2, alpha):
     diff = abs(mu_1 - mu_2)
     denominator = (sigma_1**2 / n_1 + sigma_2**2 / n_2)**0.5
@@ -142,27 +156,10 @@ def calculate_power_from_means(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2, alpha):
     }]
 
 
-def calculate_power_from_cohens_d(d, n_1, n_2, alpha):
-    denominator = (1 / n_1 + 1 / n_2)**0.5
-    Z_os = t.ppf(1 - alpha, df=n_1 + n_2)
-    Z_ts = t.ppf(1 - alpha/2, df=n_1 + n_2)
-    power_os = t.cdf(-Z_os + abs(d)/denominator, n_1 + n_2)
-    power_ts = t.cdf(-Z_ts + abs(d)/denominator, n_1 + n_2)
-
-    return [{
-        "label": "Statistical Power (1 - β)",
-        "one_sided_test": power_os,
-        "two_sided_test": power_ts
-    }]
-
-
-def caclulate_p_value_from_means(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2):
+def caclulate_p_value_from_cohens_d(d, n_1, n_2):
     n_root = (1/n_1 + 1/n_2)**0.5
-    sd_pooled = utils.calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
-    standard_error = sd_pooled * n_root
-    diff = abs(mu_1 - mu_2)
+    t_stat = d/n_root
 
-    t_stat = diff/standard_error
     one_sided_p = 1 - t.cdf(df=(n_1 + n_2 - 2), x=t_stat)
     two_sided_p = 2 * (1 - t.cdf(df=(n_1 + n_2 - 2), x=t_stat))
 
@@ -173,10 +170,13 @@ def caclulate_p_value_from_means(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2):
     }]
 
 
-def caclulate_p_value_from_cohens_d(d, n_1, n_2):
+def caclulate_p_value_from_means(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2):
     n_root = (1/n_1 + 1/n_2)**0.5
-    t_stat = d/n_root
+    sd_pooled = utils.calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
+    standard_error = sd_pooled * n_root
+    diff = abs(mu_1 - mu_2)
 
+    t_stat = diff/standard_error
     one_sided_p = 1 - t.cdf(df=(n_1 + n_2 - 2), x=t_stat)
     two_sided_p = 2 * (1 - t.cdf(df=(n_1 + n_2 - 2), x=t_stat))
 

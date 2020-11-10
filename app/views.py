@@ -5,6 +5,7 @@ import sys
 
 from app.lib import statistics
 from app.lib import charts
+from app.lib import formulae
 
 # Define the blueprint:
 basic_page = Blueprint('basic_page', __name__)
@@ -38,8 +39,10 @@ def t_test_ind():
         input = json.loads(request.data)
         stats_data = statistics.t_test.calculate_statistics(input)
         chart_data = charts.t_test.generate_chart_data(input, stats_data)
+        formulas = formulae.t_test.generate_formulas(input)
         return jsonify({
             "statistics": stats_data,
+            "formulas": formulas,
             **chart_data
         })
     except Exception as e:

@@ -8,6 +8,7 @@ async function getEstimates() {
         updateChart(chartOne, configOne, response['chartOne'], 'standard');
         updateChart(chartTwo, configTwo, response['chartTwo'], 'standard');
         updateChart(chartThree, configThree, response['chartThree'], 'distributions');
+        renderFormulas(response['formulas']);
 
         // Scroll to results section
         const offset = $("#results-container").offset();

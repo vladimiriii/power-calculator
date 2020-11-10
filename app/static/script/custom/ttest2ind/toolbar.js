@@ -2,6 +2,8 @@ function updateInputs() {
     const target = $("#target-list").val();
     addOptionFields(target, "compulsoryFields", false);
     addOptionFields(target, "orFields", true);
+    $("#results-table").empty();
+    $("#formulae").empty();
 }
 
 
