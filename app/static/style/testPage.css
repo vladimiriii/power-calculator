@@ -33,9 +33,18 @@
     margin-bottom: 10px;
 }
 
-
-
 .results-row {
     padding-top: 50px;
     padding-bottom: 0px;
+}
+
+p.notes {
+    font-size: 11px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+h4.subheader {
+    margin-top: 10px;
+    margin-bottom: 5px;
 }

@@ -4,24 +4,27 @@ from app.lib import utils
 
 
 def generate_formulas(inputs):
+    results = {}
     sample_fields = inputs['sampleFields']
     if inputs['target'] == "sample-size":
         if utils.all_sample_info_provided(sample_fields):
-            results = create_sample_size_from_means_formula(mu_1=float(sample_fields[0]['mean']),
-                                                            mu_2=float(sample_fields[1]['mean']),
-                                                            sigma_1=float(sample_fields[0]['stdDev']),
-                                                            sigma_2=float(sample_fields[1]['stdDev']),
-                                                            alpha=float(inputs['alpha']),
-                                                            power=float(inputs['power']),
-                                                            enrolment_ratio=float(inputs['enrolmentRatio']))
+            results['formulae'] = create_sample_size_from_means_formula(mu_1=float(sample_fields[0]['mean']),
+                                                                        mu_2=float(sample_fields[1]['mean']),
+                                                                        sigma_1=float(sample_fields[0]['stdDev']),
+                                                                        sigma_2=float(sample_fields[1]['stdDev']),
+                                                                        alpha=float(inputs['alpha']),
+                                                                        power=float(inputs['power']),
+                                                                        enrolment_ratio=float(inputs['enrolmentRatio']))
         else:
-            results = []
+            results['formulae'] = []
             # results = calculate_sample_size_from_cohens_d(d=float(inputs['effectSize']),
             #                                               alpha=float(inputs['alpha']),
             #                                               power=float(inputs['power']),
             #                                               enrolment_ratio=float(inputs['enrolmentRatio']))
+        results['notes'] = generate_sample_size_notes(float(inputs['alpha']), float(inputs['power']))
     else:
-        results = []
+        results['formulae'] = []
+        results['notes'] = []
     # elif inputs['target'] == "power":
     #     if utils.all_sample_info_provided(sample_fields):
     #         results = calculate_power_from_means(mu_1=float(sample_fields[0]['mean']),
@@ -81,6 +84,15 @@ def create_sample_size_from_means_formula(mu_1, mu_2, sigma_1, sigma_2, alpha, p
     formulae.append(step_4.format(n_1, enrolment_ratio, math.ceil(n_1 / enrolment_ratio)))
 
     return formulae
+
+
+def generate_sample_size_notes(alpha, power):
+    notes = [
+        "r<sub>e</sub> is the enrolment ratio.",
+        "The calculation shown is for a two tailed test. However, from the forumla, you can see the only term that will change for a one-sided test is z<sub>1−α/2</sub>​ = {:.3f}, which instead becomes z<sub>1−α</sub>​ = {:.3f}.".format(norm.ppf(1 - alpha/2), norm.ppf(1 - alpha)),
+        "The difference in means (or the effect size) for this calculation represents the difference in <i>population</i> means, or the true effect. This is because we are calculating how big a sample we need to detect this difference in {:.1%} of experiments if we repeatedly resampled from these populations (i.e. the 'power' of the experiment).".format(power)
+    ]
+    return notes
 
 
 # sample_size_from_d = r"s_1 =  \frac{(1 + \frac{n_1}{n_2})(z_\alpha + z_\beta)^2}{d^2}"

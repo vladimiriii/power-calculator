@@ -2,13 +2,14 @@ async function getEstimates() {
     $("#spinner").show();
 
     const inputs = getInputs();
-    try {
+    // try {
         const response = await calculateEstimates(inputs);
         displayResults(response['statistics']);
         updateChart(chartOne, configOne, response['chartOne'], 'standard');
         updateChart(chartTwo, configTwo, response['chartTwo'], 'standard');
         updateChart(chartThree, configThree, response['chartThree'], 'distributions');
-        renderFormulas(response['formulas']);
+        renderFormulas(response['formulae']);
+        addFormulaNotes(response['notes']);
 
         // Scroll to results section
         const offset = $("#results-container").offset();
@@ -16,13 +17,13 @@ async function getEstimates() {
             scrollTop: offset.top,
             scrollLeft: offset.left
         });
-    } catch {
-        $("#error-modal-header").empty();
-        $("#error-modal-body").empty();
-        $("#error-modal-header").text("Something Went Wrong!");
-        $("#error-modal-body").text("We couldn't process your request. Please check you have provided all the required inputs and try again.");
-        $("#error-modal").modal('show');
-    }
+    // } catch {
+    //     $("#error-modal-header").empty();
+    //     $("#error-modal-body").empty();
+    //     $("#error-modal-header").text("Something Went Wrong!");
+    //     $("#error-modal-body").text("We couldn't process your request. Please check you have provided all the required inputs and try again.");
+    //     $("#error-modal").modal('show');
+    // }
 
     $("#spinner").hide();
 }

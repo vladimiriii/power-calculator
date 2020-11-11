@@ -39,10 +39,10 @@ def t_test_ind():
         input = json.loads(request.data)
         stats_data = statistics.t_test.calculate_statistics(input)
         chart_data = charts.t_test.generate_chart_data(input, stats_data)
-        formulas = formulae.t_test.generate_formulas(input)
+        formulas_and_notes = formulae.t_test.generate_formulas(input)
         return jsonify({
             "statistics": stats_data,
-            "formulas": formulas,
+            **formulas_and_notes,
             **chart_data
         })
     except Exception as e:
