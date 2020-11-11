@@ -16,11 +16,10 @@ def generate_formulas(inputs):
                                                                         power=float(inputs['power']),
                                                                         enrolment_ratio=float(inputs['enrolmentRatio']))
         else:
-            results['formulae'] = []
-            # results = calculate_sample_size_from_cohens_d(d=float(inputs['effectSize']),
-            #                                               alpha=float(inputs['alpha']),
-            #                                               power=float(inputs['power']),
-            #                                               enrolment_ratio=float(inputs['enrolmentRatio']))
+            results['formulae'] = create_sample_size_from_d_formula(d=float(inputs['effectSize']),
+                                                                    alpha=float(inputs['alpha']),
+                                                                    power=float(inputs['power']),
+                                                                    enrolment_ratio=float(inputs['enrolmentRatio']))
         results['notes'] = generate_sample_size_notes(float(inputs['alpha']), float(inputs['power']))
     else:
         results['formulae'] = []
@@ -86,6 +85,30 @@ def create_sample_size_from_means_formula(mu_1, mu_2, sigma_1, sigma_2, alpha, p
     return formulae
 
 
+def create_sample_size_from_d_formula(d, alpha, power, enrolment_ratio):
+    formulae = []
+    step_1 = "n_1 =  \\frac{{(1 + r_e)(z_{{1 - \\alpha/2}} + z_{{1 - \\beta}})^2}}{{d^2}}"
+    formulae.append(step_1)
+
+    z_a = norm.ppf(1 - alpha/2)
+    z_b = norm.ppf(power)
+
+    step_2 = "n_1 = \\frac{{(1 + {:.3f})({:.3f} + {:.3f})^2}}{{{:.3f}^2}}"
+    formulae.append(step_2.format(enrolment_ratio, z_a, z_b, d))
+
+    step_3 = "n_1 = \\frac{{{:.3f}\\times{:.3f}}}{{{:.3f}}} = {}"
+    numerator_1 = 1 + enrolment_ratio
+    numerator_2 = (z_a + z_b)**2
+    denominator = d**2
+    n_1 = math.ceil(numerator_1 * numerator_2 / denominator)
+    formulae.append(step_3.format(numerator_1, numerator_2, denominator, n_1))
+
+    step_4 = "n_2 = \\frac{{n_1}}{{r_e}} = \\frac{{{}}}{{{:.3f}}} = {}"
+    formulae.append(step_4.format(n_1, enrolment_ratio, math.ceil(n_1 / enrolment_ratio)))
+
+    return formulae
+
+
 def generate_sample_size_notes(alpha, power):
     notes = [
         "r<sub>e</sub> is the enrolment ratio.",
@@ -95,7 +118,7 @@ def generate_sample_size_notes(alpha, power):
     return notes
 
 
-# sample_size_from_d = r"s_1 =  \frac{(1 + \frac{n_1}{n_2})(z_\alpha + z_\beta)^2}{d^2}"
+# sample_size_from_d =
 # sample_size_from_means = r"s_1 =  \frac{(\sigma_1^2 + \frac{n_1}{n_2}\cdot\sigma_2^2)(z_\alpha + z_\beta)^2}{(\mu_1 - \mu_2)^2}"
 # power_t_crit_from_d = r"t_{crit} = -t_{1-\alpha/2}\cdot\frac{|d|}{\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}"
 # power_t_crit_from_means = r"t_{crit} =  -t_{1-\alpha/2}\cdot\frac{|\mu_1 - \mu_2|}{\sqrt{\frac{\sigma_1^2}{n_1} + \frac{\sigma_2^2}{n_2}}}"
