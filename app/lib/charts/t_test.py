@@ -172,7 +172,7 @@ def generate_distributions_chart_data(d, alpha, n_1, n_2):
     x_max = max(H0_mean, HA_mean) + (se * 5)
     x_axis_values = list(np.arange(x_min, x_max, (x_max - x_min) / 500))
 
-    alpha_lower = t.ppf(alpha/2, df=n, loc=0, scale=se)
+    alpha_lower = norm.ppf(alpha/2, loc=0, scale=se)
     alpha_upper = -1 * alpha_lower
 
     H0_significant = []
@@ -181,25 +181,25 @@ def generate_distributions_chart_data(d, alpha, n_1, n_2):
     HA_unpowered = []
     for value in x_axis_values:
         # Null Hypothesis
-        H0_not_significant.append(t.pdf(value, df=n, loc=H0_mean, scale=se))
+        H0_not_significant.append(norm.pdf(value, loc=H0_mean, scale=se))
         if value < alpha_lower or value > alpha_upper:
-            H0_significant.append(t.pdf(value, df=n, loc=H0_mean, scale=se))
+            H0_significant.append(norm.pdf(value, loc=H0_mean, scale=se))
         else:
             H0_significant.append(None)
 
         # Alternative Hypothesis
-        HA_powered.append(t.pdf(value, df=n, loc=HA_mean, scale=se))
+        HA_powered.append(norm.pdf(value, loc=HA_mean, scale=se))
         if HA_mean < H0_mean and value > alpha_lower:
-            HA_unpowered.append(t.pdf(value, df=n, loc=HA_mean, scale=se))
+            HA_unpowered.append(norm.pdf(value, loc=HA_mean, scale=se))
         elif HA_mean >= H0_mean and value < alpha_upper:
-            HA_unpowered.append(t.pdf(value, df=n, loc=HA_mean, scale=se))
+            HA_unpowered.append(norm.pdf(value, loc=HA_mean, scale=se))
         else:
             HA_unpowered.append(None)
 
     if HA_mean < H0_mean:
-        power = t.cdf(alpha_lower, df=n, loc=HA_mean, scale=se)
+        power = norm.cdf(alpha_lower, loc=HA_mean, scale=se)
     else:
-        power = 1 - t.cdf(alpha_upper, df=n, loc=HA_mean, scale=se)
+        power = 1 - norm.cdf(alpha_upper, loc=HA_mean, scale=se)
 
     decimal_points = utils.determine_decimal_points(x_max)
 

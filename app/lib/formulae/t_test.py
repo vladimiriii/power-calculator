@@ -21,24 +21,22 @@ def generate_formulas(inputs):
                                                                     power=float(inputs['power']),
                                                                     enrolment_ratio=float(inputs['enrolmentRatio']))
         results['notes'] = generate_sample_size_notes(float(inputs['alpha']), float(inputs['power']))
-    else:
-        results['formulae'] = []
-        results['notes'] = []
-    # elif inputs['target'] == "power":
-    #     if utils.all_sample_info_provided(sample_fields):
-    #         results = calculate_power_from_means(mu_1=float(sample_fields[0]['mean']),
-    #                                              sigma_1=float(sample_fields[0]['stdDev']),
-    #                                              n_1=float(sample_fields[0]['n']),
-    #                                              mu_2=float(sample_fields[1]['mean']),
-    #                                              sigma_2=float(sample_fields[1]['stdDev']),
-    #                                              n_2=float(sample_fields[1]['n']),
-    #                                              alpha=float(inputs['alpha']))
-    #     else:
-    #         results = calculate_power_from_cohens_d(d=float(inputs['effectSize']),
-    #                                                 n_1=float(sample_fields[0]['n']),
-    #                                                 n_2=float(sample_fields[1]['n']),
-    #                                                 alpha=float(inputs['alpha']))
-    #
+    elif inputs['target'] == "power":
+        if utils.all_sample_info_provided(sample_fields):
+            results['formulae'] = create_power_from_means_formula(mu_1=float(sample_fields[0]['mean']),
+                                                                  sigma_1=float(sample_fields[0]['stdDev']),
+                                                                  n_1=int(sample_fields[0]['n']),
+                                                                  mu_2=float(sample_fields[1]['mean']),
+                                                                  sigma_2=float(sample_fields[1]['stdDev']),
+                                                                  n_2=int(sample_fields[1]['n']),
+                                                                  alpha=float(inputs['alpha']))
+        else:
+            results['formulae'] = create_power_from_d_formula(d=float(inputs['effectSize']),
+                                                              n_1=int(sample_fields[0]['n']),
+                                                              n_2=int(sample_fields[1]['n']),
+                                                              alpha=float(inputs['alpha']))
+        results['notes'] = generate_power_notes(float(inputs['alpha']))
+
     # elif inputs['target'] == "p-value":
     #     if utils.all_sample_info_provided(sample_fields):
     #         results = caclulate_p_value_from_means(mu_1=float(sample_fields[0]['mean']),
@@ -57,6 +55,9 @@ def generate_formulas(inputs):
     #                                             n_2=float(sample_fields[1]['n']),
     #                                             alpha=float(inputs['alpha']),
     #                                             power=float(inputs['power']))
+    else:
+        results['formulae'] = []
+        results['notes'] = []
 
     return results
 
@@ -109,6 +110,50 @@ def create_sample_size_from_d_formula(d, alpha, power, enrolment_ratio):
     return formulae
 
 
+def create_power_from_means_formula(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2, alpha):
+    formulae = []
+    step_1 = "z_{{crit}} = -z_{{1-\\alpha/2}} + \\frac{{|\\mu_1 - \\mu_2|}}{{\\sqrt{{\\sigma_1^2/n_1 + \\sigma_2^2/n_2}}}}"
+    formulae.append(step_1)
+
+    z_a = norm.ppf(1 - alpha/2)
+    step_2 = "z_{{crit}} = -{:.3f} + \\frac{{|{:.3f} - {:.3f}|}}{{\\sqrt{{\\frac{{{:.3f}^2}}{{{}}} + \\frac{{{:.3f}^2}}{{{}}}}}}}"
+    formulae.append(step_2.format(z_a, mu_1, mu_2, sigma_1, n_1, sigma_2, n_2))
+
+    step_3 = "z_{{crit}} = -{:.3f} + \\frac{{{:.3f}}}{{\\sqrt{{{:.3f}}}}} = {:.3f}"
+    diff = abs(mu_1 - mu_2)
+    pooled_variance = sigma_1**2/n_1 + sigma_2**2/n_2
+    z_crit = -z_a + (diff / pooled_variance**0.5)
+    formulae.append(step_3.format(z_a, diff, pooled_variance, z_crit))
+
+    power = norm.cdf(z_crit)
+    step_4 = "1 - \\beta = P(X <= {:.3f}) = {:.3f}"
+    formulae.append(step_4.format(z_crit, power))
+
+    return formulae
+
+
+def create_power_from_d_formula(d, n_1, n_2, alpha):
+    formulae = []
+    step_1 = "z_{{crit}} = -z_{{1-\\alpha/2}} + \\frac{{|d|}}{{\\sqrt{{1/n_1 + 1/n_2}}}}"
+    formulae.append(step_1)
+
+    z_a = norm.ppf(1 - alpha/2)
+    step_2 = "z_{{crit}} = -{:.3f} + \\frac{{|{:.3f}|}}{{\\sqrt{{1/{} + 1/{}}}}}"
+    formulae.append(step_2.format(z_a, d, n_1, n_2))
+
+    step_3 = "z_{{crit}} = -{:.3f} + \\frac{{{:.3f}}}{{\\sqrt{{{:.3f}}}}} = {:.3f}"
+    diff = abs(d)
+    df = 1/n_1 + 1/n_2
+    z_crit = -z_a + (diff / df**0.5)
+    formulae.append(step_3.format(z_a, diff, df, z_crit))
+
+    power = norm.cdf(z_crit)
+    step_4 = "1 - \\beta = P(X <= {:.3f}) = {:.3f}"
+    formulae.append(step_4.format(z_crit, power))
+
+    return formulae
+
+
 def generate_sample_size_notes(alpha, power):
     notes = [
         "r<sub>e</sub> is the enrolment ratio.",
@@ -118,10 +163,17 @@ def generate_sample_size_notes(alpha, power):
     return notes
 
 
-# sample_size_from_d =
-# sample_size_from_means = r"s_1 =  \frac{(\sigma_1^2 + \frac{n_1}{n_2}\cdot\sigma_2^2)(z_\alpha + z_\beta)^2}{(\mu_1 - \mu_2)^2}"
+def generate_power_notes(alpha):
+    notes = [
+        "X is a normally distributed random variable with mean 0 and standard deviation 1: X ~ N(0, 1).",
+        "The calculation shown is for a two tailed test. However, from the forumla, you can see the only term that will change for a one-sided test is z<sub>1−α/2</sub>​ = {:.3f}, which instead becomes z<sub>1−α</sub>​ = {:.3f}.".format(norm.ppf(1 - alpha/2), norm.ppf(1 - alpha)),
+        "The difference in means (or the effect size) for this calculation represents the difference in <i>population</i> means, or the true effect. This is because we are calculating the probability we will correctly reject H<sub>0</sub> (i.e. the 'power' of the experiment) if we repeatedly resampled from these populations with the specified sample sizes."
+    ]
+    return notes
+
+
+
 # power_t_crit_from_d = r"t_{crit} = -t_{1-\alpha/2}\cdot\frac{|d|}{\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}"
-# power_t_crit_from_means = r"t_{crit} =  -t_{1-\alpha/2}\cdot\frac{|\mu_1 - \mu_2|}{\sqrt{\frac{\sigma_1^2}{n_1} + \frac{\sigma_2^2}{n_2}}}"
 # p_value_t_crit_from_d = r"t_{crit} =  \frac{|d|}{\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}"
 # p_value_t_crit_from_means = r"t_{crit} =  \frac{|\mu_1 - \mu_2|}{\left(\frac{\sigma_1^2(n_1 - 1) + \sigma_2^2(n_2 - 1)}{n_1 + n_2 - 2}\right)\cdot\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}"
 # min_effect_size = r"d_{min} = \sqrt{\frac{(1 + \frac{n_1}{n_2})(t_{1-\alpha/2} + t_{1-\beta})^2}{n_1}}"
