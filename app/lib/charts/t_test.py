@@ -12,10 +12,18 @@ def generate_chart_data(inputs, stats):
     # Extract data points
     if inputs['target'] != 'min-effect':
         if utils.all_sample_info_provided(sample_fields):
+            if inputs['target'] == 'sample-size':
+                n_1 = stats[0]["two_sided_test"]
+                n_2 = stats[1]["two_sided_test"]
+            else:
+                n_1 = int(sample_fields[0]['n'])
+                n_2 = int(sample_fields[1]['n'])
             d = utils.calculate_cohens_d(mu_1=float(sample_fields[0]['mean']),
-                                         mu_2=float(sample_fields[1]['mean']),
                                          sigma_1=float(sample_fields[0]['stdDev']),
-                                         sigma_2=float(sample_fields[1]['stdDev']))
+                                         n_1=n_1,
+                                         mu_2=float(sample_fields[1]['mean']),
+                                         sigma_2=float(sample_fields[1]['stdDev']),
+                                         n_2=n_2)
         else:
             d = float(inputs['effectSize'])
     else:
@@ -204,7 +212,7 @@ def generate_distributions_chart_data(d, alpha, n_1, n_2):
     decimal_points = utils.determine_decimal_points(x_max)
 
     return {
-        "title": "Distributions (effect size: {:0.3f}, α: {:0.3f}, power (1 - β): {:.1%})".format(round(d, utils.determine_decimal_points(d)), alpha, power),
+        "title": "Distributions (effect size: {:0.3f}, α: {:0.3f}, power (1 - β): {:.1%})".format(d, alpha, power),
         "xAxisLabel": "Difference in sample means",
         "yAxisLabel": "Density",
         "labels": [round(x, decimal_points) for x in x_axis_values],

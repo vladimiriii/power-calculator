@@ -25,33 +25,33 @@ def calculate_statistics(inputs):
         if utils.all_sample_info_provided(sample_fields):
             results = calculate_power_from_means(mu_1=float(sample_fields[0]['mean']),
                                                  sigma_1=float(sample_fields[0]['stdDev']),
-                                                 n_1=float(sample_fields[0]['n']),
+                                                 n_1=int(sample_fields[0]['n']),
                                                  mu_2=float(sample_fields[1]['mean']),
                                                  sigma_2=float(sample_fields[1]['stdDev']),
-                                                 n_2=float(sample_fields[1]['n']),
+                                                 n_2=int(sample_fields[1]['n']),
                                                  alpha=float(inputs['alpha']))
         else:
             results = calculate_power_from_cohens_d(d=float(inputs['effectSize']),
-                                                    n_1=float(sample_fields[0]['n']),
-                                                    n_2=float(sample_fields[1]['n']),
+                                                    n_1=int(sample_fields[0]['n']),
+                                                    n_2=int(sample_fields[1]['n']),
                                                     alpha=float(inputs['alpha']))
 
     elif inputs['target'] == "p-value":
         if utils.all_sample_info_provided(sample_fields):
             results = caclulate_p_value_from_means(mu_1=float(sample_fields[0]['mean']),
                                                    sigma_1=float(sample_fields[0]['stdDev']),
-                                                   n_1=float(sample_fields[0]['n']),
+                                                   n_1=int(sample_fields[0]['n']),
                                                    mu_2=float(sample_fields[1]['mean']),
                                                    sigma_2=float(sample_fields[1]['stdDev']),
-                                                   n_2=float(sample_fields[1]['n']))
+                                                   n_2=int(sample_fields[1]['n']))
         else:
             results = caclulate_p_value_from_cohens_d(d=float(inputs['effectSize']),
-                                                      n_1=float(sample_fields[0]['n']),
-                                                      n_2=float(sample_fields[1]['n']))
+                                                      n_1=int(sample_fields[0]['n']),
+                                                      n_2=int(sample_fields[1]['n']))
     elif inputs['target'] == "min-effect":
         if utils.all_sample_info_provided(sample_fields):
-            results = caclulate_min_effect_size(n_1=float(sample_fields[0]['n']),
-                                                n_2=float(sample_fields[1]['n']),
+            results = caclulate_min_effect_size(n_1=int(sample_fields[0]['n']),
+                                                n_2=int(sample_fields[1]['n']),
                                                 alpha=float(inputs['alpha']),
                                                 power=float(inputs['power']))
 

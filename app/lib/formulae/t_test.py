@@ -37,18 +37,19 @@ def generate_formulas(inputs):
                                                               alpha=float(inputs['alpha']))
         results['notes'] = generate_power_notes(float(inputs['alpha']))
 
-    # elif inputs['target'] == "p-value":
-    #     if utils.all_sample_info_provided(sample_fields):
-    #         results = caclulate_p_value_from_means(mu_1=float(sample_fields[0]['mean']),
-    #                                                sigma_1=float(sample_fields[0]['stdDev']),
-    #                                                n_1=float(sample_fields[0]['n']),
-    #                                                mu_2=float(sample_fields[1]['mean']),
-    #                                                sigma_2=float(sample_fields[1]['stdDev']),
-    #                                                n_2=float(sample_fields[1]['n']))
-    #     else:
-    #         results = caclulate_p_value_from_cohens_d(d=float(inputs['effectSize']),
-    #                                                   n_1=float(sample_fields[0]['n']),
-    #                                                   n_2=float(sample_fields[1]['n']))
+    elif inputs['target'] == "p-value":
+        if utils.all_sample_info_provided(sample_fields):
+            results['formulae'] = create_p_value_from_means_formula(mu_1=float(sample_fields[0]['mean']),
+                                                                    sigma_1=float(sample_fields[0]['stdDev']),
+                                                                    n_1=int(sample_fields[0]['n']),
+                                                                    mu_2=float(sample_fields[1]['mean']),
+                                                                    sigma_2=float(sample_fields[1]['stdDev']),
+                                                                    n_2=int(sample_fields[1]['n']))
+        else:
+            results['formulae'] = create_p_value_from_d_formula(d=float(inputs['effectSize']),
+                                                                n_1=int(sample_fields[0]['n']),
+                                                                n_2=int(sample_fields[1]['n']))
+        results['notes'] = generate_p_value_notes(int(sample_fields[0]['n']), int(sample_fields[1]['n']))
     # elif inputs['target'] == "min-effect":
     #     if utils.all_sample_info_provided(sample_fields):
     #         results = caclulate_min_effect_size(n_1=float(sample_fields[0]['n']),
@@ -154,6 +155,50 @@ def create_power_from_d_formula(d, n_1, n_2, alpha):
     return formulae
 
 
+def create_p_value_from_means_formula(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2):
+    formulae = []
+    step_1 = "t_{{crit}} = \\frac{{|\\mu_1 - \\mu_2|}}{{\\left(\\frac{{\\sigma_1^2(n_1 - 1) + \\sigma_2^2(n_2 - 1)}}{{n_1 + n_2 - 2}}\\right)\\cdot\\sqrt{{\\frac{{1}}{{n_1}} + \\frac{{1}}{{n_2}}}}}}"
+    formulae.append(step_1)
+
+    step_2 = "t_{{crit}} = \\frac{{|{:.3f} - {:.3f}|}}{{\\left(\\frac{{{:.3f}^2({} - 1) + {:.3f}^2({} - 1)}}{{{} + {} - 2}}\\right)\\cdot\\sqrt{{\\frac{{1}}{{{}}} + \\frac{{1}}{{{}}}}}}}"
+    formulae.append(step_2.format(mu_1, mu_2, sigma_1, n_1, sigma_2, n_2, n_1, n_2, n_1, n_2))
+
+    step_3 = "t_{{crit}} = \\frac{{{:.3f}}}{{{:.3f}\\times{:.3f}}} = {:.3f}"
+    diff = abs(mu_1 - mu_2)
+    std_pooled = utils.calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
+    n_root = (1/n_1 + 1/n_2)**0.5
+    t_crit = diff / (std_pooled * n_root)
+    formulae.append(step_3.format(diff, std_pooled, n_root, t_crit))
+
+    p_value = 2 * (1 - t.cdf(t_crit, df=utils.welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2)))
+    step_4 = "p = 2 \\times P(T > {:.3f}) = {:.3f}"
+    formulae.append(step_4.format(t_crit, p_value))
+
+    return formulae
+
+
+def create_p_value_from_d_formula(d, n_1, n_2):
+    formulae = []
+    step_1 = "t_{{crit}} = \\frac{{|d|}}{{sqrt{{\\frac{{1}}{{n_1}} + \\frac{{1}}{{n_2}}}}}}"
+    formulae.append(step_1)
+
+    step_2 = "t_{{crit}} = \\frac{{|{:.3f}|}}{{\\sqrt{{\\frac{{1}}{{{}}} + \\frac{{1}}{{{}}}}}}}"
+    formulae.append(step_2.format(d, n_1, n_2))
+
+    step_3 = "t_{{crit}} = \\frac{{{:.3f}}}{{{:.3f}}} = {:.3f}"
+    diff = abs(d)
+    n_root = (1/n_1 + 1/n_2)**0.5
+    t_crit = diff / n_root
+    formulae.append(step_3.format(diff, n_root, t_crit))
+
+    df = n_1 + n_2 - 2
+    p_value = 2 * (1 - t.cdf(t_crit, df=df))
+    step_4 = "p = 2 \\times P(T > {:.3f}) = {:.3f}"
+    formulae.append(step_4.format(t_crit, p_value))
+
+    return formulae
+
+
 def generate_sample_size_notes(alpha, power):
     notes = [
         "r<sub>e</sub> is the enrolment ratio.",
@@ -167,13 +212,21 @@ def generate_power_notes(alpha):
     notes = [
         "X is a normally distributed random variable with mean 0 and standard deviation 1: X ~ N(0, 1).",
         "The calculation shown is for a two tailed test. However, from the forumla, you can see the only term that will change for a one-sided test is z<sub>1−α/2</sub>​ = {:.3f}, which instead becomes z<sub>1−α</sub>​ = {:.3f}.".format(norm.ppf(1 - alpha/2), norm.ppf(1 - alpha)),
-        "The difference in means (or the effect size) for this calculation represents the difference in <i>population</i> means, or the true effect. This is because we are calculating the probability we will correctly reject H<sub>0</sub> (i.e. the 'power' of the experiment) if we repeatedly resampled from these populations with the specified sample sizes."
+        "The difference in means (or the effect size) for this calculation represents the difference in <i>population</i> means, or the true effect. This is because we are calculating the probability we will correctly reject H<sub>0</sub> (i.e. the 'power' of the experiment) if we repeatedly resampled from these populations with the specified sample sizes.",
+        "Calculating the power of a study based on the observed difference in sample means is not recommended as it will not provide any meaningful information about the power of the study."
+    ]
+    return notes
+
+
+def generate_p_value_notes(n_1, n_2):
+    upsilon = n_1 + n_2 - 2
+    notes = [
+        "T is a t distributed random variable with {} degrees of freedom: t<sub>υ={}</sub>".format(upsilon, upsilon),
+        "The calculation shown is for a two tailed test. However, from the forumla, you can see the only change required for a one-sided test is to not multiply by 2 in the last step.",
+        "The difference in means (or the effect size) for this calculation represents the observed difference in <i>sample</i> means. This is because we are calculating the probability of observing an effect size at least as large as the one observed if H<sub>0</sub> is true. That is, it is the probability that we would incorrectly reject H<sub>0</sub> (i.e. the Type I error rate)."
     ]
     return notes
 
 
 
-# power_t_crit_from_d = r"t_{crit} = -t_{1-\alpha/2}\cdot\frac{|d|}{\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}"
-# p_value_t_crit_from_d = r"t_{crit} =  \frac{|d|}{\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}"
-# p_value_t_crit_from_means = r"t_{crit} =  \frac{|\mu_1 - \mu_2|}{\left(\frac{\sigma_1^2(n_1 - 1) + \sigma_2^2(n_2 - 1)}{n_1 + n_2 - 2}\right)\cdot\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}"
 # min_effect_size = r"d_{min} = \sqrt{\frac{(1 + \frac{n_1}{n_2})(t_{1-\alpha/2} + t_{1-\beta})^2}{n_1}}"

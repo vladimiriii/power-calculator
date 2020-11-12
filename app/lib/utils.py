@@ -11,9 +11,9 @@ def all_sample_info_provided(sample_inputs):
     return all_provided
 
 
-def calculate_cohens_d(mu_1, mu_2, sigma_1, sigma_2):
+def calculate_cohens_d(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2):
     mean_diff = abs(mu_1 - mu_2)
-    sd = calculate_pooled_standard_deviation(mu_1, mu_2, sigma_1, sigma_2)
+    sd = calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
     return mean_diff / sd
 
 
