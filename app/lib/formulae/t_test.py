@@ -179,7 +179,7 @@ def create_p_value_from_means_formula(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2):
 
 def create_p_value_from_d_formula(d, n_1, n_2):
     formulae = []
-    step_1 = "t_{{crit}} = \\frac{{|d|}}{{sqrt{{\\frac{{1}}{{n_1}} + \\frac{{1}}{{n_2}}}}}}"
+    step_1 = "t_{{crit}} = \\frac{{|d|}}{{\\sqrt{{\\frac{{1}}{{n_1}} + \\frac{{1}}{{n_2}}}}}}"
     formulae.append(step_1)
 
     step_2 = "t_{{crit}} = \\frac{{|{:.3f}|}}{{\\sqrt{{\\frac{{1}}{{{}}} + \\frac{{1}}{{{}}}}}}}"
