@@ -97,18 +97,17 @@ def create_power_from_d_formula(d, n_1, n_2, alpha):
 
 def create_p_value_from_means_formula(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2):
     formulae = []
-    step_1 = "t_{{crit}} = \\frac{{|\\mu_1 - \\mu_2|}}{{\\left(\\frac{{\\sigma_1^2(n_1 - 1) + \\sigma_2^2(n_2 - 1)}}{{n_1 + n_2 - 2}}\\right)\\cdot\\sqrt{{\\frac{{1}}{{n_1}} + \\frac{{1}}{{n_2}}}}}}"
+    step_1 = "t_{{crit}} = \\frac{{|\\bar{{x_1}} - \\bar{{x_2}}|}}{{\\sqrt{{\\frac{{s_1^2}}{{n_1}} + \\frac{{s_2^2}}{{n_2}}}}}}"
     formulae.append(step_1)
 
-    step_2 = "t_{{crit}} = \\frac{{|{:.3f} - {:.3f}|}}{{\\left(\\frac{{{:.3f}^2({} - 1) + {:.3f}^2({} - 1)}}{{{} + {} - 2}}\\right)\\cdot\\sqrt{{\\frac{{1}}{{{}}} + \\frac{{1}}{{{}}}}}}}"
-    formulae.append(step_2.format(mu_1, mu_2, sigma_1, n_1, sigma_2, n_2, n_1, n_2, n_1, n_2))
+    step_2 = "t_{{crit}} = \\frac{{|{:.3f} - {:.3f}|}}{{\\sqrt{{\\frac{{{:.3f}^2}}{{{}}} + \\frac{{{:.3f}^2}}{{{}}}}}}}"
+    formulae.append(step_2.format(mu_1, mu_2, sigma_1, n_1, sigma_2, n_2))
 
-    step_3 = "t_{{crit}} = \\frac{{{:.3f}}}{{{:.3f}\\times{:.3f}}} = {:.3f}"
-    diff = abs(mu_1 - mu_2)
-    std_pooled = utils.calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
-    n_root = (1/n_1 + 1/n_2)**0.5
-    t_crit = diff / (std_pooled * n_root)
-    formulae.append(step_3.format(diff, std_pooled, n_root, t_crit))
+    step_3 = "t_{{crit}} = \\frac{{{:.3f}}}{{{:.3f}}} = {:.3f}"
+    numerator = abs(mu_1 - mu_2)
+    denominator = (sigma_1**2 / n_1 + sigma_2**2 / n_2)**0.5
+    t_crit = numerator / denominator
+    formulae.append(step_3.format(numerator, denominator, t_crit))
 
     p_value = 2 * (1 - t.cdf(t_crit, df=utils.welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2)))
     step_4 = "p = 2 \\times P(T > {:.3f}) = {:.3f}"

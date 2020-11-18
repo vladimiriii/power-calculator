@@ -8,6 +8,7 @@ from app.lib import utils
 def run_model(inputs):
     sample_fields = inputs['sampleFields']
     results = {"charts": {}}
+    d = None
 
     # TARGET: SAMPLE SIZE
     if inputs['target'] == "sample-size":

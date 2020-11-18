@@ -118,14 +118,13 @@ def caclulate_p_value_from_cohens_d(d, n_1, n_2):
 
 
 def caclulate_p_value_from_means(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2):
-    n_root = (1/n_1 + 1/n_2)**0.5
-    sd_pooled = utils.calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
-    standard_error = sd_pooled * n_root
+    n_root = (sigma_1**2 / n_1 + sigma_2**2/n_2)**0.5
     diff = abs(mu_1 - mu_2)
 
-    t_stat = diff/standard_error
-    one_sided_p = 1 - t.cdf(df=(n_1 + n_2 - 2), x=t_stat)
-    two_sided_p = 2 * (1 - t.cdf(df=(n_1 + n_2 - 2), x=t_stat))
+    t_stat = diff/n_root
+    welches_df = utils.welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2)
+    one_sided_p = 1 - t.cdf(df=welches_df, x=t_stat)
+    two_sided_p = 2 * (1 - t.cdf(df=welches_df, x=t_stat))
 
     return [{
         "label": "p value",

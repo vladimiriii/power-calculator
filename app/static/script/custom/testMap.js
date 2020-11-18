@@ -3,6 +3,7 @@ const testMap = [
     {
         "name": "t-test with one sample",
         "url": "./t-test-one-sample",
+        "status": "development",
         "attributes": {
             "groups": ["1"],
             "independence": ["paired", "independent", "na"],
@@ -13,6 +14,7 @@ const testMap = [
     {
         "name": "t-test with two independent samples",
         "url": "./t-test-two-independent-samples",
+        "status": "available",
         "attributes": {
             "groups": ["2"],
             "independence": ["independent"],
@@ -23,6 +25,7 @@ const testMap = [
     {
         "name": "t-test with paired samples",
         "url": "./t-test-paired-samples",
+        "status": "development",
         "attributes": {
             "groups": ["2"],
             "independence": ["paired"],
@@ -32,7 +35,8 @@ const testMap = [
     },
     {
         "name": "t-test with two independent samples and unequal variance",
-        "url": "./welches-t-test-two-independent-samples",
+        "url": "./t-test-two-independent-samples",
+        "status": "available",
         "attributes": {
             "groups": ["2"],
             "independence": ["independent"],
@@ -43,6 +47,7 @@ const testMap = [
     {
         "name": "Bootstrap t-test with two independent samples",
         "url": "./bootstrap-t-test-two-independent-samples",
+        "status": "development",
         "attributes": {
             "groups": ["2"],
             "independence": ["independent"],
@@ -53,6 +58,7 @@ const testMap = [
     {
         "name": "ANOVA – One way",
         "url": "./one-way-anova",
+        "status": "development",
         "attributes": {
             "groups": ["3+"],
             "independence": ["independent"],
@@ -63,6 +69,7 @@ const testMap = [
     {
         "name": "ANOVA – Two way",
         "url": "./one-way-anova",
+        "status": "development",
         "attributes": {
             "groups": ["3+"],
             "independence": ["independent"],
