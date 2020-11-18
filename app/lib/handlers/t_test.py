@@ -63,12 +63,13 @@ def run_model(inputs):
         results['notes'] = generate_p_value_notes(n_1, n_2)
 
     elif inputs['target'] == "min-effect":
-        n_1 = int(sample_fields[0]['n']),
-        n_2 = int(sample_fields[1]['n']),
-        alpha = float(inputs['alpha']),
+        n_1 = int(sample_fields[0]['n'])
+        n_2 = int(sample_fields[1]['n'])
+        alpha = float(inputs['alpha'])
         power = float(inputs['power'])
-        results = caclulate_min_effect_size(n_1=n_1, n_2=n_2, alpha=alpha, power=power)
-
+        results['statistics'] = caclulate_min_effect_size(n_1=n_1, n_2=n_2, alpha=alpha, power=power)
+        results['formulae'] = create_min_effect_size_formula(n_1=n_1, n_2=n_2, alpha=alpha, power=power)
+        results['notes'] = generate_min_effect_size_notes(alpha=alpha, power=power)
     results['charts'] = generate_chart_data(inputs, results['statistics'])
 
     return results

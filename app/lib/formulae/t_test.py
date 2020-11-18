@@ -139,5 +139,23 @@ def create_p_value_from_d_formula(d, n_1, n_2):
     return formulae
 
 
+def create_min_effect_size_formula(alpha, power, n_1, n_2):
+    formulae = []
+    step_1 = "d_{{min}} = \\sqrt{{(\\frac{{1}}{{n_1}} + \\frac{{1}}{{n_2}})(z_{{1-\\alpha/2}} + z_{{1-\\beta}})^2}}"
+    formulae.append(step_1)
 
-# min_effect_size = r"d_{min} = \sqrt{\frac{(1 + \frac{n_1}{n_2})(t_{1-\alpha/2} + t_{1-\beta})^2}{n_1}}"
+    step_2 = "d_{{min}} = \\sqrt{{(\\frac{{1}}{{{}}} + \\frac{{1}}{{{}}})(z_{{1-\\alpha/2}} + z_{{1-\\beta}})^2}}"
+    formulae.append(step_2.format(n_1, n_2, alpha, power, n_1))
+
+    step_3 = "d_{{min}} = \\sqrt{{{:.3f}\\times({:.3f} + {:.3f})^2}}"
+    n_ratio = 1/n_1 + 1/n_2
+    z_a = norm.ppf(1 - alpha/2)
+    z_b = norm.ppf(power)
+    formulae.append(step_3.format(n_ratio, z_a, z_b))
+
+    step_4 = "d_{{min}} = \\sqrt{{{:.3f}}} = {:.3f}"
+    effect_squared = (n_ratio * (z_a + z_b)**2)
+    min_effect = effect_squared**0.5
+    formulae.append(step_4.format(effect_squared, min_effect))
+
+    return formulae

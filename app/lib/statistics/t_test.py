@@ -137,18 +137,17 @@ def caclulate_p_value_from_means(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2):
 def caclulate_min_effect_size(n_1, n_2, alpha, power):
     power = power if power < 1 else 0.99999999999
     alpha = alpha if alpha != 0 else 0.0000000001
-    enrolment_ratio = n_1 / n_2
 
     # Calculate with Normal distribution
-    z_a_one_sided = t.ppf(1 - alpha, df=n_1 + n_2)
-    z_a_two_sided = t.ppf(1 - alpha/2, df=n_1 + n_2)
-    z_b_one_sided = t.ppf(power, df=n_1 + n_2)
+    z_a_one_sided = norm.ppf(1 - alpha)
+    z_a_two_sided = norm.ppf(1 - alpha/2)
+    z_b_one_sided = norm.ppf(power)
 
     z_total_os = (z_a_one_sided + z_b_one_sided)**2
     z_total_ts = (z_a_two_sided + z_b_one_sided)**2
 
-    d_os = ((1 + enrolment_ratio) * z_total_os / n_1)**0.5
-    d_ts = ((1 + enrolment_ratio) * z_total_ts / n_1)**0.5
+    d_os = ((1/n_1 + 1/n_2) * z_total_os)**0.5
+    d_ts = ((1/n_1 + 1/n_2) * z_total_ts)**0.5
 
     return [{
         "label": "Minimum effect size",
