@@ -3,9 +3,7 @@ from flask import Blueprint, jsonify, json, render_template, redirect, url_for, 
 import os
 import sys
 
-from app.lib import statistics
-from app.lib import charts
-from app.lib import formulae
+from app.lib.handlers import t_test
 
 # Define the blueprint:
 basic_page = Blueprint('basic_page', __name__)
@@ -37,13 +35,7 @@ def t_test_two_ind():
 def t_test_ind():
     try:
         input = json.loads(request.data)
-        stats_data = statistics.t_test.calculate_statistics(input)
-        chart_data = charts.t_test.generate_chart_data(input, stats_data)
-        formulas_and_notes = formulae.t_test.generate_formulas(input)
-        return jsonify({
-            "statistics": stats_data,
-            **formulas_and_notes,
-            **chart_data
-        })
+        results = t_test.run_model(input)
+        return jsonify(results)
     except Exception as e:
         return Response("{'error': '" + str(e) + "'}", status=400, mimetype='application/json')

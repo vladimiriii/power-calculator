@@ -5,9 +5,9 @@ async function getEstimates() {
     try {
         const response = await calculateEstimates(inputs);
         displayResults(response['statistics']);
-        updateChart(chartOne, configOne, response['chartOne'], 'standard');
-        updateChart(chartTwo, configTwo, response['chartTwo'], 'standard');
-        updateChart(chartThree, configThree, response['chartThree'], 'distributions');
+        updateChart(chartOne, configOne, response['charts']['chartOne'], 'standard');
+        updateChart(chartTwo, configTwo, response['charts']['chartTwo'], 'standard');
+        updateChart(chartThree, configThree, response['charts']['chartThree'], 'distributions');
         renderFormulas(response['formulae']);
         addFormulaNotes(response['notes']);
 

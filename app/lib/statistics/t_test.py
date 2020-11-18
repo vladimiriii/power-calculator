@@ -5,59 +5,6 @@ import pandas as pd
 from app.lib import utils
 
 
-def calculate_statistics(inputs):
-    sample_fields = inputs['sampleFields']
-    if inputs['target'] == "sample-size":
-        if utils.all_sample_info_provided(sample_fields):
-            results = calculate_sample_size_from_means(mu_1=float(sample_fields[0]['mean']),
-                                                       mu_2=float(sample_fields[1]['mean']),
-                                                       sigma_1=float(sample_fields[0]['stdDev']),
-                                                       sigma_2=float(sample_fields[1]['stdDev']),
-                                                       alpha=float(inputs['alpha']),
-                                                       power=float(inputs['power']),
-                                                       enrolment_ratio=float(inputs['enrolmentRatio']))
-        else:
-            results = calculate_sample_size_from_cohens_d(d=float(inputs['effectSize']),
-                                                          alpha=float(inputs['alpha']),
-                                                          power=float(inputs['power']),
-                                                          enrolment_ratio=float(inputs['enrolmentRatio']))
-    elif inputs['target'] == "power":
-        if utils.all_sample_info_provided(sample_fields):
-            results = calculate_power_from_means(mu_1=float(sample_fields[0]['mean']),
-                                                 sigma_1=float(sample_fields[0]['stdDev']),
-                                                 n_1=int(sample_fields[0]['n']),
-                                                 mu_2=float(sample_fields[1]['mean']),
-                                                 sigma_2=float(sample_fields[1]['stdDev']),
-                                                 n_2=int(sample_fields[1]['n']),
-                                                 alpha=float(inputs['alpha']))
-        else:
-            results = calculate_power_from_cohens_d(d=float(inputs['effectSize']),
-                                                    n_1=int(sample_fields[0]['n']),
-                                                    n_2=int(sample_fields[1]['n']),
-                                                    alpha=float(inputs['alpha']))
-
-    elif inputs['target'] == "p-value":
-        if utils.all_sample_info_provided(sample_fields):
-            results = caclulate_p_value_from_means(mu_1=float(sample_fields[0]['mean']),
-                                                   sigma_1=float(sample_fields[0]['stdDev']),
-                                                   n_1=int(sample_fields[0]['n']),
-                                                   mu_2=float(sample_fields[1]['mean']),
-                                                   sigma_2=float(sample_fields[1]['stdDev']),
-                                                   n_2=int(sample_fields[1]['n']))
-        else:
-            results = caclulate_p_value_from_cohens_d(d=float(inputs['effectSize']),
-                                                      n_1=int(sample_fields[0]['n']),
-                                                      n_2=int(sample_fields[1]['n']))
-    elif inputs['target'] == "min-effect":
-        if utils.all_sample_info_provided(sample_fields):
-            results = caclulate_min_effect_size(n_1=int(sample_fields[0]['n']),
-                                                n_2=int(sample_fields[1]['n']),
-                                                alpha=float(inputs['alpha']),
-                                                power=float(inputs['power']))
-
-    return results
-
-
 def calculate_sample_size_from_cohens_d(d, alpha, power, enrolment_ratio):
     d_squared = d**2 if d != 0 else 0.00000000001
     power = power if power < 1 else 0.99999999999
