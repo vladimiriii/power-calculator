@@ -26,12 +26,12 @@ def privacy_policy_page():
     return render_template('privacy-policy.html')
 
 
-@test_page.route('/t-test-two-independent-samples', methods=['GET'])
+@test_page.route('/t-test-independent-samples', methods=['GET'])
 def t_test_two_ind():
     return render_template('t-test-two-ind.html')
 
 
-@api_endpoint.route('/t-test-2-sample-ind-calc', methods=['POST'])
+@api_endpoint.route('/t-test-independent-samples-calc', methods=['POST'])
 def t_test_ind():
     try:
         input = json.loads(request.data)

@@ -25,7 +25,7 @@ def generate_p_value_notes(n_1, n_2):
     notes = [
         "T is a t distributed random variable with {} degrees of freedom: t<sub>υ={}</sub>".format(upsilon, upsilon),
         "The calculation shown is for a two tailed test. However, from the forumla, you can see the only change required for a one-sided test is to not multiply by 2 in the last step.",
-        "The difference in means (or the effect size) for this calculation represents the observed difference in <i>sample</i> means. This is because we are calculating the probability of observing an effect size at least as large as the one observed if H<sub>0</sub> is true. That is, it is the probability that we would incorrectly reject H<sub>0</sub> (i.e. the Type I error rate)."
+        "The difference in means (or the effect size) for this calculation represents the observed difference in <i>sample</i> means. This is because we are calculating the probability of observing an effect size at least as large as the one observed if H<sub>0</sub> is true. That is, the probability that we would incorrectly reject H<sub>0</sub> (i.e. the Type I error rate)."
     ]
     return notes
 

@@ -64,7 +64,7 @@ function calculateEstimates(inputs) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: '/t-test-2-sample-ind-calc',
+            url: '/t-test-independent-samples-calc',
             data: JSON.stringify(inputs),
             contentType: 'application/json',
             success: (response) => {

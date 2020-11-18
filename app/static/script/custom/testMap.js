@@ -13,7 +13,7 @@ const testMap = [
     },
     {
         "name": "t-test with two independent samples",
-        "url": "./t-test-two-independent-samples",
+        "url": "./t-test-independent-samples",
         "status": "available",
         "attributes": {
             "groups": ["2"],
@@ -35,7 +35,7 @@ const testMap = [
     },
     {
         "name": "t-test with two independent samples and unequal variance",
-        "url": "./t-test-two-independent-samples",
+        "url": "./t-test-independent-samples",
         "status": "available",
         "attributes": {
             "groups": ["2"],
