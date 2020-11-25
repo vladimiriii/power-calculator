@@ -1,14 +1,29 @@
-function updateInputs() {
-    const target = $("#target-list").val();
-    addOptionFields(target, "compulsoryFields", false);
-    addOptionFields(target, "orFields", true);
-    $("#results-table").empty();
-    $("#formulae").empty();
+function updateTargetSelector() {
+    resetOptionsAndResults();
+    $("#target-select").empty();
+
+    const status = $("#status-list").val();
+    let options = `<p>What do you want to calculate?</p>`;
+    options += `<select id="target-list" class="form-control eco-select">`;
+    for (key in optionMap[status]) {
+        options += `<option value="${key}">${optionMap[status][key]['displayName']}</option>`;
+    }
+    options += `</select>`;
+    $("#target-select").append(options);
+    $("#target-list").change(updateInputOptions);
+    updateInputOptions();
 }
 
+function updateInputOptions() {
+    resetOptionsAndResults();
+    const status = $("#status-list").val();
+    const target = $("#target-list").val();
+    addOptionFields(status, target, "compulsoryFields", false);
+    addOptionFields(status, target, "orFields", true);
+}
 
-function addOptionFields(target, div, orField) {
-    const oneOffFields = optionMap[target][div]['oneOf'];
+function addOptionFields(status, target, div, orField) {
+    const oneOffFields = optionMap[status][target][div]['oneOf'];
     const optionRowClass = "option-row";
     const headerClass = "option-header";
     $("#" + div).empty();
@@ -41,7 +56,7 @@ function addOptionFields(target, div, orField) {
     }
 
     // Sample Fields (need to be repeated X times)
-    const perGroupFields = optionMap[target][div]['perGroup'];
+    const perGroupFields = optionMap[status][target][div]['perGroup'];
     if (perGroupFields.length > 0) {
         if (orField) {
             $("#" + div).append('<h4 class="' + headerClass + '"> — OR —</h4>');
@@ -59,4 +74,12 @@ function addOptionFields(target, div, orField) {
             }
         }
     }
+}
+
+function resetOptionsAndResults() {
+    $("#results-table").empty();
+    $("#formulae").empty();
+    initializeCharts();
+    $("#compulsoryFields").empty();
+    $("#orFields").empty();
 }

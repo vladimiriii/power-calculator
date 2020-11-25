@@ -6,6 +6,17 @@ let chartTwo = null;
 let chartThree = null;
 
 
+function initializeCharts() {
+    Chart.defaults.global.defaultFontFamily = 'Roboto';
+    configOne = createChartConfig();
+    configTwo = createChartConfig();
+    configThree = createChartConfig();
+    chartOne = generateChart('chart-1', configOne);
+    chartTwo = generateChart('chart-2', configTwo);
+    chartThree = generateChart('chart-3', configThree);
+}
+
+
 function createChartConfig() {
     return {
         // The type of chart we want to create

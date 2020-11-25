@@ -44,44 +44,75 @@ const fieldMap = {
 }
 
 const optionMap = {
-    "sample-size": {
-        "compulsoryFields": {
-            "oneOf": ["alpha", "power", "enrolmentRatio"],
-            "perGroup": []
+    "planning": {
+        "sample-size": {
+            "displayName": "Minimum Sample Size",
+            "compulsoryFields": {
+                "oneOf": ["alpha", "power", "enrolmentRatio"],
+                "perGroup": []
+            },
+            "orFields": {
+                "oneOf": ["effectSize"],
+                "perGroup": ["mean", "stdDev"]
+            }
         },
-        "orFields": {
-            "oneOf": ["effectSize"],
-            "perGroup": ["mean", "stdDev"]
+        "power": {
+            "displayName": "Statistical Power",
+            "compulsoryFields": {
+                "oneOf": ["alpha"],
+                "perGroup": ["n"]
+            },
+            "orFields": {
+                "oneOf": ["effectSize"],
+                "perGroup": ["mean", "stdDev"]
+            }
+        },
+        "min-effect": {
+            "displayName": "Minimum Effect Size",
+            "compulsoryFields": {
+                "oneOf": ['alpha', 'power'],
+                "perGroup": ["n"]
+            },
+            "orFields": {
+                "oneOf": [],
+                "perGroup": []
+            }
         }
     },
-    "power": {
-        "compulsoryFields": {
-            "oneOf": ["alpha"],
-            "perGroup": ["n"]
+    "assessing": {
+        "p-value": {
+            "displayName": "p-value",
+            "compulsoryFields": {
+                "oneOf": [],
+                "perGroup": ["n"]
+            },
+            "orFields": {
+                "oneOf": ["effectSize"],
+                "perGroup": ["mean", "stdDev"]
+            }
         },
-        "orFields": {
-            "oneOf": ["effectSize"],
-            "perGroup": ["mean", "stdDev"]
-        }
-    },
-    "p-value": {
-        "compulsoryFields": {
-            "oneOf": [],
-            "perGroup": ["n"]
+        "null-rejected": {
+            "displayName": "Was the Null Hypothesis Rejected",
+            "compulsoryFields": {
+                "oneOf": ['alpha'],
+                "perGroup": ["n"]
+            },
+            "orFields": {
+                "oneOf": ["effectSize"],
+                "perGroup": ["mean", "stdDev"]
+            }
         },
-        "orFields": {
-            "oneOf": ["effectSize"],
-            "perGroup": ["mean", "stdDev"]
+        "t-crit": {
+            "displayName": "Critical t-statistic",
+            "compulsoryFields": {
+                "oneOf": [],
+                "perGroup": ["n"]
+            },
+            "orFields": {
+                "oneOf": ["effectSize"],
+                "perGroup": ["mean", "stdDev"]
+            }
         }
-    },
-    "min-effect": {
-        "compulsoryFields": {
-            "oneOf": ['alpha', 'power'],
-            "perGroup": ["n"]
-        },
-        "orFields": {
-            "oneOf": [],
-            "perGroup": []
-        }
+
     }
 }

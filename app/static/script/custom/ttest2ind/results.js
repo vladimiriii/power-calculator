@@ -29,13 +29,14 @@ async function getEstimates() {
 }
 
 function getInputs() {
+    const status = $("#status-list").val();
     const target = $("#target-list").val();
 
-    let generalFields = optionMap[target]["compulsoryFields"]['oneOf'];
-    generalFields = generalFields.concat(optionMap[target]["orFields"]['oneOf']);
+    let generalFields = optionMap[status][target]["compulsoryFields"]['oneOf'];
+    generalFields = generalFields.concat(optionMap[status][target]["orFields"]['oneOf']);
 
-    let sampleFields = optionMap[target]["compulsoryFields"]['perGroup'];
-    sampleFields = sampleFields.concat(optionMap[target]["orFields"]['perGroup']);
+    let sampleFields = optionMap[status][target]["compulsoryFields"]['perGroup'];
+    sampleFields = sampleFields.concat(optionMap[status][target]["orFields"]['perGroup']);
 
     // Initiate results object
     const inputs = {'target': target};

@@ -60,14 +60,18 @@
                 </div>
                 <div class="row">
                     <div class="col-md-3">
-                        <p>What do you want to estimate?
-                        <div id="target-select" class="form-group question-select">
-                            <select id="target-list" class="form-control eco-select">
-                                <option value='sample-size'>Minimum Sample Size</option>
-                                <option value='power'>Statistical Power</option>
-                                <option value='p-value'>p value</option>
-                                <option value='min-effect'>Minimum Effect Size</option>
-                            </select>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="status-select" class="form-group question-select">
+                                    <p>What do you want to do?</p>
+                                    <select id="status-list" class="form-control eco-select">
+                                        <option value='planning'>Plan a new study</option>
+                                        <option value='assessing'>Assess a completed study</option>
+                                    </select>
+                                </div>
+                                <div id="target-select" class="form-group question-select">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4 option-col" id="compulsoryFields"></div>
