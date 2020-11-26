@@ -1,8 +1,9 @@
 import numpy as np
+import math
 from scipy.stats import norm, t
 
 from app.lib import utils, colors
-from app.lib.statistics.t_test import calculate_sample_size_from_cohens_d
+from app.lib.statistics import t_test as tt
 
 
 def generate_power_chart_data(d, alpha, power, enrolment_ratio):
@@ -12,10 +13,10 @@ def generate_power_chart_data(d, alpha, power, enrolment_ratio):
     one_sided_sample_sizes = []
     two_sided_sample_sizes = []
     for p in power_range:
-        results = calculate_sample_size_from_cohens_d(d=d,
-                                                      alpha=alpha,
-                                                      power=p,
-                                                      enrolment_ratio=enrolment_ratio)
+        results = tt.calculate_sample_size_from_cohens_d(d=d,
+                                                         alpha=alpha,
+                                                         power=p,
+                                                         enrolment_ratio=enrolment_ratio)
         one_sided_sample_sizes.append(results[-1]['one_sided_test'])
         two_sided_sample_sizes.append(results[-1]['two_sided_test'])
 
@@ -87,10 +88,10 @@ def generate_effect_size_chart_data(d, alpha, power, enrolment_ratio):
     one_sided_sample_sizes = []
     two_sided_sample_sizes = []
     for es in effect_sizes:
-        results = calculate_sample_size_from_cohens_d(d=es,
-                                                      alpha=alpha,
-                                                      power=power,
-                                                      enrolment_ratio=enrolment_ratio)
+        results = tt.calculate_sample_size_from_cohens_d(d=es,
+                                                         alpha=alpha,
+                                                         power=power,
+                                                         enrolment_ratio=enrolment_ratio)
         one_sided_sample_sizes.append(results[-1]['one_sided_test'])
         two_sided_sample_sizes.append(results[-1]['two_sided_test'])
 
@@ -252,7 +253,7 @@ def generate_t_distribution_chart_data(t_stat, n_1, n_2, x_bar_1, x_bar_2, s_1, 
     # Determine X axis range
     x_min = -5
     x_max = 5
-    x_axis = list(np.arange(x_min, x_max, (x_max - x_min) / 500))
+    x_axis = list(np.arange(x_min, x_max, (x_max - x_min) / 501))
     x_axis_values = ["{:.3f}".format(x) for x in x_axis]
 
     H0 = []
@@ -276,6 +277,141 @@ def generate_t_distribution_chart_data(t_stat, n_1, n_2, x_bar_1, x_bar_2, s_1, 
                 "pointRadius": 0.5,
                 "borderColor": colors.line_colors[0],
                 "backgroundColor": None
+            }
+        ]
+    }
+
+
+def generate_sample_size_vs_t_statistic_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
+    d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
+    n_actual = n_1 + n_2
+    r_e = n_1/n_2
+    sample_sizes = np.arange(max(4, n_actual - 249), max(n_actual + 250, 501))
+
+    t_stat_lower = []
+    t_stat_higher = []
+    for n in sample_sizes:
+        cn_1 = math.ceil(n * r_e / (1 + r_e))
+        cn_2 = math.ceil(n - cn_1)
+        welches_df = utils.welches_degrees_of_freedom(s_1, cn_1, s_2, cn_2)
+        d = utils.calculate_cohens_d(x_bar_1, s_1, cn_1, x_bar_2, s_2, cn_2)
+        t_stat = tt.calculate_t_stat_from_cohens_d(d, cn_1, cn_2)
+        if n <= n_actual:
+            t_stat_lower.append(t_stat)
+        else:
+            t_stat_lower.append(None)
+        if n >= n_actual:
+            t_stat_higher.append(t_stat)
+        else:
+            t_stat_higher.append(None)
+
+    # Determine X axis range
+    x_axis_values = [str(x) for x in list(sample_sizes)]
+
+    return {
+        "title": "Sample Size vs t-statistic (effect size: {:.3f})".format(d_actual),
+        "xAxisLabel": "Total Samples",
+        "yAxisLabel": "t-statistic",
+        "labels": x_axis_values,
+        "verticalLine": {
+            "position": str(n_actual),
+            "label": "Current Sample Size"
+        },
+        "dataset": [
+            {
+                "label": "t-statistic",
+                "data": t_stat_lower,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
+            },
+            {
+                "label": "t-statistic",
+                "data": t_stat_higher,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[1],
+                "backgroundColor": colors.background_colors[1]
+            }
+        ]
+    }
+
+
+def generate_sample_size_vs_p_value_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
+    d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
+    n_actual = n_1 + n_2
+    r_e = n_1 / n_2
+    sample_sizes = np.arange(max(4, n_actual - 249), max(n_actual + 250, 500))
+
+    os_lower = []
+    ts_lower = []
+    os_higher = []
+    ts_higher = []
+    for n in sample_sizes:
+        cn_1 = math.ceil(n * r_e / (1 + r_e))
+        cn_2 = math.ceil(n - cn_1)
+        welches_df = utils.welches_degrees_of_freedom(s_1, cn_1, s_2, cn_2)
+        d = utils.calculate_cohens_d(x_bar_1, s_1, cn_1, x_bar_2, s_2, cn_2)
+        t_stat = tt.calculate_t_stat_from_cohens_d(d, cn_1, cn_2)
+        results = tt.calculate_p_value(t_stat, welches_df)
+        if n <= n_actual:
+            os_lower.append(results[-1]['one_sided_test'])
+            ts_lower.append(results[-1]['two_sided_test'])
+        else:
+            os_lower.append(None)
+            ts_lower.append(None)
+        if n >= n_actual:
+            os_higher.append(results[-1]['one_sided_test'])
+            ts_higher.append(results[-1]['two_sided_test'])
+        else:
+            os_higher.append(None)
+            ts_higher.append(None)
+
+    # Determine X axis range
+    x_axis_values = [str(x) for x in list(sample_sizes)]
+
+    return {
+        "title": "Sample Size vs p-value (effect size: {:.3f})".format(d_actual),
+        "xAxisLabel": "Total Samples",
+        "yAxisLabel": "p-value",
+        "labels": x_axis_values,
+        "verticalLine": {
+            "position": str(n_actual),
+            "label": "Current Sample Size"
+        },
+        "dataset": [
+            {
+                "label": "One Sided Test",
+                "data": os_lower,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
+            },
+            {
+                "label": "One Sided Test",
+                "data": os_higher,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[1],
+                "backgroundColor": colors.background_colors[1]
+            },
+            {
+                "label": "Two Sided Test",
+                "data": ts_lower,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
+            },
+            {
+                "label": "Two Sided Test",
+                "data": ts_higher,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[1],
+                "backgroundColor": colors.background_colors[1]
             }
         ]
     }
