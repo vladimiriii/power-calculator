@@ -245,8 +245,9 @@ def generate_distributions_chart_data(d, alpha, n_1, n_2):
     }
 
 
-def generate_t_distribution_chart_data(t_stat, n_1, n_2, s_1, s_2):
+def generate_t_distribution_chart_data(t_stat, n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
     welches_df = utils.welches_degrees_of_freedom(s_1, n_1, s_2, n_2)
+    d = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
 
     # Determine X axis range
     x_min = -5
@@ -259,7 +260,7 @@ def generate_t_distribution_chart_data(t_stat, n_1, n_2, s_1, s_2):
         H0.append(t.pdf(value, loc=0, df=welches_df))
 
     return {
-        "title": "Null Hypothesis t-distribution",
+        "title": "Null Hypothesis t-distribution (effect size: {:.3f})".format(d),
         "xAxisLabel": "t",
         "yAxisLabel": "Density",
         "labels": x_axis_values,

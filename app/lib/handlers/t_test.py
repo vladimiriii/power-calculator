@@ -102,6 +102,7 @@ def run_model(inputs):
             results['formulae'] = create_t_stat_from_means_formula(x_bar_1=x_bar_1, s_1=s_1, n_1=n_1, x_bar_2=x_bar_2, s_2=s_2, n_2=n_2)
         else:
             d = float(inputs['effectSize'])
+            x_bar_1, x_bar_2 = 1, 1 + d
             s_1, s_2 = 1, 1
             t_stat = calculate_t_stat_from_cohens_d(d=d, n_1=n_1, n_2=n_2)
             results['formulae'] = create_t_stat_from_d_formula(d=d, n_1=n_1, n_2=n_2)
@@ -118,9 +119,9 @@ def run_model(inputs):
 
         # Charts
         t_stat = results['statistics'][0]["two_sided_test"]
-        results['charts']['chartOne'] = generate_t_distribution_chart_data(t_stat=t_stat, n_1=n_1, n_2=n_2, s_1=s_1, s_2=s_2)
-        results['charts']['chartTwo'] = generate_t_distribution_chart_data(t_stat=t_stat, n_1=n_1, n_2=n_2, s_1=s_1, s_2=s_2)
-        results['charts']['chartThree'] = generate_t_distribution_chart_data(t_stat=t_stat, n_1=n_1, n_2=n_2, s_1=s_1, s_2=s_2)
+        results['charts']['chartOne'] = generate_t_distribution_chart_data(t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
+        results['charts']['chartTwo'] = generate_t_distribution_chart_data(t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
+        results['charts']['chartThree'] = generate_t_distribution_chart_data(t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
 
     # TARGET: P-VALUE
     elif inputs['target'] == "p-value":
