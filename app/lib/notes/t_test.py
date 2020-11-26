@@ -20,19 +20,25 @@ def generate_power_notes(alpha):
     return notes
 
 
+def generate_min_effect_size_notes(alpha, power):
+    notes = [
+        "The calculation shown is for a two tailed test. However, from the forumla, you can see the only term that will change for a one-sided test is z<sub>1−α/2</sub>​ = {:.3f}, which instead becomes z<sub>1−α</sub>​ = {:.3f}.".format(norm.ppf(1 - alpha/2), norm.ppf(1 - alpha)),
+        "The minimum effect size produced by this calculation represents the minimum difference in <i>population</i> means that will lead to the correct rejection of H<sub>0</sub> in {:.2%} of experiments if we repeatedly resampled from these populations with the specified sample sizes.".format(power)
+    ]
+    return notes
+
+
+def generate_t_stat_notes(n_1, n_2):
+    upsilon = n_1 + n_2 - 2
+    notes = []
+    return notes
+
+
 def generate_p_value_notes(n_1, n_2):
     upsilon = n_1 + n_2 - 2
     notes = [
         "T is a t distributed random variable with {} degrees of freedom: t<sub>υ={}</sub>".format(upsilon, upsilon),
         "The calculation shown is for a two tailed test. However, from the forumla, you can see the only change required for a one-sided test is to not multiply by 2 in the last step.",
         "The difference in means (or the effect size) for this calculation represents the observed difference in <i>sample</i> means. This is because we are calculating the probability of observing an effect size at least as large as the one observed if H<sub>0</sub> is true. That is, the probability that we would incorrectly reject H<sub>0</sub> (i.e. the Type I error rate)."
-    ]
-    return notes
-
-
-def generate_min_effect_size_notes(alpha, power):
-    notes = [
-        "The calculation shown is for a two tailed test. However, from the forumla, you can see the only term that will change for a one-sided test is z<sub>1−α/2</sub>​ = {:.3f}, which instead becomes z<sub>1−α</sub>​ = {:.3f}.".format(norm.ppf(1 - alpha/2), norm.ppf(1 - alpha)),
-        "The minimum effect size produced by this calculation represents the minimum difference in <i>population</i> means that will lead to the correct rejection of H<sub>0</sub> in {:.2%} of experiments if we repeatedly resampled from these populations with the specified sample sizes.".format(power)
     ]
     return notes

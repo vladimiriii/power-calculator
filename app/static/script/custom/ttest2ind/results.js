@@ -4,10 +4,11 @@ async function getEstimates() {
     const inputs = getInputs();
     try {
         const response = await calculateEstimates(inputs);
+        clearCharts();
         displayResults(response['statistics']);
-        updateChart(chartOne, configOne, response['charts']['chartOne'], 'standard');
-        updateChart(chartTwo, configTwo, response['charts']['chartTwo'], 'standard');
-        updateChart(chartThree, configThree, response['charts']['chartThree'], 'distributions');
+        createChart('chart-1', response['charts']['chartOne']);
+        createChart('chart-2', response['charts']['chartTwo']);
+        createChart('chart-3', response['charts']['chartThree']);
         renderFormulas(response['formulae']);
         addFormulaNotes(response['notes']);
 

@@ -1,22 +1,3 @@
-let configOne = null;
-let configTwo = null;
-let configThree = null;
-let chartOne = null;
-let chartTwo = null;
-let chartThree = null;
-
-
-function initializeCharts() {
-    Chart.defaults.global.defaultFontFamily = 'Roboto';
-    configOne = createChartConfig();
-    configTwo = createChartConfig();
-    configThree = createChartConfig();
-    chartOne = generateChart('chart-1', configOne);
-    chartTwo = generateChart('chart-2', configTwo);
-    chartThree = generateChart('chart-3', configThree);
-}
-
-
 function createChartConfig() {
     return {
         // The type of chart we want to create
@@ -72,76 +53,56 @@ function createChartConfig() {
                         return label;
                     }
                 }
+            },
+            annotation: {
+                annotations: []
             }
         }
     };
 }
 
 
-function generateChart(id, config) {
-    const div = $('#' + id)[0].getContext('2d');
-    return new Chart(div, config);
-}
+function createChart(div, chartData) {
+    const config = createChartConfig();
+    const canvas = $('#' + div)[0].getContext('2d');
+    const chart = new Chart(canvas, config);
 
-
-function generateDatasets(data, colorScheme) {
-    for (let i = 0; i < data.length; ++i) {
-        data[i]['backgroundColor'] = chartColors[colorScheme][i]['background'];
-        data[i]['borderColor'] = chartColors[colorScheme][i]['line'];
-    }
-    return data;
-}
-
-
-function updateChart(chart, config, chartData, colorScheme) {
     config['options']['title']['text'] = chartData['title'];
     config['options']['scales']['xAxes'][0]['scaleLabel']['labelString'] = chartData['xAxisLabel'];
     config['options']['scales']['yAxes'][0]['scaleLabel']['labelString'] = chartData['yAxisLabel'];
     config['data']['labels'] = chartData['labels'];
-    config['data']['datasets'] = generateDatasets(chartData['dataset'], colorScheme);
+    config['data']['datasets'] = chartData['dataset'];
+    console.log(chartData['dataset']);
 
     if ("hidePoints" in chartData) {
         config['options']['elements']['point']['radius'] = 0;
+        config['options']['tooltips']['enabled'] = false;
     }
-	chart.update();
+    if ("verticalLine" in chartData) {
+        annotation = {
+            type: "line",
+            mode: "vertical",
+            scaleID: "x-axis-0",
+            value: chartData['verticalLine']['position'],
+            borderColor: "black",
+            label: {
+                content: chartData['verticalLine']['label'],
+                enabled: true,
+                position: "top"
+            }
+        };
+        config['options']['annotation']['annotations'][0] = annotation;
+    }
+
+    chart.update();
 }
-    // const div = $('#' + id)[0].getContext('2d');
-    // const chart = new Chart(div, {
-    //     // The type of chart we want to create
-    //     type: 'line',
-    //
-    //     // The data for our dataset
-    //     data: {
-    //         labels: options['labels'],
-    //         datasets: generateDatasets(options['dataset']),
-    //     },
-    //
-    //     // Configuration options go here
-    //     options: {
-    //         title: {
-    //             display: true,
-    //             fontSize: 24,
-    //             fontStyle: "normal",
-    //             text: options['title']
-    //         },
-    //         scales: {
-	// 			xAxes: [{
-	// 				display: true,
-	// 				scaleLabel: {
-	// 					display: true,
-	// 					labelString: options['xAxisLabel']
-	// 				}
-	// 			}],
-	// 			yAxes: [{
-	// 				display: true,
-	// 				scaleLabel: {
-	// 					display: true,
-	// 					labelString: options['yAxisLabel']
-	// 				}
-	// 			}]
-	// 		},
-    //         legend: {
-    //             display: false
-    //         }
-    //     }
-    // });
+
+
+function clearCharts() {
+    const charts = $(".chart");
+    for (const key in charts) {
+        const id = charts[key]['id'];
+        let blankCanvas = `<canvas class="chart" id="chart-${String(Number(key) + 1)}"></canvas>`
+        $("#" + id).replaceWith(blankCanvas);
+    }
+}

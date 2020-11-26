@@ -95,49 +95,6 @@ def create_power_from_d_formula(d, n_1, n_2, alpha):
     return formulae
 
 
-def create_p_value_from_means_formula(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2):
-    formulae = []
-    step_1 = "t_{{crit}} = \\frac{{|\\bar{{x_1}} - \\bar{{x_2}}|}}{{\\sqrt{{\\frac{{s_1^2}}{{n_1}} + \\frac{{s_2^2}}{{n_2}}}}}}"
-    formulae.append(step_1)
-
-    step_2 = "t_{{crit}} = \\frac{{|{:.3f} - {:.3f}|}}{{\\sqrt{{\\frac{{{:.3f}^2}}{{{}}} + \\frac{{{:.3f}^2}}{{{}}}}}}}"
-    formulae.append(step_2.format(mu_1, mu_2, sigma_1, n_1, sigma_2, n_2))
-
-    step_3 = "t_{{crit}} = \\frac{{{:.3f}}}{{{:.3f}}} = {:.3f}"
-    numerator = abs(mu_1 - mu_2)
-    denominator = (sigma_1**2 / n_1 + sigma_2**2 / n_2)**0.5
-    t_crit = numerator / denominator
-    formulae.append(step_3.format(numerator, denominator, t_crit))
-
-    p_value = 2 * (1 - t.cdf(t_crit, df=utils.welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2)))
-    step_4 = "p = 2 \\times P(T > {:.3f}) = {:.3f}"
-    formulae.append(step_4.format(t_crit, p_value))
-
-    return formulae
-
-
-def create_p_value_from_d_formula(d, n_1, n_2):
-    formulae = []
-    step_1 = "t_{{crit}} = \\frac{{|d|}}{{\\sqrt{{\\frac{{1}}{{n_1}} + \\frac{{1}}{{n_2}}}}}}"
-    formulae.append(step_1)
-
-    step_2 = "t_{{crit}} = \\frac{{|{:.3f}|}}{{\\sqrt{{\\frac{{1}}{{{}}} + \\frac{{1}}{{{}}}}}}}"
-    formulae.append(step_2.format(d, n_1, n_2))
-
-    step_3 = "t_{{crit}} = \\frac{{{:.3f}}}{{{:.3f}}} = {:.3f}"
-    diff = abs(d)
-    n_root = (1/n_1 + 1/n_2)**0.5
-    t_crit = diff / n_root
-    formulae.append(step_3.format(diff, n_root, t_crit))
-
-    df = n_1 + n_2 - 2
-    p_value = 2 * (1 - t.cdf(t_crit, df=df))
-    step_4 = "p = 2 \\times P(T > {:.3f}) = {:.3f}"
-    formulae.append(step_4.format(t_crit, p_value))
-
-    return formulae
-
-
 def create_min_effect_size_formula(alpha, power, n_1, n_2):
     formulae = []
     step_1 = "d_{{min}} = \\sqrt{{(\\frac{{1}}{{n_1}} + \\frac{{1}}{{n_2}})(z_{{1-\\alpha/2}} + z_{{1-\\beta}})^2}}"
@@ -156,5 +113,82 @@ def create_min_effect_size_formula(alpha, power, n_1, n_2):
     effect_squared = (n_ratio * (z_a + z_b)**2)
     min_effect = effect_squared**0.5
     formulae.append(step_4.format(effect_squared, min_effect))
+
+    return formulae
+
+
+def create_t_stat_from_means_formula(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2):
+    formulae = []
+    step_1 = "t = \\frac{{|\\bar{{x_1}} - \\bar{{x_2}}|}}{{\\sqrt{{\\frac{{s_1^2}}{{n_1}} + \\frac{{s_2^2}}{{n_2}}}}}}"
+    formulae.append(step_1)
+
+    step_2 = "t = \\frac{{|{:.3f} - {:.3f}|}}{{\\sqrt{{\\frac{{{:.3f}^2}}{{{}}} + \\frac{{{:.3f}^2}}{{{}}}}}}}"
+    formulae.append(step_2.format(x_bar_1, x_bar_2, s_1, n_1, s_2, n_2))
+
+    step_3 = "t = \\frac{{{:.3f}}}{{{:.3f}}} = {:.3f}"
+    numerator = abs(x_bar_1 - x_bar_2)
+    denominator = (s_1**2 / n_1 + s_2**2 / n_2)**0.5
+    t_stat = numerator / denominator
+    formulae.append(step_3.format(numerator, denominator, t_stat))
+
+    return formulae
+
+
+def create_t_stat_from_d_formula(d, n_1, n_2):
+    formulae = []
+    step_1 = "t = \\frac{{|d|}}{{\\sqrt{{\\frac{{1}}{{n_1}} + \\frac{{1}}{{n_2}}}}}}"
+    formulae.append(step_1)
+
+    step_2 = "t = \\frac{{|{:.3f}|}}{{\\sqrt{{\\frac{{1}}{{{}}} + \\frac{{1}}{{{}}}}}}}"
+    formulae.append(step_2.format(d, n_1, n_2))
+
+    step_3 = "t = \\frac{{{:.3f}}}{{{:.3f}}} = {:.3f}"
+    diff = abs(d)
+    n_root = (1/n_1 + 1/n_2)**0.5
+    t_crit = diff / n_root
+    formulae.append(step_3.format(diff, n_root, t_crit))
+
+    return formulae
+
+
+def create_p_value_from_means_formula(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2):
+    formulae = []
+    step_1 = "t = \\frac{{|\\bar{{x_1}} - \\bar{{x_2}}|}}{{\\sqrt{{\\frac{{s_1^2}}{{n_1}} + \\frac{{s_2^2}}{{n_2}}}}}}"
+    formulae.append(step_1)
+
+    step_2 = "t = \\frac{{|{:.3f} - {:.3f}|}}{{\\sqrt{{\\frac{{{:.3f}^2}}{{{}}} + \\frac{{{:.3f}^2}}{{{}}}}}}}"
+    formulae.append(step_2.format(x_bar_1, x_bar_2, s_1, n_1, s_2, n_2))
+
+    step_3 = "t = \\frac{{{:.3f}}}{{{:.3f}}} = {:.3f}"
+    numerator = abs(x_bar_1 - x_bar_2)
+    denominator = (s_1**2 / n_1 + s_2**2 / n_2)**0.5
+    t_stat = numerator / denominator
+    formulae.append(step_3.format(numerator, denominator, t_stat))
+
+    p_value = 2 * (1 - t.cdf(t_stat, df=utils.welches_degrees_of_freedom(s_1, n_1, s_2, n_2)))
+    step_4 = "p = 2 \\times P(T > {:.3f}) = {:.3f}"
+    formulae.append(step_4.format(t_stat, p_value))
+
+    return formulae
+
+
+def create_p_value_from_d_formula(d, n_1, n_2):
+    formulae = []
+    step_1 = "t = \\frac{{|d|}}{{\\sqrt{{\\frac{{1}}{{n_1}} + \\frac{{1}}{{n_2}}}}}}"
+    formulae.append(step_1)
+
+    step_2 = "t = \\frac{{|{:.3f}|}}{{\\sqrt{{\\frac{{1}}{{{}}} + \\frac{{1}}{{{}}}}}}}"
+    formulae.append(step_2.format(d, n_1, n_2))
+
+    step_3 = "t = \\frac{{{:.3f}}}{{{:.3f}}} = {:.3f}"
+    diff = abs(d)
+    n_root = (1/n_1 + 1/n_2)**0.5
+    t_stat = diff / n_root
+    formulae.append(step_3.format(diff, n_root, t_stat))
+
+    df = n_1 + n_2 - 2
+    p_value = 2 * (1 - t.cdf(t_stat, df=df))
+    step_4 = "p = 2 \\times P(T > {:.3f}) = {:.3f}"
+    formulae.append(step_4.format(t_stat, p_value))
 
     return formulae

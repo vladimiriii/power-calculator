@@ -5,8 +5,8 @@ $(document).ready(function(){
     // Run this to initiate a set of fields
     updateTargetSelector();
 
-    // Initialize Charts
-    initializeCharts();
+    // Initialize Charts Font
+    Chart.defaults.global.defaultFontFamily = 'Roboto';
 
     $("#status-list").change(updateTargetSelector);
     $("#go-btn").click(getEstimates);

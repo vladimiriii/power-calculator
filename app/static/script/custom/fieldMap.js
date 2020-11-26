@@ -36,8 +36,16 @@ const fieldMap = {
             "label": 'Standard Deviation: ',
             "step": "any"
     },
+    "sampleMean": {
+            "label": "Sample Mean: ",
+            "step": "any"
+    },
+    "sampleStdDev": {
+            "label": "Sample Standard Deviation: ",
+            "step": "any"
+    },
     "n": {
-            "label": 'Sample Size (n):',
+            "label": "Sample Size (n): ",
             "step": 1,
             "min": 2
     }
@@ -80,6 +88,17 @@ const optionMap = {
         }
     },
     "assessing": {
+        "t-stat": {
+            "displayName": "t-statistic",
+            "compulsoryFields": {
+                "oneOf": [],
+                "perGroup": ["n"]
+            },
+            "orFields": {
+                "oneOf": ["effectSize"],
+                "perGroup": ["sampleMean", "sampleStdDev"]
+            }
+        },
         "p-value": {
             "displayName": "p-value",
             "compulsoryFields": {
@@ -88,31 +107,8 @@ const optionMap = {
             },
             "orFields": {
                 "oneOf": ["effectSize"],
-                "perGroup": ["mean", "stdDev"]
-            }
-        },
-        "null-rejected": {
-            "displayName": "Was the Null Hypothesis Rejected",
-            "compulsoryFields": {
-                "oneOf": ['alpha'],
-                "perGroup": ["n"]
-            },
-            "orFields": {
-                "oneOf": ["effectSize"],
-                "perGroup": ["mean", "stdDev"]
-            }
-        },
-        "t-crit": {
-            "displayName": "Critical t-statistic",
-            "compulsoryFields": {
-                "oneOf": [],
-                "perGroup": ["n"]
-            },
-            "orFields": {
-                "oneOf": ["effectSize"],
-                "perGroup": ["mean", "stdDev"]
+                "perGroup": ["sampleMean", "sampleStdDev"]
             }
         }
-
     }
 }

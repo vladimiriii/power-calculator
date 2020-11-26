@@ -79,7 +79,7 @@ function addOptionFields(status, target, div, orField) {
 function resetOptionsAndResults() {
     $("#results-table").empty();
     $("#formulae").empty();
-    initializeCharts();
     $("#compulsoryFields").empty();
     $("#orFields").empty();
+    clearCharts();
 }

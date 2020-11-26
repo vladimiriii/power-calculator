@@ -48,7 +48,8 @@
                     <li>Calculate the p-value of a completed test.</li>
                     <li>Estimate the smallest effect size you can detect (at a given power level) based on your sample size.</li>
                 </ol>
-                <i><p>Note: This calculator does not require the groups to have equal variance as it uses the Welch's unequal variances t-test formulation by default – and <a href='https://daniellakens.blogspot.com/2015/01/always-use-welchs-t-test-instead-of.html' target='_blank'>you probably should too</a>.</p></i>
+                <p><i>Note 1: This calculator does not require the groups to have equal variance as it uses the Welch's unequal variances t-test formulation by default – and <a href='https://daniellakens.blogspot.com/2015/01/always-use-welchs-t-test-instead-of.html' target='_blank'>you probably should too</a>.</i></p>
+                <p><i>Note 2: Another underlying assumption of the t-test is not only that the sample means are normally distributed, but also that the sample variance is χ<sup>2</sup> distributed.</i></p>
             </div>
         </div>
         <div class="row">
@@ -98,12 +99,12 @@
                         </div>
                     </div>
                     <div class="col-md-7 chart-div" id="results-chart-1">
-                        <canvas id="chart-1"></canvas>
+                        <canvas class="chart" id="chart-1"></canvas>
                     </div>
                 </div>
                 <div class="row results-row">
                     <div class="col-md-6 chart-div" id="results-chart-2">
-                        <canvas id="chart-2"></canvas>
+                        <canvas class="chart" id="chart-2"></canvas>
                     </div>
                     <div class="col-md-6">
                         <div class="row">
@@ -139,7 +140,7 @@
                         </div>
                     </div>
                     <div class="col-md-7 chart-div" id="results-chart-3">
-                        <canvas id="chart-3"></canvas>
+                        <canvas class="chart" id="chart-3"></canvas>
                     </div>
                 </div>
             </div>
