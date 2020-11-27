@@ -28,17 +28,22 @@ def generate_min_effect_size_notes(alpha, power):
     return notes
 
 
-def generate_t_stat_notes(n_1, n_2):
+def generate_t_stat_notes(n_1, n_2, d, t_stat):
     upsilon = n_1 + n_2 - 2
-    notes = []
+    notes = [
+        "The difference in means (or the effect size) for this calculation (d={:.3f}) represents the observed difference in <i>sample</i> means. This is because we are calculating the probability of observing an effect size at least as large as the one observed if H<sub>0</sub> is true. That is, the probability that we would incorrectly reject H<sub>0</sub> or the Type I error rate.".format(d),
+        "The t-statistic can be compared to the critical value for a given level of alpha to decide if H<sub>0</sub> is rejected; or it can be used to determine the p-value, which is the probability of observing an effect size at least as large as the one observed if H<sub>0</sub> is true.",
+        "The p-value can also be understood as the area underneath the t-distribution shown above where t is greater than {:.3f} for a one-sided test; or greater than {:.3f} <i>and</i> less than {:.3f} for a two-sided test.".format(abs(t_stat), abs(t_stat), -abs(t_stat))
+        ]
     return notes
 
 
-def generate_p_value_notes(n_1, n_2):
+def generate_p_value_notes(n_1, n_2, d, p_one_sided, p_two_sided, t_stat):
     upsilon = n_1 + n_2 - 2
     notes = [
-        "T is a t distributed random variable with {} degrees of freedom: t<sub>υ={}</sub>".format(upsilon, upsilon),
+        "T is a t-distributed random variable with {} degrees of freedom: t<sub>υ={}</sub>".format(upsilon, upsilon),
         "The calculation shown is for a two tailed test. However, from the forumla, you can see the only change required for a one-sided test is to not multiply by 2 in the last step.",
-        "The difference in means (or the effect size) for this calculation represents the observed difference in <i>sample</i> means. This is because we are calculating the probability of observing an effect size at least as large as the one observed if H<sub>0</sub> is true. That is, the probability that we would incorrectly reject H<sub>0</sub> (i.e. the Type I error rate)."
+        "The difference in means (or the effect size) for this calculation (d={:.3f}) represents the observed difference in <i>sample</i> means. This is because we are calculating the probability of observing an effect size at least as large as the one observed if H<sub>0</sub> is true. That is, the probability that we would incorrectly reject H<sub>0</sub> or the Type I error rate.".format(d),
+        "The p-value can also be understood as the area underneath the t-distribution where t is greater than {:.3f} for a one-sided test (p = {:.3f}); or greater than {:.3f} <i>and</i> less than {:.3f} for a two-sided test (p = {:.3f})".format(abs(t_stat), p_one_sided, abs(t_stat), -abs(t_stat), p_two_sided)
     ]
     return notes

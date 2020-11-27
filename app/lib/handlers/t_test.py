@@ -99,6 +99,7 @@ def run_model(inputs):
             s_1 = float(sample_fields[0]['sampleStdDev'])
             x_bar_2 = float(sample_fields[1]['sampleMean'])
             s_2 = float(sample_fields[1]['sampleStdDev'])
+            d = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
             t_stat = calculate_t_stat_from_means(x_bar_1=x_bar_1, s_1=s_1, n_1=n_1, x_bar_2=x_bar_2, s_2=s_2, n_2=n_2)
             results['formulae'] = create_t_stat_from_means_formula(x_bar_1=x_bar_1, s_1=s_1, n_1=n_1, x_bar_2=x_bar_2, s_2=s_2, n_2=n_2)
         else:
@@ -116,7 +117,7 @@ def run_model(inputs):
         }]
 
         # Notes
-        results['notes'] = generate_t_stat_notes(n_1, n_2)
+        results['notes'] = generate_t_stat_notes(n_1, n_2, d, t_stat)
 
         # Charts
         t_stat = results['statistics'][0]["two_sided_test"]
@@ -136,6 +137,7 @@ def run_model(inputs):
             s_1 = float(sample_fields[0]['sampleStdDev'])
             x_bar_2 = float(sample_fields[1]['sampleMean'])
             s_2 = float(sample_fields[1]['sampleStdDev'])
+            d = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
             welches_df = utils.welches_degrees_of_freedom(s_1, n_1, s_2, n_2)
             t_stat = calculate_t_stat_from_means(x_bar_1=x_bar_1, s_1=s_1, n_1=n_1, x_bar_2=x_bar_2, s_2=s_2, n_2=n_2)
             results['statistics'] = calculate_p_value(t_stat=t_stat, df=welches_df)
@@ -149,7 +151,12 @@ def run_model(inputs):
             results['formulae'] = create_p_value_from_d_formula(d=d, n_1=n_1, n_2=n_2)
 
         # Notes
-        results['notes'] = generate_p_value_notes(n_1, n_2)
+        results['notes'] = generate_p_value_notes(n_1=n_1,
+                                                  n_2=n_2,
+                                                  d=d,
+                                                  p_one_sided=results['statistics'][0]['one_sided_test'],
+                                                  p_two_sided=results['statistics'][0]['two_sided_test'],
+                                                  t_stat=t_stat)
 
         # Charts
         results['charts']['chartOne'] = generate_t_distribution_chart_data(alpha=alpha, t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
