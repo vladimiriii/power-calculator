@@ -91,6 +91,7 @@ def run_model(inputs):
     elif inputs['target'] == "t-stat":
         n_1 = int(sample_fields[0]['n'])
         n_2 = int(sample_fields[1]['n'])
+        alpha = float(inputs['alpha'])
 
         # Statistics
         if utils.all_sample_info_provided(sample_fields):
@@ -119,14 +120,15 @@ def run_model(inputs):
 
         # Charts
         t_stat = results['statistics'][0]["two_sided_test"]
-        results['charts']['chartOne'] = generate_t_distribution_chart_data(t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
-        results['charts']['chartTwo'] = generate_sample_size_vs_t_statistic_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
-        results['charts']['chartThree'] = generate_t_distribution_chart_data(t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
+        results['charts']['chartOne'] = generate_t_distribution_chart_data(alpha=alpha, t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
+        results['charts']['chartTwo'] = generate_t_statistic_vs_sample_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
+        results['charts']['chartThree'] = generate_t_statistic_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2)
 
     # TARGET: P-VALUE
     elif inputs['target'] == "p-value":
         n_1 = int(sample_fields[0]['n'])
         n_2 = int(sample_fields[1]['n'])
+        alpha = float(inputs['alpha'])
 
         # Statistics
         if utils.all_sample_info_provided(sample_fields):
@@ -150,8 +152,8 @@ def run_model(inputs):
         results['notes'] = generate_p_value_notes(n_1, n_2)
 
         # Charts
-        results['charts']['chartOne'] = generate_t_distribution_chart_data(t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
-        results['charts']['chartTwo'] = generate_sample_size_vs_p_value_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
-        results['charts']['chartThree'] = generate_t_distribution_chart_data(t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
+        results['charts']['chartOne'] = generate_t_distribution_chart_data(alpha=alpha, t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
+        results['charts']['chartTwo'] = generate_p_value_vs_sample_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
+        results['charts']['chartThree'] = generate_p_value_vs_effect_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
 
     return results

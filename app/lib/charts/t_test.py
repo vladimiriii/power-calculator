@@ -246,9 +246,11 @@ def generate_distributions_chart_data(d, alpha, n_1, n_2):
     }
 
 
-def generate_t_distribution_chart_data(t_stat, n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
+def generate_t_distribution_chart_data(alpha, t_stat, n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
     welches_df = utils.welches_degrees_of_freedom(s_1, n_1, s_2, n_2)
     d = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
+    alpha_upper = t.ppf(1 - alpha/2, df=welches_df)
+    alpha_lower = -alpha_upper
 
     # Determine X axis range
     x_min = -5
@@ -257,8 +259,14 @@ def generate_t_distribution_chart_data(t_stat, n_1, n_2, x_bar_1, x_bar_2, s_1, 
     x_axis_values = ["{:.3f}".format(x) for x in x_axis]
 
     H0 = []
+    significant = []
     for value in x_axis:
-        H0.append(t.pdf(value, loc=0, df=welches_df))
+        H0.append(t.pdf(value, df=welches_df))
+        if alpha_lower <= value <= alpha_upper:
+            significant.append(None)
+        else:
+            significant.append(t.pdf(value, df=welches_df))
+
 
     return {
         "title": "Null Hypothesis t-distribution (effect size: {:.3f})".format(d),
@@ -277,12 +285,20 @@ def generate_t_distribution_chart_data(t_stat, n_1, n_2, x_bar_1, x_bar_2, s_1, 
                 "pointRadius": 0.5,
                 "borderColor": colors.line_colors[0],
                 "backgroundColor": None
+            },
+            {
+                "label": "H0",
+                "data": significant,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
             }
         ]
     }
 
 
-def generate_sample_size_vs_t_statistic_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
+def generate_t_statistic_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
     d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
     n_actual = n_1 + n_2
     r_e = n_1/n_2
@@ -309,7 +325,7 @@ def generate_sample_size_vs_t_statistic_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
     x_axis_values = [str(x) for x in list(sample_sizes)]
 
     return {
-        "title": "Sample Size vs t-statistic (effect size: {:.3f})".format(d_actual),
+        "title": "t-statistic vs Sample Size (effect size: {:.3f})".format(d_actual),
         "xAxisLabel": "Total Samples",
         "yAxisLabel": "t-statistic",
         "labels": x_axis_values,
@@ -338,7 +354,70 @@ def generate_sample_size_vs_t_statistic_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
     }
 
 
-def generate_sample_size_vs_p_value_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
+def generate_t_statistic_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
+    d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
+    window = 0.5
+    if d_actual < 0:
+        x_max = d_actual * (1 - window)
+        x_min = d_actual * (1 + window)
+    else:
+        x_min = d_actual * (1 - window)
+        x_max = d_actual * (1 + window)
+    step = (x_max - x_min) / 500
+
+    # Rounding to ensure matches
+    dps = utils.determine_decimal_points(x_max)
+    effect_sizes = [round(x, dps) for x in np.arange(x_min, x_max, step)]
+    d_actual = round(d_actual, dps)
+
+    t_stat_lower = []
+    t_stat_higher = []
+    for d in effect_sizes:
+        t_stat = tt.calculate_t_stat_from_cohens_d(d, n_1, n_2)
+        if d <= d_actual:
+            t_stat_lower.append(t_stat)
+        else:
+            t_stat_lower.append(None)
+        if d >= d_actual:
+            t_stat_higher.append(t_stat)
+        else:
+            t_stat_higher.append(None)
+
+    # Determine X axis range
+    format_string = "{:." + str(dps) + "f}"
+    x_axis_values = [format_string.format(x) for x in list(effect_sizes)]
+
+    return {
+        "title": "t-statistic vs Effect Size (sample size: {})".format(n_1 + n_2),
+        "xAxisLabel": "Effect Size",
+        "yAxisLabel": "t-statistic",
+        "labels": x_axis_values,
+        "verticalLine": {
+            "position": format_string.format(d_actual),
+            "label": "Current Effect Size"
+        },
+        "dataset": [
+            {
+                "label": "t-statistic",
+                "data": t_stat_lower,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
+            },
+            {
+                "label": "t-statistic",
+                "data": t_stat_higher,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[1],
+                "backgroundColor": colors.background_colors[1]
+            }
+        ]
+    }
+
+
+def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
     d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
     n_actual = n_1 + n_2
     r_e = n_1 / n_2
@@ -379,6 +458,93 @@ def generate_sample_size_vs_p_value_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
         "verticalLine": {
             "position": str(n_actual),
             "label": "Current Sample Size"
+        },
+        "dataset": [
+            {
+                "label": "One Sided Test",
+                "data": os_lower,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
+            },
+            {
+                "label": "One Sided Test",
+                "data": os_higher,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[1],
+                "backgroundColor": colors.background_colors[1]
+            },
+            {
+                "label": "Two Sided Test",
+                "data": ts_lower,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
+            },
+            {
+                "label": "Two Sided Test",
+                "data": ts_higher,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[1],
+                "backgroundColor": colors.background_colors[1]
+            }
+        ]
+    }
+
+
+def generate_p_value_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
+    d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
+    window = 0.1
+    if d_actual < 0:
+        x_max = d_actual * (1 - window)
+        x_min = d_actual * (1 + window)
+    else:
+        x_min = d_actual * (1 - window)
+        x_max = d_actual * (1 + window)
+    step = (x_max - x_min) / 500
+
+    # Rounding to ensure matches
+    dps = utils.determine_decimal_points(x_max)
+    effect_sizes = [round(x, dps) for x in np.arange(x_min, x_max, step)]
+    d_actual = round(d_actual, dps)
+
+    os_lower = []
+    ts_lower = []
+    os_higher = []
+    ts_higher = []
+    for d in effect_sizes:
+        welches_df = utils.welches_degrees_of_freedom(s_1, n_1, s_2, n_2)
+        t_stat = tt.calculate_t_stat_from_cohens_d(d, n_1, n_2)
+        results = tt.calculate_p_value(t_stat, welches_df)
+        if d <= d_actual:
+            os_lower.append(results[-1]['one_sided_test'])
+            ts_lower.append(results[-1]['two_sided_test'])
+        else:
+            os_lower.append(None)
+            ts_lower.append(None)
+        if d >= d_actual:
+            os_higher.append(results[-1]['one_sided_test'])
+            ts_higher.append(results[-1]['two_sided_test'])
+        else:
+            os_higher.append(None)
+            ts_higher.append(None)
+
+    # Determine X axis range
+    format_string = "{:." + str(dps) + "f}"
+    x_axis_values = [format_string.format(x) for x in list(effect_sizes)]
+
+    return {
+        "title": "p-value vs Effect Size (sample size: {})".format(n_1 + n_2),
+        "xAxisLabel": "Effect Size",
+        "yAxisLabel": "p-value",
+        "labels": x_axis_values,
+        "verticalLine": {
+            "position": format_string.format(d_actual),
+            "label": "Current Effect Size"
         },
         "dataset": [
             {

@@ -91,7 +91,7 @@ const optionMap = {
         "t-stat": {
             "displayName": "t-statistic",
             "compulsoryFields": {
-                "oneOf": [],
+                "oneOf": ['alpha'],
                 "perGroup": ["n"]
             },
             "orFields": {
@@ -102,7 +102,7 @@ const optionMap = {
         "p-value": {
             "displayName": "p-value",
             "compulsoryFields": {
-                "oneOf": [],
+                "oneOf": ['alpha'],
                 "perGroup": ["n"]
             },
             "orFields": {
