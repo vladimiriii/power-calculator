@@ -72,7 +72,6 @@ function createChart(div, chartData) {
     config['options']['scales']['yAxes'][0]['scaleLabel']['labelString'] = chartData['yAxisLabel'];
     config['data']['labels'] = chartData['labels'];
     config['data']['datasets'] = chartData['dataset'];
-    console.log(chartData['dataset']);
 
     if ("hidePoints" in chartData) {
         config['options']['elements']['point']['radius'] = 0;

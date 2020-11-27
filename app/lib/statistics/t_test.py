@@ -22,21 +22,9 @@ def calculate_sample_size_from_cohens_d(d, alpha, power, enrolment_ratio):
     n_1_ts = math.ceil((1 + enrolment_ratio) * z_total_ts / d_squared)
 
     return [
-        {
-            "label": "Group 1",
-            "one_sided_test": n_1_os,
-            "two_sided_test": n_1_ts
-        },
-        {
-            "label": "Group 2",
-            "one_sided_test": math.ceil(n_1_os / enrolment_ratio),
-            "two_sided_test": math.ceil(n_1_ts / enrolment_ratio)
-        },
-        {
-            "label": "All Samples",
-            "one_sided_test": n_1_os + math.ceil(n_1_os / enrolment_ratio),
-            "two_sided_test": n_1_ts + math.ceil(n_1_ts / enrolment_ratio)
-        }
+        [n_1_os, n_1_ts],
+        [math.ceil(n_1_os / enrolment_ratio), math.ceil(n_1_ts / enrolment_ratio)],
+        [n_1_os + math.ceil(n_1_os / enrolment_ratio), n_1_ts + math.ceil(n_1_ts / enrolment_ratio)]
     ]
 
 
@@ -56,21 +44,9 @@ def calculate_sample_size_from_means(mu_1, mu_2, sigma_1, sigma_2, alpha, power,
     n_1_ts = math.ceil(combined_sigma * z_total_ts / mu_diff)
 
     return [
-        {
-            "label": "Group 1",
-            "one_sided_test": n_1_os,
-            "two_sided_test": n_1_ts
-        },
-        {
-            "label": "Group 2",
-            "one_sided_test": math.ceil(n_1_os / enrolment_ratio),
-            "two_sided_test": math.ceil(n_1_ts / enrolment_ratio)
-        },
-        {
-            "label": "All Samples",
-            "one_sided_test": n_1_os + math.ceil(n_1_os / enrolment_ratio),
-            "two_sided_test": n_1_ts + math.ceil(n_1_ts / enrolment_ratio)
-        }
+        [n_1_os, n_1_ts],
+        [math.ceil(n_1_os / enrolment_ratio), math.ceil(n_1_ts / enrolment_ratio)],
+        [n_1_os + math.ceil(n_1_os / enrolment_ratio), n_1_ts + math.ceil(n_1_ts / enrolment_ratio)]
     ]
 
 
@@ -81,11 +57,7 @@ def calculate_power_from_cohens_d(d, n_1, n_2, alpha):
     power_os = norm.cdf(-Z_os + abs(d)/denominator)
     power_ts = norm.cdf(-Z_ts + abs(d)/denominator)
 
-    return [{
-        "label": "Statistical Power (1 - β)",
-        "one_sided_test": power_os,
-        "two_sided_test": power_ts
-    }]
+    return [[power_os], [power_ts]]
 
 
 def calculate_power_from_means(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2, alpha):
@@ -96,11 +68,7 @@ def calculate_power_from_means(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2, alpha):
     power_os = norm.cdf(-Z_os + diff/denominator)
     power_ts = norm.cdf(-Z_ts + diff/denominator)
 
-    return [{
-        "label": "Statistical Power (1 - β)",
-        "one_sided_test": power_os,
-        "two_sided_test": power_ts
-    }]
+    return [[power_os], [power_ts]]
 
 
 def calculate_min_effect_size(n_1, n_2, alpha, power):
@@ -118,11 +86,7 @@ def calculate_min_effect_size(n_1, n_2, alpha, power):
     d_os = ((1/n_1 + 1/n_2) * z_total_os)**0.5
     d_ts = ((1/n_1 + 1/n_2) * z_total_ts)**0.5
 
-    return [{
-        "label": "Minimum effect size",
-        "one_sided_test": d_os,
-        "two_sided_test": d_ts
-    }]
+    return [[d_os], [d_ts]]
 
 
 def calculate_t_stat_from_cohens_d(d, n_1, n_2):
@@ -144,8 +108,4 @@ def calculate_p_value(t_stat, df):
     one_sided_p = 1 - t.cdf(df=df, x=t_stat)
     two_sided_p = 2 * (1 - t.cdf(df=df, x=t_stat))
 
-    return [{
-        "label": "p value",
-        "one_sided_test": one_sided_p,
-        "two_sided_test": two_sided_p
-    }]
+    return [[one_sided_p], [two_sided_p]]

@@ -17,8 +17,8 @@ def generate_power_chart_data(d, alpha, power, enrolment_ratio):
                                                          alpha=alpha,
                                                          power=p,
                                                          enrolment_ratio=enrolment_ratio)
-        one_sided_sample_sizes.append(results[-1]['one_sided_test'])
-        two_sided_sample_sizes.append(results[-1]['two_sided_test'])
+        one_sided_sample_sizes.append(results[-1][0])
+        two_sided_sample_sizes.append(results[-1][1])
 
     # Split into higher and lower
 
@@ -92,8 +92,8 @@ def generate_effect_size_chart_data(d, alpha, power, enrolment_ratio):
                                                          alpha=alpha,
                                                          power=power,
                                                          enrolment_ratio=enrolment_ratio)
-        one_sided_sample_sizes.append(results[-1]['one_sided_test'])
-        two_sided_sample_sizes.append(results[-1]['two_sided_test'])
+        one_sided_sample_sizes.append(results[-1][0])
+        two_sided_sample_sizes.append(results[-1][1])
 
     # Split into higher and lower
     actual_x = abs(round(d, dps))
@@ -303,7 +303,7 @@ def generate_t_statistic_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
     n_actual = n_1 + n_2
     r_e = n_1/n_2
     n_results = tt.calculate_sample_size_from_means(mu_1=x_bar_1, mu_2=x_bar_2, sigma_1=s_1, sigma_2=s_2, alpha=alpha, power=0.5, enrolment_ratio=r_e)
-    n_target = n_results[0]["two_sided_test"] + n_results[1]["two_sided_test"]
+    n_target = n_results[0][1] + n_results[1][1]
     ff = 0.1
     x_min = int(max(4, min(n_actual * (1 - ff), n_target * (1 - ff))))
     x_max = int(max(n_actual * (1 + ff), n_target * (1 + ff)))
@@ -365,7 +365,7 @@ def generate_t_statistic_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
 def generate_t_statistic_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2, alpha):
     d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
     d_results = tt.calculate_min_effect_size(n_1=n_1, n_2=n_2, alpha=alpha, power=0.5)
-    d_target = d_results[0]['two_sided_test']
+    d_target = d_results[1][0]
     ff = 0.5
     if d_actual < 0:
         x_min = min(-d_target, d_actual) * (1 + ff)
@@ -433,7 +433,7 @@ def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
     n_actual = n_1 + n_2
     r_e = n_1 / n_2
     n_results = tt.calculate_sample_size_from_means(mu_1=x_bar_1, mu_2=x_bar_2, sigma_1=s_1, sigma_2=s_2, alpha=alpha, power=0.5, enrolment_ratio=r_e)
-    n_target = n_results[0]["two_sided_test"] + n_results[1]["two_sided_test"]
+    n_target = n_results[0][1] + n_results[1][1]
     ff = 0.1
     x_min = int(max(4, min(n_actual * (1 - ff), n_target * (1 - ff))))
     x_max = int(max(n_actual * (1 + ff), n_target * (1 + ff)))
@@ -454,14 +454,14 @@ def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
         t_stat = tt.calculate_t_stat_from_cohens_d(d, cn_1, cn_2)
         results = tt.calculate_p_value(t_stat, welches_df)
         if n <= n_target:
-            os_lower.append(results[-1]['one_sided_test'])
-            ts_lower.append(results[-1]['two_sided_test'])
+            os_lower.append(results[0][0])
+            ts_lower.append(results[1][0])
         else:
             os_lower.append(None)
             ts_lower.append(None)
         if n >= n_target:
-            os_higher.append(results[-1]['one_sided_test'])
-            ts_higher.append(results[-1]['two_sided_test'])
+            os_higher.append(results[0][0])
+            ts_higher.append(results[1][0])
         else:
             os_higher.append(None)
             ts_higher.append(None)
@@ -518,7 +518,7 @@ def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
 def generate_p_value_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2, alpha):
     d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
     d_results = tt.calculate_min_effect_size(n_1=n_1, n_2=n_2, alpha=alpha, power=0.5)
-    d_target = d_results[0]['two_sided_test']
+    d_target = d_results[1][0]
     ff = 0.5
     if d_actual < 0:
         x_min = min(-d_target, d_actual) * (1 + ff)
@@ -543,14 +543,14 @@ def generate_p_value_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
         t_stat = tt.calculate_t_stat_from_cohens_d(d, n_1, n_2)
         results = tt.calculate_p_value(t_stat, welches_df)
         if d <= d_target:
-            os_lower.append(results[-1]['one_sided_test'])
-            ts_lower.append(results[-1]['two_sided_test'])
+            os_lower.append(results[0][0])
+            ts_lower.append(results[1][0])
         else:
             os_lower.append(None)
             ts_lower.append(None)
         if d >= d_target:
-            os_higher.append(results[-1]['one_sided_test'])
-            ts_higher.append(results[-1]['two_sided_test'])
+            os_higher.append(results[0][0])
+            ts_higher.append(results[1][0])
         else:
             os_higher.append(None)
             ts_higher.append(None)

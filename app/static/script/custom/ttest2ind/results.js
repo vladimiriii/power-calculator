@@ -5,7 +5,7 @@ async function getEstimates() {
     try {
         const response = await calculateEstimates(inputs);
         clearCharts();
-        displayResults(response['statistics']);
+        displayResults(response);
         createChart('chart-1', response['charts']['chartOne']);
         createChart('chart-2', response['charts']['chartTwo']);
         createChart('chart-3', response['charts']['chartThree']);
@@ -82,21 +82,26 @@ function calculateEstimates(inputs) {
 
 function displayResults(results) {
     $("#results-table").empty();
+    const data = results['statistics']
+    const labels = results['labels']
 
+    // Column Headers
     let table = '<table class="table table-bordered"><thead><tr>';
-    table += '<th scope="col">Group</th>';
-    table += '<th scope="col">One Sided Test</th>';
-    table += '<th scope="col">Two Sided Test</th>';
+    for (let i = 0; i < labels['columns'].length; ++i) {
+        const label = labels['columns'][i]
+        table += `<th scope="col">${label}</th>`;
+    }
     table += '</tr></thead><tbody>';
 
-    for (let i = 0; i < results.length; ++i) {
-        table += '<tr>';
-        table += '<th scope="row">' + results[i]['label'].toLocaleString(undefined, {minimumFractionDigits: 0}) + '</th>';
-        table += '<td>' + results[i]['one_sided_test'].toLocaleString(undefined, {minimumFractionDigits: 0}) + '</td>';
-        table += '<td>' + results[i]['two_sided_test'].toLocaleString(undefined, {minimumFractionDigits: 0}) + '</td>';
+    for (let j = 0; j < data.length; ++j) {
+        const row_label = labels['rows'][j].toLocaleString(undefined, {minimumFractionDigits: 0});
+        table += `<tr><th scope="row">${row_label}</th>`;
+        for (let k = 0; k < data[j].length; ++k) {
+            const data_point = data[j][k].toLocaleString(undefined, {minimumFractionDigits: 0});
+            table += `<td>${data_point}</td>`;
+        }
         table += '</tr>';
     }
-
     table += '</tbody></table>'
     $("#results-table").append(table);
 }

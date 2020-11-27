@@ -33,13 +33,19 @@ def run_model(inputs):
         results['notes'] = generate_sample_size_notes(alpha, power)
 
         # Charts
-        n_1 = results['statistics'][0]["two_sided_test"]
-        n_2 = results['statistics'][1]["two_sided_test"]
+        n_1 = results['statistics'][0][1]
+        n_2 = results['statistics'][1][1]
         if d is None:
             d = utils.calculate_cohens_d(mu_1=mu_1, sigma_1=sigma_1, n_1=n_1, mu_2=mu_2, sigma_2=sigma_2, n_2=n_2)
         results['charts']['chartOne'] = generate_power_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
         results['charts']['chartTwo'] = generate_effect_size_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
         results['charts']['chartThree'] = generate_distributions_chart_data(d=d, alpha=alpha, n_1=n_1, n_2=n_2)
+
+        # Labels
+        results['labels'] = {
+            "columns": ["Sample", "One-sided test", "Two-sided test"],
+            "rows": ["Group 1", "Group 2", "Combined"],
+        }
 
     # TARGET: POWER
     elif inputs['target'] == "power":
@@ -64,12 +70,18 @@ def run_model(inputs):
         results['notes'] = generate_power_notes(alpha)
 
         # Charts
-        power = results['statistics'][0]["two_sided_test"]
+        power = results['statistics'][1][0]
         if d is None:
             d = utils.calculate_cohens_d(mu_1=mu_1, sigma_1=sigma_1, n_1=n_1, mu_2=mu_2, sigma_2=sigma_2, n_2=n_2)
         results['charts']['chartOne'] = generate_power_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=n_1/n_2)
         results['charts']['chartTwo'] = generate_effect_size_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=n_1/n_2)
         results['charts']['chartThree'] = generate_distributions_chart_data(d=d, alpha=alpha, n_1=n_1, n_2=n_2)
+
+        # Labels
+        results['labels'] = {
+            "columns": ["Test type", "Statistical Power (1 - β)"],
+            "rows": ["One-sided test", "Two-sided test"],
+        }
 
     # TARGET: MIN EFFECT SIZE
     elif inputs['target'] == "min-effect":
@@ -82,10 +94,16 @@ def run_model(inputs):
         results['notes'] = generate_min_effect_size_notes(alpha=alpha, power=power)
 
         # Charts
-        d = results['statistics'][0]["two_sided_test"]
+        d = results['statistics'][1][0]
         results['charts']['chartOne'] = generate_power_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=n_1/n_2)
         results['charts']['chartTwo'] = generate_effect_size_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=n_1/n_2)
         results['charts']['chartThree'] = generate_distributions_chart_data(d=d, alpha=alpha, n_1=n_1, n_2=n_2)
+
+        # Labels
+        results['labels'] = {
+            "columns": ["Test type", "Minimum effect size"],
+            "rows": ["One-sided test", "Two-sided test"],
+        }
 
     # TARGET: T-STATISTIC
     elif inputs['target'] == "t-stat":
@@ -110,20 +128,28 @@ def run_model(inputs):
             results['formulae'] = create_t_stat_from_d_formula(d=d, n_1=n_1, n_2=n_2)
 
         # Format Stats
-        results['statistics'] = [{
-            "label": "t-statistic",
-            "one_sided_test": t_stat,
-            "two_sided_test": t_stat
-        }]
+        welches_df = utils.welches_degrees_of_freedom(s_1, n_1, s_2, n_2)
+        t_critical_os = t.ppf(1 - alpha, df=welches_df)
+        t_critical_ts = t.ppf(1 - alpha/2, df=welches_df)
+        results['statistics'] = [
+            [t_stat, t_critical_os],
+            [t_stat, t_critical_ts],
+        ]
 
         # Notes
         results['notes'] = generate_t_stat_notes(n_1, n_2, d, t_stat)
 
         # Charts
-        t_stat = results['statistics'][0]["two_sided_test"]
+        t_stat = results['statistics'][0][0]
         results['charts']['chartOne'] = generate_t_distribution_chart_data(alpha=alpha, t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
         results['charts']['chartTwo'] = generate_t_statistic_vs_sample_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2, alpha=alpha)
         results['charts']['chartThree'] = generate_t_statistic_vs_effect_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2, alpha=alpha)
+
+        # Labels
+        results['labels'] = {
+            "columns": ["Test Type", "t-statistic", 't-critical'],
+            "rows": ["One-sided test", "Two-sided test"],
+        }
 
     # TARGET: P-VALUE
     elif inputs['target'] == "p-value":
@@ -154,13 +180,19 @@ def run_model(inputs):
         results['notes'] = generate_p_value_notes(n_1=n_1,
                                                   n_2=n_2,
                                                   d=d,
-                                                  p_one_sided=results['statistics'][0]['one_sided_test'],
-                                                  p_two_sided=results['statistics'][0]['two_sided_test'],
+                                                  p_one_sided=results['statistics'][0][0],
+                                                  p_two_sided=results['statistics'][1][0],
                                                   t_stat=t_stat)
 
         # Charts
         results['charts']['chartOne'] = generate_t_distribution_chart_data(alpha=alpha, t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
         results['charts']['chartTwo'] = generate_p_value_vs_sample_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2, alpha=alpha)
         results['charts']['chartThree'] = generate_p_value_vs_effect_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2, alpha=alpha)
+
+        # Labels
+        results['labels'] = {
+            "columns": ["Test Type", "p-value"],
+            "rows": ["One-sided test", "Two-sided test"],
+        }
 
     return results
