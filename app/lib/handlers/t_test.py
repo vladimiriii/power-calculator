@@ -121,8 +121,8 @@ def run_model(inputs):
         # Charts
         t_stat = results['statistics'][0]["two_sided_test"]
         results['charts']['chartOne'] = generate_t_distribution_chart_data(alpha=alpha, t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
-        results['charts']['chartTwo'] = generate_t_statistic_vs_sample_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
-        results['charts']['chartThree'] = generate_t_statistic_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2)
+        results['charts']['chartTwo'] = generate_t_statistic_vs_sample_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2, alpha=alpha)
+        results['charts']['chartThree'] = generate_t_statistic_vs_effect_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2, alpha=alpha)
 
     # TARGET: P-VALUE
     elif inputs['target'] == "p-value":
@@ -153,7 +153,7 @@ def run_model(inputs):
 
         # Charts
         results['charts']['chartOne'] = generate_t_distribution_chart_data(alpha=alpha, t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
-        results['charts']['chartTwo'] = generate_p_value_vs_sample_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
-        results['charts']['chartThree'] = generate_p_value_vs_effect_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
+        results['charts']['chartTwo'] = generate_p_value_vs_sample_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2, alpha=alpha)
+        results['charts']['chartThree'] = generate_p_value_vs_effect_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2, alpha=alpha)
 
     return results

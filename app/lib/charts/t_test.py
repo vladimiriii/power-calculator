@@ -298,11 +298,19 @@ def generate_t_distribution_chart_data(alpha, t_stat, n_1, n_2, x_bar_1, x_bar_2
     }
 
 
-def generate_t_statistic_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
+def generate_t_statistic_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2, alpha):
     d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
     n_actual = n_1 + n_2
     r_e = n_1/n_2
-    sample_sizes = np.arange(max(4, n_actual - 249), max(n_actual + 250, 501))
+    n_results = tt.calculate_sample_size_from_means(mu_1=x_bar_1, mu_2=x_bar_2, sigma_1=s_1, sigma_2=s_2, alpha=alpha, power=0.5, enrolment_ratio=r_e)
+    n_target = n_results[0]["two_sided_test"] + n_results[1]["two_sided_test"]
+    ff = 0.1
+    x_min = int(max(4, min(n_actual * (1 - ff), n_target * (1 - ff))))
+    x_max = int(max(n_actual * (1 + ff), n_target * (1 + ff)))
+    step = int(max(1, (x_max - x_min) / 500))
+    sample_sizes = np.arange(x_min, x_max, step)
+    n_actual = utils.find_closest_value(sample_sizes, n_actual)
+    n_target = utils.find_closest_value(sample_sizes, n_target)
 
     t_stat_lower = []
     t_stat_higher = []
@@ -312,11 +320,11 @@ def generate_t_statistic_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
         welches_df = utils.welches_degrees_of_freedom(s_1, cn_1, s_2, cn_2)
         d = utils.calculate_cohens_d(x_bar_1, s_1, cn_1, x_bar_2, s_2, cn_2)
         t_stat = tt.calculate_t_stat_from_cohens_d(d, cn_1, cn_2)
-        if n <= n_actual:
+        if n <= n_target:
             t_stat_lower.append(t_stat)
         else:
             t_stat_lower.append(None)
-        if n >= n_actual:
+        if n >= n_target:
             t_stat_higher.append(t_stat)
         else:
             t_stat_higher.append(None)
@@ -325,7 +333,7 @@ def generate_t_statistic_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
     x_axis_values = [str(x) for x in list(sample_sizes)]
 
     return {
-        "title": "t-statistic vs Sample Size (effect size: {:.3f})".format(d_actual),
+        "title": "t-statistic vs Sample Size (effect size: {:.3f}, enrolment ratio: {:.3f})".format(d_actual, n_1/n_2),
         "xAxisLabel": "Total Samples",
         "yAxisLabel": "t-statistic",
         "labels": x_axis_values,
@@ -354,31 +362,34 @@ def generate_t_statistic_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
     }
 
 
-def generate_t_statistic_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
+def generate_t_statistic_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2, alpha):
     d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
-    window = 0.5
+    d_results = tt.calculate_min_effect_size(n_1=n_1, n_2=n_2, alpha=alpha, power=0.5)
+    d_target = d_results[0]['two_sided_test']
+    ff = 0.5
     if d_actual < 0:
-        x_max = d_actual * (1 - window)
-        x_min = d_actual * (1 + window)
+        x_min = min(-d_target, d_actual) * (1 + ff)
+        x_max = max(-d_target, d_actual) * (1 - ff)
     else:
-        x_min = d_actual * (1 - window)
-        x_max = d_actual * (1 + window)
-    step = (x_max - x_min) / 500
+        x_min = min(d_target, d_actual) * (1 - ff)
+        x_max = max(d_target, d_actual) * (1 + ff)
 
     # Rounding to ensure matches
+    step = (x_max - x_min) / 500
     dps = utils.determine_decimal_points(x_max)
     effect_sizes = [round(x, dps) for x in np.arange(x_min, x_max, step)]
-    d_actual = round(d_actual, dps)
+    d_actual = utils.find_closest_value(effect_sizes, d_actual)
+    d_target = utils.find_closest_value(effect_sizes, d_target)
 
     t_stat_lower = []
     t_stat_higher = []
     for d in effect_sizes:
         t_stat = tt.calculate_t_stat_from_cohens_d(d, n_1, n_2)
-        if d <= d_actual:
+        if d <= d_target:
             t_stat_lower.append(t_stat)
         else:
             t_stat_lower.append(None)
-        if d >= d_actual:
+        if d >= d_target:
             t_stat_higher.append(t_stat)
         else:
             t_stat_higher.append(None)
@@ -388,7 +399,7 @@ def generate_t_statistic_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
     x_axis_values = [format_string.format(x) for x in list(effect_sizes)]
 
     return {
-        "title": "t-statistic vs Effect Size (sample size: {})".format(n_1 + n_2),
+        "title": "t-statistic vs Effect Size (sample size: {}, enrolment ratio: {:.3f})".format(n_1 + n_2, n_1/n_2),
         "xAxisLabel": "Effect Size",
         "yAxisLabel": "t-statistic",
         "labels": x_axis_values,
@@ -417,11 +428,19 @@ def generate_t_statistic_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
     }
 
 
-def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
+def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2, alpha):
     d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
     n_actual = n_1 + n_2
     r_e = n_1 / n_2
-    sample_sizes = np.arange(max(4, n_actual - 249), max(n_actual + 250, 500))
+    n_results = tt.calculate_sample_size_from_means(mu_1=x_bar_1, mu_2=x_bar_2, sigma_1=s_1, sigma_2=s_2, alpha=alpha, power=0.5, enrolment_ratio=r_e)
+    n_target = n_results[0]["two_sided_test"] + n_results[1]["two_sided_test"]
+    ff = 0.1
+    x_min = int(max(4, min(n_actual * (1 - ff), n_target * (1 - ff))))
+    x_max = int(max(n_actual * (1 + ff), n_target * (1 + ff)))
+    step = int(max(1, (x_max - x_min) / 500))
+    sample_sizes = np.arange(x_min, x_max, step)
+    n_actual = utils.find_closest_value(sample_sizes, n_actual)
+    n_target = utils.find_closest_value(sample_sizes, n_target)
 
     os_lower = []
     ts_lower = []
@@ -434,13 +453,13 @@ def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
         d = utils.calculate_cohens_d(x_bar_1, s_1, cn_1, x_bar_2, s_2, cn_2)
         t_stat = tt.calculate_t_stat_from_cohens_d(d, cn_1, cn_2)
         results = tt.calculate_p_value(t_stat, welches_df)
-        if n <= n_actual:
+        if n <= n_target:
             os_lower.append(results[-1]['one_sided_test'])
             ts_lower.append(results[-1]['two_sided_test'])
         else:
             os_lower.append(None)
             ts_lower.append(None)
-        if n >= n_actual:
+        if n >= n_target:
             os_higher.append(results[-1]['one_sided_test'])
             ts_higher.append(results[-1]['two_sided_test'])
         else:
@@ -451,7 +470,7 @@ def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
     x_axis_values = [str(x) for x in list(sample_sizes)]
 
     return {
-        "title": "Sample Size vs p-value (effect size: {:.3f})".format(d_actual),
+        "title": "Sample Size vs p-value (effect size: {:.3f}, enrolment ratio: {:.3f})".format(d_actual, n_1/n_2),
         "xAxisLabel": "Total Samples",
         "yAxisLabel": "p-value",
         "labels": x_axis_values,
@@ -496,21 +515,24 @@ def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
     }
 
 
-def generate_p_value_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2):
+def generate_p_value_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2, alpha):
     d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
-    window = 0.1
+    d_results = tt.calculate_min_effect_size(n_1=n_1, n_2=n_2, alpha=alpha, power=0.5)
+    d_target = d_results[0]['two_sided_test']
+    ff = 0.5
     if d_actual < 0:
-        x_max = d_actual * (1 - window)
-        x_min = d_actual * (1 + window)
+        x_min = min(-d_target, d_actual) * (1 + ff)
+        x_max = max(-d_target, d_actual) * (1 - ff)
     else:
-        x_min = d_actual * (1 - window)
-        x_max = d_actual * (1 + window)
-    step = (x_max - x_min) / 500
+        x_min = min(d_target, d_actual) * (1 - ff)
+        x_max = max(d_target, d_actual) * (1 + ff)
 
     # Rounding to ensure matches
+    step = (x_max - x_min) / 500
     dps = utils.determine_decimal_points(x_max)
     effect_sizes = [round(x, dps) for x in np.arange(x_min, x_max, step)]
-    d_actual = round(d_actual, dps)
+    d_actual = utils.find_closest_value(effect_sizes, d_actual)
+    d_target = utils.find_closest_value(effect_sizes, d_target)
 
     os_lower = []
     ts_lower = []
@@ -520,13 +542,13 @@ def generate_p_value_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
         welches_df = utils.welches_degrees_of_freedom(s_1, n_1, s_2, n_2)
         t_stat = tt.calculate_t_stat_from_cohens_d(d, n_1, n_2)
         results = tt.calculate_p_value(t_stat, welches_df)
-        if d <= d_actual:
+        if d <= d_target:
             os_lower.append(results[-1]['one_sided_test'])
             ts_lower.append(results[-1]['two_sided_test'])
         else:
             os_lower.append(None)
             ts_lower.append(None)
-        if d >= d_actual:
+        if d >= d_target:
             os_higher.append(results[-1]['one_sided_test'])
             ts_higher.append(results[-1]['two_sided_test'])
         else:
@@ -538,7 +560,7 @@ def generate_p_value_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
     x_axis_values = [format_string.format(x) for x in list(effect_sizes)]
 
     return {
-        "title": "p-value vs Effect Size (sample size: {})".format(n_1 + n_2),
+        "title": "p-value vs Effect Size (sample size: {}, enrolment ratio: {:.3f})".format(n_1 + n_2, n_1/n_2),
         "xAxisLabel": "Effect Size",
         "yAxisLabel": "p-value",
         "labels": x_axis_values,
