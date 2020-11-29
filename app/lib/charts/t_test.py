@@ -6,7 +6,7 @@ from app.lib import utils, colors
 from app.lib.statistics import t_test as tt
 
 
-def generate_power_chart_data(d, alpha, power, enrolment_ratio):
+def generate_power_vs_sample_size_chart_data(d, alpha, power, enrolment_ratio):
     dps = 3
     power = round(power, dps)
     power_range = list(np.arange(0.50, 1, 0.001))
@@ -73,7 +73,7 @@ def generate_power_chart_data(d, alpha, power, enrolment_ratio):
     }
 
 
-def generate_effect_size_chart_data(d, alpha, power, enrolment_ratio):
+def generate_effect_size_vs_sample_size_chart_data(d, alpha, power, enrolment_ratio):
     window = 0.1
     if d < 0:
         x_max = d * (1 - window)
@@ -149,6 +149,90 @@ def generate_effect_size_chart_data(d, alpha, power, enrolment_ratio):
     }
 
     return chart_data
+
+
+def generate_sample_size_vs_power_chart_data(d, alpha, power, enrolment_ratio):
+    n_results = tt.calculate_sample_size_from_cohens_d(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
+    n_powered = tt.calculate_sample_size_from_cohens_d(d=d, alpha=alpha, power=0.8, enrolment_ratio=enrolment_ratio)
+    n_target = n_results[0][1] + n_results[1][1]
+    ff = 0.1
+    x_min = 4
+    x_max = max(n_powered[0][1] + n_powered[1][1], int(n_target * (1 + ff)))
+    step = int(max(1, (x_max - x_min) / 500))
+    sample_sizes = np.arange(x_min, x_max, step)
+    n_target = utils.find_closest_value(sample_sizes, n_target)
+
+    os_lower = []
+    ts_lower = []
+    os_upper = []
+    ts_upper = []
+    for n in sample_sizes:
+        cn_1 = math.ceil(n * enrolment_ratio / (1 + enrolment_ratio))
+        cn_2 = math.ceil(n - cn_1)
+        results = tt.calculate_power_from_cohens_d(d=d, n_1=cn_1, n_2=cn_2, alpha=alpha)
+        if n < n_target:
+            os_lower.append(results[0][0])
+            ts_lower.append(results[1][0])
+            os_upper.append(None)
+            ts_upper.append(None)
+        elif n > n_target:
+            os_lower.append(None)
+            ts_lower.append(None)
+            os_upper.append(results[0][0])
+            ts_upper.append(results[1][0])
+        elif n == n_target:
+            os_lower.append(results[0][0])
+            ts_lower.append(results[1][0])
+            os_upper.append(results[0][0])
+            ts_upper.append(results[1][0])
+
+    # Determine X axis range
+    x_axis_values = [str(x) for x in list(sample_sizes)]
+
+    return {
+        "title": "Sample Size vs Power (effect size: {:0.3f}, α: {:0.3f})".format(d, alpha),
+        "xAxisLabel": "Sample Size",
+        "yAxisLabel": "Statistical Power (1 - β)",
+        "labels": x_axis_values,
+        "verticalLine": {
+            "position": str(n_target),
+            "label": "Current Sample Size"
+        },
+        "dataset": [
+            {
+                "label": "One Sided Test",
+                "data": os_lower,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
+            },
+            {
+                "label": "One Sided Test",
+                "data": os_upper,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[1],
+                "backgroundColor": colors.background_colors[1]
+            },
+            {
+                "label": "Two Sided Test",
+                "data": ts_lower,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
+            },
+            {
+                "label": "Two Sided Test",
+                "data": ts_upper,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[1],
+                "backgroundColor": colors.background_colors[1]
+            }
+        ]
+    }
 
 
 def generate_distributions_chart_data(d, alpha, n_1, n_2):
