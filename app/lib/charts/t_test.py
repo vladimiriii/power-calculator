@@ -587,7 +587,6 @@ def generate_t_distribution_chart_data(alpha, t_stat, n_1, n_2, x_bar_1, x_bar_2
         else:
             significant.append(t.pdf(value, df=welches_df))
 
-
     return {
         "title": "Null Hypothesis t-distribution (effect size: {:.3f})".format(d),
         "xAxisLabel": "t",
@@ -659,7 +658,7 @@ def generate_t_statistic_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
         "labels": x_axis_values,
         "verticalLine": {
             "position": str(n_actual),
-            "label": "Current Sample Size"
+            "label": "Specified Sample Size"
         },
         "dataset": [
             {
@@ -725,7 +724,7 @@ def generate_t_statistic_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
         "labels": x_axis_values,
         "verticalLine": {
             "position": format_string.format(d_actual),
-            "label": "Current Effect Size"
+            "label": "Specified Effect Size"
         },
         "dataset": [
             {
@@ -796,7 +795,7 @@ def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
         "labels": x_axis_values,
         "verticalLine": {
             "position": str(n_actual),
-            "label": "Current Sample Size"
+            "label": "Specified Sample Size"
         },
         "dataset": [
             {
@@ -886,7 +885,7 @@ def generate_p_value_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
         "labels": x_axis_values,
         "verticalLine": {
             "position": format_string.format(d_actual),
-            "label": "Current Effect Size"
+            "label": "Specified Effect Size"
         },
         "dataset": [
             {
