@@ -43,10 +43,10 @@ h2, h3, h4, h5 {
     text-align: center;
 }
 
-.share-btn.facebook:hover {
+.share-btn.github:hover {
     color: #FFFFFF;
-    background-color: #3b5998;
-    border: 2px solid #3b5998;
+    background-color: #000;
+    border: 2px solid #000;
 }
 
 .share-btn.twitter:hover {
