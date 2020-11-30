@@ -43,8 +43,8 @@ def run_model(inputs):
 
         # Labels
         results['labels'] = {
-            "columns": ["Sample", "One-sided test", "Two-sided test"],
-            "rows": ["Group 1", "Group 2", "Combined"],
+            "columns": ["", "One-sided test", "Two-sided test"],
+            "rows": ["Sample 1 (n<sub>1</sub>)", "Sample 2 (n<sub>2</sub>)", "All Samples (n<sub>1</sub> + n<sub>2</sub>)"],
         }
 
     # TARGET: POWER
@@ -74,8 +74,8 @@ def run_model(inputs):
         power = results['statistics'][1][0]
         if d is None:
             d = utils.calculate_cohens_d(mu_1=mu_1, sigma_1=sigma_1, n_1=n_1, mu_2=mu_2, sigma_2=sigma_2, n_2=n_2)
-        results['charts']['chartOne'] = generate_sample_size_vs_power_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=n_1/n_2)
-        results['charts']['chartTwo'] = generate_effect_size_vs_sample_size_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=n_1/n_2)
+        results['charts']['chartOne'] = generate_sample_size_vs_power_chart_data(d=d, alpha=alpha, power=power, n_1=n_1, n_2=n_2)
+        results['charts']['chartTwo'] = generate_effect_size_vs_power_chart_data(d=d, alpha=alpha, n_1=n_1, n_2=n_2)
         results['charts']['chartThree'] = generate_distributions_chart_data(d=d, alpha=alpha, n_1=n_1, n_2=n_2)
 
         # Labels
@@ -96,8 +96,8 @@ def run_model(inputs):
 
         # Charts
         d = results['statistics'][1][0]
-        results['charts']['chartOne'] = generate_sample_size_vs_power_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=n_1/n_2)
-        results['charts']['chartTwo'] = generate_effect_size_vs_sample_size_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=n_1/n_2)
+        results['charts']['chartOne'] = generate_sample_size_vs_effect_size_data(d=d, alpha=alpha, power=power, n_1=n_1, n_2=n_2)
+        results['charts']['chartTwo'] = generate_power_vs_effect_size_data(d=d, alpha=alpha, power=power, n_1=n_1, n_2=n_2)
         results['charts']['chartThree'] = generate_distributions_chart_data(d=d, alpha=alpha, n_1=n_1, n_2=n_2)
 
         # Labels

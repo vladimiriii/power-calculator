@@ -28,13 +28,13 @@ def generate_power_vs_sample_size_chart_data(d, alpha, power, enrolment_ratio):
     ts_higher = [round(val, dps) if round(pow, dps) >= power else None for pow, val in zip(power_range, two_sided_sample_sizes)]
 
     return {
-        "title": "Sample Size vs Power (effect size: {:0.3f}, α: {:0.3f})".format(d, alpha),
+        "title": "Sample Size vs Power (effect size (d): {:0.3f}, α: {:0.3f})".format(d, alpha),
         "xAxisLabel": "Statistical Power (1 - β)",
         "yAxisLabel": "Sample Size",
         "labels": ["{:0.3f}".format(p) for p in power_range],
         "verticalLine": {
             "position": "{:0.3f}".format(power),
-            "label": "Current Power"
+            "label": "Specified Power"
         },
         "dataset": [
             {
@@ -105,12 +105,12 @@ def generate_effect_size_vs_sample_size_chart_data(d, alpha, power, enrolment_ra
     format_string = "{:." + str(dps) + "f}"
     chart_data = {
         "title": "Sample Size vs Effect Size (α: {:0.3f}, power (1 - β): {:.1%})".format(alpha, power),
-        "xAxisLabel": "Effect Size",
+        "xAxisLabel": "Effect Size (d)",
         "yAxisLabel": "Sample Size",
         "labels": [format_string.format(es) for es in effect_sizes],
         "verticalLine": {
             "position": format_string.format(d),
-            "label": "Current Effect Size"
+            "label": "Specified Effect Size"
         },
         "dataset": [
             {
@@ -151,13 +151,14 @@ def generate_effect_size_vs_sample_size_chart_data(d, alpha, power, enrolment_ra
     return chart_data
 
 
-def generate_sample_size_vs_power_chart_data(d, alpha, power, enrolment_ratio):
-    n_results = tt.calculate_sample_size_from_cohens_d(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
+def generate_sample_size_vs_power_chart_data(d, alpha, power, n_1, n_2):
+    enrolment_ratio = n_1/n_2
     n_powered = tt.calculate_sample_size_from_cohens_d(d=d, alpha=alpha, power=0.8, enrolment_ratio=enrolment_ratio)
-    n_target = n_results[0][1] + n_results[1][1]
+    n_target = n_1 + n_2
+
     ff = 0.1
     x_min = 4
-    x_max = max(n_powered[0][1] + n_powered[1][1], int(n_target * (1 + ff)))
+    x_max = max(n_powered[-1][1] + n_powered[-1][1], int(n_target * (1 + ff)))
     step = int(max(1, (x_max - x_min) / 500))
     sample_sizes = np.arange(x_min, x_max, step)
     n_target = utils.find_closest_value(sample_sizes, n_target)
@@ -186,17 +187,252 @@ def generate_sample_size_vs_power_chart_data(d, alpha, power, enrolment_ratio):
             os_upper.append(results[0][0])
             ts_upper.append(results[1][0])
 
-    # Determine X axis range
-    x_axis_values = [str(x) for x in list(sample_sizes)]
-
     return {
-        "title": "Sample Size vs Power (effect size: {:0.3f}, α: {:0.3f})".format(d, alpha),
+        "title": "Sample Size vs Power (effect size (d): {:0.3f}, α: {:0.3f})".format(d, alpha),
         "xAxisLabel": "Sample Size",
         "yAxisLabel": "Statistical Power (1 - β)",
-        "labels": x_axis_values,
+        "labels": [str(x) for x in list(sample_sizes)],
         "verticalLine": {
             "position": str(n_target),
-            "label": "Current Sample Size"
+            "label": "Specified Sample Size"
+        },
+        "dataset": [
+            {
+                "label": "One Sided Test",
+                "data": os_lower,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
+            },
+            {
+                "label": "One Sided Test",
+                "data": os_upper,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[1],
+                "backgroundColor": colors.background_colors[1]
+            },
+            {
+                "label": "Two Sided Test",
+                "data": ts_lower,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
+            },
+            {
+                "label": "Two Sided Test",
+                "data": ts_upper,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[1],
+                "backgroundColor": colors.background_colors[1]
+            }
+        ]
+    }
+
+
+def generate_effect_size_vs_power_chart_data(d, alpha, n_1, n_2):
+    ff = 0.1
+    d_powered = tt.calculate_min_effect_size(n_1=n_1, n_2=n_2, alpha=alpha, power=0.8)
+    if d < 0:
+        x_min = min(-d_powered[1][0], d) * (1 + ff)
+        x_max = max(-0.01, d * (1 + ff))
+    else:
+        x_min = min(0.01, d * (1 - ff))
+        x_max = max(d_powered[1][0], d) * (1 + ff)
+    step = (x_max - x_min) / 500
+    dps = utils.determine_decimal_points(x_max)
+    effect_sizes = [round(x, dps) for x in np.arange(x_min, x_max, step)]
+    d_target = utils.find_closest_value(effect_sizes, d)
+
+    os_lower = []
+    ts_lower = []
+    os_higher = []
+    ts_higher = []
+    for es in effect_sizes:
+        results = tt.calculate_power_from_cohens_d(d=es, n_1=n_1, n_2=n_2, alpha=alpha)
+        if (es < d_target and d_target > 0) or (es > d_target and d_target < 0):
+            os_lower.append(results[0][0])
+            ts_lower.append(results[1][0])
+            os_higher.append(None)
+            ts_higher.append(None)
+        elif (es < d_target and d_target < 0) or (es > d_target and d_target > 0):
+            os_lower.append(None)
+            ts_lower.append(None)
+            os_higher.append(results[0][0])
+            ts_higher.append(results[1][0])
+        elif es == d_target:
+            os_lower.append(results[0][0])
+            ts_lower.append(results[1][0])
+            os_higher.append(results[0][0])
+            ts_higher.append(results[1][0])
+
+    format_string = "{:." + str(dps) + "f}"
+    chart_data = {
+        "title": "Sample Size vs Effect Size (α: {:.3f}, total samples: {:,})".format(alpha, n_1 + n_2),
+        "xAxisLabel": "Effect Size (d)",
+        "yAxisLabel": "Statistical Power (1 - β)",
+        "labels": [format_string.format(es) for es in effect_sizes],
+        "verticalLine": {
+            "position": format_string.format(d_target),
+            "label": "Specified Effect Size"
+        },
+        "dataset": [
+            {
+                "label": "Lower Powers – One Sided Test",
+                "data": os_lower,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
+            },
+            {
+                "label": "Higher Powers – One Sided Test",
+                "data": os_higher,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[1],
+                "backgroundColor": colors.background_colors[1]
+            },
+            {
+                "label": "Lower Powers – Two Sided Test",
+                "data": ts_lower,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
+            },
+            {
+                "label": "Higher Powers – Two Sided Test",
+                "data": ts_higher,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[1],
+                "backgroundColor": colors.background_colors[1]
+            },
+        ]
+    }
+
+    return chart_data
+
+
+def generate_sample_size_vs_effect_size_data(d, alpha, power, n_1, n_2):
+    enrolment_ratio = n_1/n_2
+    n_target = n_1 + n_2
+
+    ff = 0.1
+    x_min = 4
+    x_max = int(n_target * (1 + ff))
+    step = int(max(1, (x_max - x_min) / 500))
+    sample_sizes = np.arange(x_min, x_max, step)
+    n_target = utils.find_closest_value(sample_sizes, n_target)
+
+    os_lower = []
+    ts_lower = []
+    os_upper = []
+    ts_upper = []
+    for n in sample_sizes:
+        cn_1 = math.ceil(n * enrolment_ratio / (1 + enrolment_ratio))
+        cn_2 = math.ceil(n - cn_1)
+        results = tt.calculate_min_effect_size(n_1=cn_1, n_2=cn_2, alpha=alpha, power=power)
+        if n < n_target:
+            os_lower.append(results[0][0])
+            ts_lower.append(results[1][0])
+            os_upper.append(None)
+            ts_upper.append(None)
+        elif n > n_target:
+            os_lower.append(None)
+            ts_lower.append(None)
+            os_upper.append(results[0][0])
+            ts_upper.append(results[1][0])
+        elif n == n_target:
+            os_lower.append(results[0][0])
+            ts_lower.append(results[1][0])
+            os_upper.append(results[0][0])
+            ts_upper.append(results[1][0])
+
+    return {
+        "title": "Sample Size vs Effect Size (α: {:0.3f}, power (1 - β): {:.1%})".format(alpha, power),
+        "xAxisLabel": "Sample Size",
+        "yAxisLabel": "Effect Size (d)",
+        "labels": [str(x) for x in list(sample_sizes)],
+        "verticalLine": {
+            "position": str(n_target),
+            "label": "Specified Sample Size"
+        },
+        "dataset": [
+            {
+                "label": "One Sided Test",
+                "data": os_lower,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
+            },
+            {
+                "label": "One Sided Test",
+                "data": os_upper,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[1],
+                "backgroundColor": colors.background_colors[1]
+            },
+            {
+                "label": "Two Sided Test",
+                "data": ts_lower,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[0],
+                "backgroundColor": colors.background_colors[0]
+            },
+            {
+                "label": "Two Sided Test",
+                "data": ts_upper,
+                "pointBorderWidth": 0,
+                "pointRadius": 0.5,
+                "borderColor": colors.line_colors[1],
+                "backgroundColor": colors.background_colors[1]
+            }
+        ]
+    }
+
+
+def generate_power_vs_effect_size_data(d, alpha, power, n_1, n_2):
+    power_list = list(np.arange(0.4, 1, 0.001))
+    power_target = utils.find_closest_value(power_list, power)
+
+    os_lower = []
+    ts_lower = []
+    os_upper = []
+    ts_upper = []
+    for pow in power_list:
+        results = tt.calculate_min_effect_size(n_1=n_1, n_2=n_2, alpha=alpha, power=pow)
+        if pow < power_target:
+            os_lower.append(results[0][0])
+            ts_lower.append(results[1][0])
+            os_upper.append(None)
+            ts_upper.append(None)
+        elif pow > power_target:
+            os_lower.append(None)
+            ts_lower.append(None)
+            os_upper.append(results[0][0])
+            ts_upper.append(results[1][0])
+        elif pow == power_target:
+            os_lower.append(results[0][0])
+            ts_lower.append(results[1][0])
+            os_upper.append(results[0][0])
+            ts_upper.append(results[1][0])
+
+    return {
+        "title": "Power vs Effect Size (α: {:0.3f}, total samples: {:,})".format(alpha, n_1 + n_2),
+        "xAxisLabel": "Statistical Power (1 - β)",
+        "yAxisLabel": "Effect Size (d)",
+        "labels": ["{:.3f}".format(x) for x in power_list],
+        "verticalLine": {
+            "position": "{:.3f}".format(power_target),
+            "label": "Specified Sample Size"
         },
         "dataset": [
             {
