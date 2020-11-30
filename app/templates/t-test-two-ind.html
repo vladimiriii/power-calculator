@@ -34,22 +34,23 @@
         <div class="row">
             <div class="col-md-10 offset-md-1">
                 <h1>t-test – Independent Samples</h1>
-                <p>This test is used when:</p>
+                <p>One of the most well-known hypothesis tests, the t-test is used to assess the equality of two population statistics (typically means) based on samples from those populations. This test is used when:</p>
                 <ol>
-                    <li>You have two <a href="https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables" target='_blank'>independent and identically distributed</a> samples (e.g. a treatment group and a control group, not a before and after treatment comparison (i.e. "paired samples").</li>
+                    <li>You have two separate sets of <a href="https://en.wikipedia.org/wiki/Independent_and_identically-distributed_random_variables" target="_blank">independent and identically distributed</a> samples. E.g. a treatment group and a control group, not a before and after treatment comparison ("paired samples").</li>
                     <li>You want to assess if a treatment led to some measureable difference in the groups (e.g. giving the treatment group a low fat diet led to a reduction in average weight).</li>
-                    <li>You can reasonably assume (or you have confirmed) that the sample means (not the underlying data) are normally distributed (see <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target='_blank'>Central Limit Theorem</a>).</li>
+                    <li>The sample means (not neccessarily the underlying data) are independent and normally distributed (see <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target='_blank'>Central Limit Theorem</a>).</li>
+                    <li>The sample variance is χ<sup>2</sup> distributed, and the sample mean and sample variance are statistically independent.<sup><i>See note 2</i></sup></li>
                     <li>You do not know the standard deviation of the underlying populations. If you do, you can instead use a <i>z</i>-test.</li>
                 </ol>
                 <p>If this is the type of test you are conducting, or have already completed, you can use this calculator to:</p>
                 <ol>
                     <li>Estimate how large a sample you will need to detect an expected effect size (at a given power level).</li>
-                    <li>Assess the power of a completed test based on the sample and effect sizes.</li>
-                    <li>Calculate the p-value of a completed test.</li>
-                    <li>Estimate the smallest effect size you can detect (at a given power level) based on your sample size.</li>
+                    <li>Estimate the power of a planned study based on expected sample and effect sizes. You cannot calculate the power of a completed study based on the observed effect size.</li>
+                    <li>Estimate the smallest effect size you can detect for a given power level and sample size.</li>
+                    <li>Calculate the t-statistic and/or p-value of a completed test.</li>
                 </ol>
                 <p><i>Note 1: This calculator does not require the groups to have equal variance as it uses the Welch's unequal variances t-test formulation by default – and <a href='https://daniellakens.blogspot.com/2015/01/always-use-welchs-t-test-instead-of.html' target='_blank'>you probably should too</a>.</i></p>
-                <p><i>Note 2: Another underlying assumption of the t-test is not only that the sample means are normally distributed, but also that the sample variance is χ<sup>2</sup> distributed.</i></p>
+                <p><i>Note 2: This assumption holds if the underlying data are normally distributed, but not neccessarily if you are relying on the central limit theorem for normally distributed sample means.</i></p>
             </div>
         </div>
         <div class="row">
@@ -132,9 +133,9 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <ul id="understanding">
-                                    <li><strong>Significance Level (α)</strong>: In order to reject the null hypothesis (H<sub>0</sub>: θ = 0; where θ = |μ<sub>1</sub> - μ<sub>2</sub>|), we must observe a difference in sample means that falls in the α most extreme differences in sample means that we would expect to see if the null hypothesis is true. Values in these regions are highlighted in red in the chart to the right.</li>
-                                    <li><strong>Statistical Power (1 - β)</strong>: Assuming the alternate hypothesis is true (H<sub>A</sub>: θ = x; where x is the expected difference in population means), repeated sampling would cause us to correctly reject the null hypothesis at a rate of 1 - β. This equates to a false negative (Type II error) rate of β. The sample mean differences that would lead to a Type II error are highlighted in blue in the chart to the right.</li>
-                                    <li><strong>Effect Size (Cohen's d)</strong>: A standardized measure of the difference in the group means (can be sample or population means depending on the context). The difference in means is divided by the standard deviation to make the number comparable across different experiments.</li>
+                                    <li><strong>Significance Level (α)</strong>: In order to reject the null hypothesis (H<sub>0</sub>: θ = 0; where θ = μ<sub>1</sub> - μ<sub>2</sub>), we must observe a difference in sample means that falls in the α most extreme differences in sample means that we would expect to see if the null hypothesis is true.</li>
+                                    <li><strong>Statistical Power (1 - β)</strong>: Assuming the alternate hypothesis is true (H<sub>A</sub>: θ ≠ 0), repeated sampling would cause us to correctly reject the null hypothesis at a rate of 1 - β. This equates to a false negative (Type II error) rate of β.</li>
+                                    <li><strong>Effect Size (Cohen's d)</strong>: A standardized measure of the difference in the means (can be sample or population means depending on the context). The difference in means is divided by the <a href="https://en.wikipedia.org/wiki/Pooled_variance" target="_blank">pooled standard deviation</a> of the two samples/populations to make the number comparable across different experiments.</li>
                                 </ul>
                             </div>
                         </div>

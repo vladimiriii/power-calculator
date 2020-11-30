@@ -26,6 +26,9 @@ def run_model(inputs):
             results['formulae'] = create_sample_size_from_means_formula(mu_1=mu_1, mu_2=mu_2, sigma_1=sigma_1, sigma_2=sigma_2, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
         else:
             d = float(inputs['effectSize'])
+            mu_1 = 0
+            mu_2 = mu_1 + d
+            sigma_1, sigma_2 = 1, 1
             results['statistics'] = calculate_sample_size_from_cohens_d(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
             results['formulae'] = create_sample_size_from_d_formula(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
 
@@ -39,7 +42,7 @@ def run_model(inputs):
             d = utils.calculate_cohens_d(mu_1=mu_1, sigma_1=sigma_1, n_1=n_1, mu_2=mu_2, sigma_2=sigma_2, n_2=n_2)
         results['charts']['chartOne'] = generate_power_vs_sample_size_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
         results['charts']['chartTwo'] = generate_effect_size_vs_sample_size_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
-        results['charts']['chartThree'] = generate_distributions_chart_data(d=d, alpha=alpha, n_1=n_1, n_2=n_2)
+        results['charts']['chartThree'] = generate_sampling_distributions_chart_data(mu_1=mu_1, mu_2=mu_2, sigma_1=sigma_1, sigma_2=sigma_2, n_1=n_1, n_2=n_2, alpha=alpha)
 
         # Labels
         results['labels'] = {
@@ -64,6 +67,9 @@ def run_model(inputs):
             results['formulae'] = create_power_from_means_formula(mu_1=mu_1, sigma_1=sigma_1, n_1=n_1, mu_2=mu_2, sigma_2=sigma_2, n_2=n_2, alpha=alpha)
         else:
             d = float(inputs['effectSize'])
+            mu_1 = 0
+            mu_2 = mu_1 + d
+            sigma_1, sigma_2 = 1, 1
             results['statistics'] = calculate_power_from_cohens_d(d=d, n_1=n_1, n_2=n_2, alpha=alpha)
             results['formulae'] = create_power_from_d_formula(d=d, n_1=n_1, n_2=n_2, alpha=alpha)
 
@@ -76,7 +82,7 @@ def run_model(inputs):
             d = utils.calculate_cohens_d(mu_1=mu_1, sigma_1=sigma_1, n_1=n_1, mu_2=mu_2, sigma_2=sigma_2, n_2=n_2)
         results['charts']['chartOne'] = generate_sample_size_vs_power_chart_data(d=d, alpha=alpha, power=power, n_1=n_1, n_2=n_2)
         results['charts']['chartTwo'] = generate_effect_size_vs_power_chart_data(d=d, alpha=alpha, n_1=n_1, n_2=n_2)
-        results['charts']['chartThree'] = generate_distributions_chart_data(d=d, alpha=alpha, n_1=n_1, n_2=n_2)
+        results['charts']['chartThree'] = generate_sampling_distributions_chart_data(mu_1=mu_1, mu_2=mu_2, sigma_1=sigma_1, sigma_2=sigma_2, n_1=n_1, n_2=n_2, alpha=alpha)
 
         # Labels
         results['labels'] = {
@@ -96,9 +102,12 @@ def run_model(inputs):
 
         # Charts
         d = results['statistics'][1][0]
+        mu_1 = 0
+        mu_2 = mu_1 + d
+        sigma_1, sigma_2 = 1, 1
         results['charts']['chartOne'] = generate_sample_size_vs_effect_size_data(d=d, alpha=alpha, power=power, n_1=n_1, n_2=n_2)
         results['charts']['chartTwo'] = generate_power_vs_effect_size_data(d=d, alpha=alpha, power=power, n_1=n_1, n_2=n_2)
-        results['charts']['chartThree'] = generate_distributions_chart_data(d=d, alpha=alpha, n_1=n_1, n_2=n_2)
+        results['charts']['chartThree'] = generate_sampling_distributions_chart_data(mu_1=mu_1, mu_2=mu_2, sigma_1=sigma_1, sigma_2=sigma_2, n_1=n_1, n_2=n_2, alpha=alpha)
 
         # Labels
         results['labels'] = {

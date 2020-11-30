@@ -5,7 +5,7 @@ from app.lib import utils
 
 def create_sample_size_from_means_formula(mu_1, mu_2, sigma_1, sigma_2, alpha, power, enrolment_ratio):
     formulae = []
-    step_1 = "n_1 = \\frac{{(\\sigma_1^2 + r_e\\sigma_2^2)(z_{{1 - \\alpha/2}} + z_{{1 - \\beta}})^2}}{{(\\mu_1 - \\mu_2)^2}}"
+    step_1 = "n_1 = \\frac{{(\\sigma_1^2 + r_n\\sigma_2^2)(z_{{1 - \\alpha/2}} + z_{{1 - \\beta}})^2}}{{(\\mu_1 - \\mu_2)^2}}"
     formulae.append(step_1)
 
     z_a = norm.ppf(1 - alpha/2)
@@ -21,7 +21,7 @@ def create_sample_size_from_means_formula(mu_1, mu_2, sigma_1, sigma_2, alpha, p
     n_1 = math.ceil(numerator_1 * numerator_2 / denominator)
     formulae.append(step_3.format(numerator_1, numerator_2, denominator, n_1))
 
-    step_4 = "n_2 = \\frac{{n_1}}{{r_e}} = \\frac{{{}}}{{{:.3f}}} = {}"
+    step_4 = "n_2 = \\frac{{n_1}}{{r_n}} = \\frac{{{}}}{{{:.3f}}} = {}"
     formulae.append(step_4.format(n_1, enrolment_ratio, math.ceil(n_1 / enrolment_ratio)))
 
     return formulae
@@ -29,7 +29,7 @@ def create_sample_size_from_means_formula(mu_1, mu_2, sigma_1, sigma_2, alpha, p
 
 def create_sample_size_from_d_formula(d, alpha, power, enrolment_ratio):
     formulae = []
-    step_1 = "n_1 =  \\frac{{(1 + r_e)(z_{{1 - \\alpha/2}} + z_{{1 - \\beta}})^2}}{{d^2}}"
+    step_1 = "n_1 =  \\frac{{(1 + r_n)(z_{{1 - \\alpha/2}} + z_{{1 - \\beta}})^2}}{{d^2}}"
     formulae.append(step_1)
 
     z_a = norm.ppf(1 - alpha/2)
@@ -45,7 +45,7 @@ def create_sample_size_from_d_formula(d, alpha, power, enrolment_ratio):
     n_1 = math.ceil(numerator_1 * numerator_2 / denominator)
     formulae.append(step_3.format(numerator_1, numerator_2, denominator, n_1))
 
-    step_4 = "n_2 = \\frac{{n_1}}{{r_e}} = \\frac{{{}}}{{{:.3f}}} = {}"
+    step_4 = "n_2 = \\frac{{n_1}}{{r_n}} = \\frac{{{}}}{{{:.3f}}} = {}"
     formulae.append(step_4.format(n_1, enrolment_ratio, math.ceil(n_1 / enrolment_ratio)))
 
     return formulae

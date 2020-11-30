@@ -22,7 +22,7 @@ const fieldMap = {
             "required": false
     },
     "enrolmentRatio": {
-            "label": 'Enrolment Ratio (n<sub>1</sub> / n<sub>2</sub>):',
+            "label": 'Ratio of observations (n<sub>1</sub> / n<sub>2</sub>):',
             "default": 1,
             "step": "any",
             "min": 0,

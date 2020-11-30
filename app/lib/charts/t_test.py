@@ -7,34 +7,32 @@ from app.lib.statistics import t_test as tt
 
 
 def generate_power_vs_sample_size_chart_data(d, alpha, power, enrolment_ratio):
-    dps = 3
-    power = round(power, dps)
-    power_range = list(np.arange(0.50, 1, 0.001))
-    one_sided_sample_sizes = []
-    two_sided_sample_sizes = []
+    power_range = list(np.arange(0.40, 1, 0.001))
+    os_sample_sizes = []
+    ts_sample_sizes = []
     for p in power_range:
         results = tt.calculate_sample_size_from_cohens_d(d=d,
                                                          alpha=alpha,
                                                          power=p,
                                                          enrolment_ratio=enrolment_ratio)
-        one_sided_sample_sizes.append(results[-1][0])
-        two_sided_sample_sizes.append(results[-1][1])
+        os_sample_sizes.append(results[-1][0])
+        ts_sample_sizes.append(results[-1][1])
 
     # Split into higher and lower
-
-    os_lower = [round(val, dps) if round(pow, dps) <= power else None for pow, val in zip(power_range, one_sided_sample_sizes)]
-    os_higher = [round(val, dps) if round(pow, dps) >= power else None for pow, val in zip(power_range, one_sided_sample_sizes)]
-    ts_lower = [round(val, dps) if round(pow, dps) <= power else None for pow, val in zip(power_range, two_sided_sample_sizes)]
-    ts_higher = [round(val, dps) if round(pow, dps) >= power else None for pow, val in zip(power_range, two_sided_sample_sizes)]
+    rounded_power = round(power, 3)
+    os_lower = [math.ceil(val) if pow <= rounded_power else None for pow, val in zip(power_range, os_sample_sizes)]
+    os_higher = [math.ceil(val) if pow >= rounded_power else None for pow, val in zip(power_range, os_sample_sizes)]
+    ts_lower = [math.ceil(val) if pow <= rounded_power else None for pow, val in zip(power_range, ts_sample_sizes)]
+    ts_higher = [math.ceil(val) if pow >= rounded_power else None for pow, val in zip(power_range, ts_sample_sizes)]
 
     return {
-        "title": "Sample Size vs Power (effect size (d): {:0.3f}, α: {:0.3f})".format(d, alpha),
+        "title": "Sample Size vs Power (effect size: {:0.3f}, α: {:0.3f})".format(d, alpha),
         "xAxisLabel": "Statistical Power (1 - β)",
         "yAxisLabel": "Sample Size",
         "labels": ["{:0.3f}".format(p) for p in power_range],
         "verticalLine": {
-            "position": "{:0.3f}".format(power),
-            "label": "Specified Power"
+            "position": "{:0.3f}".format(rounded_power),
+            "label": "Power: {:.3f}".format(power)
         },
         "dataset": [
             {
@@ -83,24 +81,24 @@ def generate_effect_size_vs_sample_size_chart_data(d, alpha, power, enrolment_ra
         x_max = d * (1 + window)
     step = (x_max - x_min) / 500
     dps = utils.determine_decimal_points(x_max)
-    effect_sizes = list(np.arange(x_min, x_max, step))
+    effect_sizes = [round(x, dps) for x in np.arange(x_min, x_max, step)]
 
-    one_sided_sample_sizes = []
-    two_sided_sample_sizes = []
+    os_sample_sizes = []
+    ts_sample_sizes = []
     for es in effect_sizes:
         results = tt.calculate_sample_size_from_cohens_d(d=es,
                                                          alpha=alpha,
                                                          power=power,
                                                          enrolment_ratio=enrolment_ratio)
-        one_sided_sample_sizes.append(results[-1][0])
-        two_sided_sample_sizes.append(results[-1][1])
+        os_sample_sizes.append(results[-1][0])
+        ts_sample_sizes.append(results[-1][1])
 
     # Split into higher and lower
-    actual_x = abs(round(d, dps))
-    os_lower = [round(y, dps) if -actual_x <= round(x, dps) <= actual_x else None for x, y in zip(effect_sizes, one_sided_sample_sizes)]
-    os_higher = [round(y, dps) if round(x, dps) <= -actual_x or round(x, dps) >= actual_x else None for x, y in zip(effect_sizes, one_sided_sample_sizes)]
-    ts_lower = [round(y, dps) if -actual_x <= round(x, dps) <= actual_x else None for x, y in zip(effect_sizes, two_sided_sample_sizes)]
-    ts_higher = [round(y, dps) if round(x, dps) <= -actual_x or round(x, dps) >= actual_x else None for x, y in zip(effect_sizes, two_sided_sample_sizes)]
+    rounded_d = abs(round(d, dps))
+    os_lower = [y if -rounded_d <= x <= rounded_d else None for x, y in zip(effect_sizes, os_sample_sizes)]
+    os_higher = [y if x <= -rounded_d or x >= rounded_d else None for x, y in zip(effect_sizes, os_sample_sizes)]
+    ts_lower = [y if -rounded_d <= x <= rounded_d else None for x, y in zip(effect_sizes, ts_sample_sizes)]
+    ts_higher = [y if x <= -rounded_d or x >= rounded_d else None for x, y in zip(effect_sizes, ts_sample_sizes)]
 
     format_string = "{:." + str(dps) + "f}"
     chart_data = {
@@ -109,8 +107,8 @@ def generate_effect_size_vs_sample_size_chart_data(d, alpha, power, enrolment_ra
         "yAxisLabel": "Sample Size",
         "labels": [format_string.format(es) for es in effect_sizes],
         "verticalLine": {
-            "position": format_string.format(d),
-            "label": "Specified Effect Size"
+            "position": format_string.format(rounded_d),
+            "label": "Effect Size: " + format_string.format(d)
         },
         "dataset": [
             {
@@ -154,14 +152,14 @@ def generate_effect_size_vs_sample_size_chart_data(d, alpha, power, enrolment_ra
 def generate_sample_size_vs_power_chart_data(d, alpha, power, n_1, n_2):
     enrolment_ratio = n_1/n_2
     n_powered = tt.calculate_sample_size_from_cohens_d(d=d, alpha=alpha, power=0.8, enrolment_ratio=enrolment_ratio)
-    n_target = n_1 + n_2
+    n_raw = n_1 + n_2
 
     ff = 0.1
     x_min = 4
-    x_max = max(n_powered[-1][1] + n_powered[-1][1], int(n_target * (1 + ff)))
+    x_max = max(n_powered[-1][1] + n_powered[-1][1], int(n_raw * (1 + ff)))
     step = int(max(1, (x_max - x_min) / 500))
     sample_sizes = np.arange(x_min, x_max, step)
-    n_target = utils.find_closest_value(sample_sizes, n_target)
+    n_actual = utils.find_closest_value(sample_sizes, n_raw)
 
     os_lower = []
     ts_lower = []
@@ -171,30 +169,30 @@ def generate_sample_size_vs_power_chart_data(d, alpha, power, n_1, n_2):
         cn_1 = math.ceil(n * enrolment_ratio / (1 + enrolment_ratio))
         cn_2 = math.ceil(n - cn_1)
         results = tt.calculate_power_from_cohens_d(d=d, n_1=cn_1, n_2=cn_2, alpha=alpha)
-        if n < n_target:
+        if n < n_actual:
             os_lower.append(results[0][0])
             ts_lower.append(results[1][0])
             os_upper.append(None)
             ts_upper.append(None)
-        elif n > n_target:
+        elif n > n_actual:
             os_lower.append(None)
             ts_lower.append(None)
             os_upper.append(results[0][0])
             ts_upper.append(results[1][0])
-        elif n == n_target:
+        elif n == n_actual:
             os_lower.append(results[0][0])
             ts_lower.append(results[1][0])
             os_upper.append(results[0][0])
             ts_upper.append(results[1][0])
 
     return {
-        "title": "Sample Size vs Power (effect size (d): {:0.3f}, α: {:0.3f})".format(d, alpha),
+        "title": "Sample Size vs Power (effect size: {:0.3f}, α: {:0.3f})".format(d, alpha),
         "xAxisLabel": "Sample Size",
         "yAxisLabel": "Statistical Power (1 - β)",
         "labels": [str(x) for x in list(sample_sizes)],
         "verticalLine": {
-            "position": str(n_target),
-            "label": "Specified Sample Size"
+            "position": str(n_actual),
+            "label": "Sample Size: {}".format(n_raw)
         },
         "dataset": [
             {
@@ -245,7 +243,7 @@ def generate_effect_size_vs_power_chart_data(d, alpha, n_1, n_2):
     step = (x_max - x_min) / 500
     dps = utils.determine_decimal_points(x_max)
     effect_sizes = [round(x, dps) for x in np.arange(x_min, x_max, step)]
-    d_target = utils.find_closest_value(effect_sizes, d)
+    d_actual = utils.find_closest_value(effect_sizes, d)
 
     os_lower = []
     ts_lower = []
@@ -253,17 +251,17 @@ def generate_effect_size_vs_power_chart_data(d, alpha, n_1, n_2):
     ts_higher = []
     for es in effect_sizes:
         results = tt.calculate_power_from_cohens_d(d=es, n_1=n_1, n_2=n_2, alpha=alpha)
-        if (es < d_target and d_target > 0) or (es > d_target and d_target < 0):
+        if (es < d_actual and d_actual > 0) or (es > d_actual and d_actual < 0):
             os_lower.append(results[0][0])
             ts_lower.append(results[1][0])
             os_higher.append(None)
             ts_higher.append(None)
-        elif (es < d_target and d_target < 0) or (es > d_target and d_target > 0):
+        elif (es < d_actual and d_actual < 0) or (es > d_actual and d_actual > 0):
             os_lower.append(None)
             ts_lower.append(None)
             os_higher.append(results[0][0])
             ts_higher.append(results[1][0])
-        elif es == d_target:
+        elif es == d_actual:
             os_lower.append(results[0][0])
             ts_lower.append(results[1][0])
             os_higher.append(results[0][0])
@@ -276,8 +274,8 @@ def generate_effect_size_vs_power_chart_data(d, alpha, n_1, n_2):
         "yAxisLabel": "Statistical Power (1 - β)",
         "labels": [format_string.format(es) for es in effect_sizes],
         "verticalLine": {
-            "position": format_string.format(d_target),
-            "label": "Specified Effect Size"
+            "position": format_string.format(d_actual),
+            "label": "Effect Size: " + format_string.format(d)
         },
         "dataset": [
             {
@@ -320,14 +318,14 @@ def generate_effect_size_vs_power_chart_data(d, alpha, n_1, n_2):
 
 def generate_sample_size_vs_effect_size_data(d, alpha, power, n_1, n_2):
     enrolment_ratio = n_1/n_2
-    n_target = n_1 + n_2
+    n_raw = n_1 + n_2
 
     ff = 0.1
     x_min = 4
-    x_max = int(n_target * (1 + ff))
+    x_max = int(n_raw * (1 + ff))
     step = int(max(1, (x_max - x_min) / 500))
     sample_sizes = np.arange(x_min, x_max, step)
-    n_target = utils.find_closest_value(sample_sizes, n_target)
+    n_actual = utils.find_closest_value(sample_sizes, n_raw)
 
     os_lower = []
     ts_lower = []
@@ -337,17 +335,17 @@ def generate_sample_size_vs_effect_size_data(d, alpha, power, n_1, n_2):
         cn_1 = math.ceil(n * enrolment_ratio / (1 + enrolment_ratio))
         cn_2 = math.ceil(n - cn_1)
         results = tt.calculate_min_effect_size(n_1=cn_1, n_2=cn_2, alpha=alpha, power=power)
-        if n < n_target:
+        if n < n_actual:
             os_lower.append(results[0][0])
             ts_lower.append(results[1][0])
             os_upper.append(None)
             ts_upper.append(None)
-        elif n > n_target:
+        elif n > n_actual:
             os_lower.append(None)
             ts_lower.append(None)
             os_upper.append(results[0][0])
             ts_upper.append(results[1][0])
-        elif n == n_target:
+        elif n == n_actual:
             os_lower.append(results[0][0])
             ts_lower.append(results[1][0])
             os_upper.append(results[0][0])
@@ -359,8 +357,8 @@ def generate_sample_size_vs_effect_size_data(d, alpha, power, n_1, n_2):
         "yAxisLabel": "Effect Size (d)",
         "labels": [str(x) for x in list(sample_sizes)],
         "verticalLine": {
-            "position": str(n_target),
-            "label": "Specified Sample Size"
+            "position": str(n_actual),
+            "label": "Sample Size: {}".format(n_raw)
         },
         "dataset": [
             {
@@ -426,13 +424,13 @@ def generate_power_vs_effect_size_data(d, alpha, power, n_1, n_2):
             ts_upper.append(results[1][0])
 
     return {
-        "title": "Power vs Effect Size (α: {:0.3f}, total samples: {:,})".format(alpha, n_1 + n_2),
-        "xAxisLabel": "Statistical Power (1 - β)",
+        "title": "Power vs Effect Size (α: {:0.3f}, total samples: {})".format(alpha, n_1 + n_2),
+        "xAxisLabel": "Power (1 - β)",
         "yAxisLabel": "Effect Size (d)",
         "labels": ["{:.3f}".format(x) for x in power_list],
         "verticalLine": {
             "position": "{:.3f}".format(power_target),
-            "label": "Specified Sample Size"
+            "label": "Statistical Power: {:.3f}".format(power)
         },
         "dataset": [
             {
@@ -471,21 +469,13 @@ def generate_power_vs_effect_size_data(d, alpha, power, n_1, n_2):
     }
 
 
-def generate_distributions_chart_data(d, alpha, n_1, n_2):
+def generate_sampling_distributions_chart_data(mu_1, mu_2, sigma_1, sigma_2, n_1, n_2, alpha):
     n = n_1 + n_2 - 2
-    mu_1 = 0
-    mu_2 = mu_1 + d
-    sigma_1 = 1
-    sigma_2 = 1
-
-    if n <= 0:
-        n_1 += 1
-        n_2 += 1
-        n = 2
-    sd_pooled = utils.calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
     H0_mean = 0
     HA_mean = mu_2 - mu_1
+    sd_pooled = utils.calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
     se = sd_pooled * (1/n_1 + 1/n_2)**0.5
+    d = utils.calculate_cohens_d(mu_1=mu_1, sigma_1=sigma_1, n_1=n_1, mu_2=mu_2, sigma_2=sigma_2, n_2=n_2)
 
     # Determine X axis range
     x_min = min(H0_mean, HA_mean) - (se * 5)
@@ -528,13 +518,13 @@ def generate_distributions_chart_data(d, alpha, n_1, n_2):
     format_string = "{:." + str(decimal_points) + "f}"
 
     return {
-        "title": "Distributions (effect size: {:0.3f}, α: {:0.3f}, power (1 - β): {:.1%})".format(d, alpha, power),
+        "title": "Central and Noncentral Distributions (effect size: {:0.3f}, α: {:0.3f}, power (1 - β): {:.1%})".format(d, alpha, power),
         "xAxisLabel": "Difference in population means",
         "yAxisLabel": "Density",
         "labels": [format_string.format(x) for x in x_axis_values],
         "verticalLine": {
             "position": format_string.format(utils.find_closest_value(x_axis_values, threshold)),
-            "label": "Threshold"
+            "label": "Significance Cutoff: " + format_string.format(threshold)
         },
         "hidePoints": True,
         "dataset": [
@@ -594,7 +584,7 @@ def generate_t_distribution_chart_data(alpha, t_stat, n_1, n_2, x_bar_1, x_bar_2
         "labels": x_axis_values,
         "verticalLine": {
             "position": "{:.3f}".format(utils.find_closest_value(x_axis, t_stat)),
-            "label": "t statistic"
+            "label": "t statistic: {:.3f}".format(t_stat)
         },
         "dataset": [
             {
@@ -619,16 +609,16 @@ def generate_t_distribution_chart_data(alpha, t_stat, n_1, n_2, x_bar_1, x_bar_2
 
 def generate_t_statistic_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2, alpha):
     d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
-    n_actual = n_1 + n_2
+    n_raw = n_1 + n_2
     r_e = n_1/n_2
     n_results = tt.calculate_sample_size_from_means(mu_1=x_bar_1, mu_2=x_bar_2, sigma_1=s_1, sigma_2=s_2, alpha=alpha, power=0.5, enrolment_ratio=r_e)
     n_target = n_results[0][1] + n_results[1][1]
     ff = 0.1
-    x_min = int(max(4, min(n_actual * (1 - ff), n_target * (1 - ff))))
-    x_max = int(max(n_actual * (1 + ff), n_target * (1 + ff)))
+    x_min = int(max(4, min(n_raw * (1 - ff), n_target * (1 - ff))))
+    x_max = int(max(n_raw * (1 + ff), n_target * (1 + ff)))
     step = int(max(1, (x_max - x_min) / 500))
     sample_sizes = np.arange(x_min, x_max, step)
-    n_actual = utils.find_closest_value(sample_sizes, n_actual)
+    n_actual = utils.find_closest_value(sample_sizes, n_raw)
     n_target = utils.find_closest_value(sample_sizes, n_target)
 
     t_stat_lower = []
@@ -658,7 +648,7 @@ def generate_t_statistic_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
         "labels": x_axis_values,
         "verticalLine": {
             "position": str(n_actual),
-            "label": "Specified Sample Size"
+            "label": "Sample Size: {}".format(n_raw)
         },
         "dataset": [
             {
@@ -682,22 +672,22 @@ def generate_t_statistic_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
 
 
 def generate_t_statistic_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2, alpha):
-    d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
+    d_raw = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
     d_results = tt.calculate_min_effect_size(n_1=n_1, n_2=n_2, alpha=alpha, power=0.5)
     d_target = d_results[1][0]
     ff = 0.5
-    if d_actual < 0:
-        x_min = min(-d_target, d_actual) * (1 + ff)
-        x_max = max(-d_target, d_actual) * (1 - ff)
+    if d_raw < 0:
+        x_min = min(-d_target, d_raw) * (1 + ff)
+        x_max = max(-d_target, d_raw) * (1 - ff)
     else:
-        x_min = min(d_target, d_actual) * (1 - ff)
-        x_max = max(d_target, d_actual) * (1 + ff)
+        x_min = min(d_target, d_raw) * (1 - ff)
+        x_max = max(d_target, d_raw) * (1 + ff)
 
     # Rounding to ensure matches
     step = (x_max - x_min) / 500
     dps = utils.determine_decimal_points(x_max)
     effect_sizes = [round(x, dps) for x in np.arange(x_min, x_max, step)]
-    d_actual = utils.find_closest_value(effect_sizes, d_actual)
+    d_actual = utils.find_closest_value(effect_sizes, d_raw)
     d_target = utils.find_closest_value(effect_sizes, d_target)
 
     t_stat_lower = []
@@ -719,12 +709,12 @@ def generate_t_statistic_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
 
     return {
         "title": "t-statistic vs Effect Size (sample size: {}, enrolment ratio: {:.3f})".format(n_1 + n_2, n_1/n_2),
-        "xAxisLabel": "Effect Size",
+        "xAxisLabel": "Effect Size (d)",
         "yAxisLabel": "t-statistic",
         "labels": x_axis_values,
         "verticalLine": {
             "position": format_string.format(d_actual),
-            "label": "Specified Effect Size"
+            "label": "Effect Size: " + format_string.format(d_raw)
         },
         "dataset": [
             {
@@ -749,16 +739,16 @@ def generate_t_statistic_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
 
 def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2, alpha):
     d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
-    n_actual = n_1 + n_2
+    n_raw = n_1 + n_2
     r_e = n_1 / n_2
     n_results = tt.calculate_sample_size_from_means(mu_1=x_bar_1, mu_2=x_bar_2, sigma_1=s_1, sigma_2=s_2, alpha=alpha, power=0.5, enrolment_ratio=r_e)
     n_target = n_results[0][1] + n_results[1][1]
     ff = 0.1
-    x_min = int(max(4, min(n_actual * (1 - ff), n_target * (1 - ff))))
-    x_max = int(max(n_actual * (1 + ff), n_target * (1 + ff)))
+    x_min = int(max(4, min(n_raw * (1 - ff), n_target * (1 - ff))))
+    x_max = int(max(n_raw * (1 + ff), n_target * (1 + ff)))
     step = int(max(1, (x_max - x_min) / 500))
     sample_sizes = np.arange(x_min, x_max, step)
-    n_actual = utils.find_closest_value(sample_sizes, n_actual)
+    n_actual = utils.find_closest_value(sample_sizes, n_raw)
     n_target = utils.find_closest_value(sample_sizes, n_target)
 
     os_lower = []
@@ -795,7 +785,7 @@ def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
         "labels": x_axis_values,
         "verticalLine": {
             "position": str(n_actual),
-            "label": "Specified Sample Size"
+            "label": "Sample Size: {}".format(n_raw)
         },
         "dataset": [
             {
@@ -835,22 +825,22 @@ def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
 
 
 def generate_p_value_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2, alpha):
-    d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
+    d_raw = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
     d_results = tt.calculate_min_effect_size(n_1=n_1, n_2=n_2, alpha=alpha, power=0.5)
     d_target = d_results[1][0]
     ff = 0.5
-    if d_actual < 0:
-        x_min = min(-d_target, d_actual) * (1 + ff)
-        x_max = max(-d_target, d_actual) * (1 - ff)
+    if d_raw < 0:
+        x_min = min(-d_target, d_raw) * (1 + ff)
+        x_max = max(-d_target, d_raw) * (1 - ff)
     else:
-        x_min = min(d_target, d_actual) * (1 - ff)
-        x_max = max(d_target, d_actual) * (1 + ff)
+        x_min = min(d_target, d_raw) * (1 - ff)
+        x_max = max(d_target, d_raw) * (1 + ff)
 
     # Rounding to ensure matches
     step = (x_max - x_min) / 500
     dps = utils.determine_decimal_points(x_max)
     effect_sizes = [round(x, dps) for x in np.arange(x_min, x_max, step)]
-    d_actual = utils.find_closest_value(effect_sizes, d_actual)
+    d_actual = utils.find_closest_value(effect_sizes, d_raw)
     d_target = utils.find_closest_value(effect_sizes, d_target)
 
     os_lower = []
@@ -880,12 +870,12 @@ def generate_p_value_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
 
     return {
         "title": "p-value vs Effect Size (sample size: {}, enrolment ratio: {:.3f})".format(n_1 + n_2, n_1/n_2),
-        "xAxisLabel": "Effect Size",
+        "xAxisLabel": "Effect Size (d)",
         "yAxisLabel": "p-value",
         "labels": x_axis_values,
         "verticalLine": {
             "position": format_string.format(d_actual),
-            "label": "Specified Effect Size"
+            "label": "Effect Size: " + format_string.format(d_raw)
         },
         "dataset": [
             {
