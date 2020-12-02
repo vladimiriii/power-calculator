@@ -4,6 +4,7 @@ import os
 import sys
 
 from app.lib.handlers import t_test
+from app.lib import textInserts as txt
 
 # Define the blueprint:
 basic_page = Blueprint('basic_page', __name__)
@@ -28,7 +29,11 @@ def privacy_policy_page():
 
 @test_page.route('/t-test-independent-samples', methods=['GET'])
 def t_test_two_ind():
-    return render_template('t-test-two-ind.html')
+    return render_template('t-test-two-ind.html',
+                           alpha=txt.alpha_text,
+                           power=txt.power_text,
+                           d=txt.d_text
+                           )
 
 
 @api_endpoint.route('/t-test-independent-samples-calc', methods=['POST'])

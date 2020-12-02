@@ -11,7 +11,7 @@
     {% include 'includes/formula-scripts.html' %}
 
     <!-- Page Specific Styling -->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style/testPage.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style/testPage.css') }}?v=001">
 
     <!-- Custom JavaScript -->
     <script src="{{ url_for('static',filename='script/custom/ttest2ind/onLoad.js') }}"></script>
@@ -33,24 +33,83 @@
         </div> -->
         <div class="row">
             <div class="col-md-10 offset-md-1">
-                <h1>t-test – Independent Samples</h1>
-                <p>One of the most well-known hypothesis tests, the t-test is used to assess the equality of two population statistics (typically means) based on samples from those populations. More specifically, this test is used when:</p>
-                <ol>
-                    <li>You have two separate sets of <a href="https://en.wikipedia.org/wiki/Independent_and_identically-distributed_random_variables" target="_blank">independent and identically distributed</a> samples. E.g. a treatment group and a control group, not a before and after treatment comparison ("paired samples").</li>
-                    <li>You want to assess if a treatment led to some measureable difference in the groups (e.g. giving the treatment group a low fat diet led to a reduction in average weight).</li>
-                    <li>The sample means (not neccessarily the underlying data) are independent and normally distributed (see <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target='_blank'>Central Limit Theorem</a>).</li>
-                    <li>The sample variance is χ<sup>2</sup> distributed, and the sample mean and sample variance are statistically independent.<sup><i>See note 2</i></sup></li>
-                    <li>You do not know the standard deviation of the underlying populations. If you do, you can instead use a <i>z</i>-test.</li>
-                </ol>
-                <p>If this is the type of test you are conducting, or have already completed, you can use this calculator to:</p>
-                <ol>
-                    <li>Estimate how large a sample you will need to detect an expected effect size (at a given power level).</li>
-                    <li>Estimate the power of a planned study based on expected sample and effect sizes. You cannot calculate the power of a completed study based on the observed effect size.</li>
-                    <li>Estimate the smallest effect size you can detect for a given power level and sample size.</li>
-                    <li>Calculate the t-statistic and/or p-value of a completed test.</li>
-                </ol>
-                <p><i>Note 1: This calculator does not require the groups to have equal variance as it uses the Welch's unequal variances t-test formulation by default – and <a href='https://daniellakens.blogspot.com/2015/01/always-use-welchs-t-test-instead-of.html' target='_blank'>you probably should too</a>.</i></p>
-                <p><i>Note 2: This assumption holds if the underlying data are normally distributed, but not neccessarily if you are relying on the central limit theorem for normally distributed sample means.</i></p>
+                <h1>Student's t-test: Two Independent Samples</h1>
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header" id="headingOne">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                <h3 class="mb-0 accordian-header">When should I use this calculator?</h3>
+                            </button>
+                        </div>
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                            <div class="card-body">
+                                <p>One of the most well-known hypothesis tests, Student's t-test is used to assess the equality of two statistics. In this case we are testing the equality of two population statistics (typically means) based on samples from those populations. More specifically, this test is used when:</p>
+                                <ol>
+                                    <li>You have two separate sets of samples. E.g. a treatment group and a control group, not a before and after treatment comparison ("paired samples").</li>
+                                    <li>You want to assess if a treatment led to some measureable difference in the groups (e.g. giving the treatment group a low fat diet led to a reduction in average weight).</li>
+                                    <li>You do not know the population standard deviation(s). If you do, you can instead use a <i>z</i>-test.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="headingTwo">
+                            <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <h3 class="mb-0 accordian-header">Assumptions</h3>
+                            </button>
+                        </div>
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                            <div class="card-body">
+                                <p>When conducting a t-test with two independent samples, the following assumptions are made about your data:</p>
+                                <ol>
+                                    <li>Your data consists of two <a href="https://en.wikipedia.org/wiki/Independent_and_identically-distributed_random_variables" target="_blank">independent and identically distributed</a> samples, one from each of the two populations being compared.</li>
+                                    <li>The sample means (<span style="text-decoration:overline;"><i>X</i></span><sub>1</sub> and <span style="text-decoration:overline;"><i>X</i></span><sub>2</sub>) are normally distributed.<sup>1</sup></li>
+                                    <li>The sample variances (<i>s</i><sup>2</sup><sub>1</sub> and <i>s</i><sup>2</sup><sub>2</sub>) are χ<sup>2</sup> distributed.<sup>2</sup></li>
+                                    <li>The sample means and sample variances are statistically independent.</li>
+                                    <li>This calculator does not require the groups to have equal variance as it uses the Welch's unequal variances t-test formulation by default<sup>3</sup></li>
+                                </ol>
+                                <br>
+                                <p>[1] This does not require your underlying data to be normally distributed. With larger samples, the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target='_blank'>Central Limit Theorem</a> typically means the sample means will be normally distributed.</p>
+                                <p>[2] This assumption holds if the underlying data are normally distributed, but not neccessarily if you are relying on the Central Limit Theorem for normally distributed sample means.</p>
+                                <p>[3] <a href='https://daniellakens.blogspot.com/2015/01/always-use-welchs-t-test-instead-of.html' target='_blank'>You probably should be doing this too</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="headingThree">
+                            <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                <h3 class="mb-0 accordian-header">What can I calculate?</h3>
+                            </button>
+                        </div>
+                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                            <div class="card-body">
+                                <p>You can use this calculator to estimate:</p>
+                                <ol>
+                                    <li>How large a sample will my study need to detect an expected effect size for a given power level?</li>
+                                    <li>How much power will my study have based on expected sample and effect sizes?<sup>4</sup></li>
+                                    <li>What will be the smallest effect size my study can detect for a given power level and sample size?</li>
+                                    <li>What is the t-statistic and/or p-value for my completed study?</li>
+                                </ol>
+                                <p>[4] You cannot calculate the power of a completed study based on the <i>observed</i> effect size.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="headingFour">
+                            <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                <h3 class="mb-0 accordian-header">Key Concepts</h3>
+                            </button>
+                        </div>
+                        <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
+                            <div class="card-body">
+                                <p>{{ alpha | safe }}</p>
+                                <p>{{ power | safe }}</p>
+                                <p>{{ d | safe }}</p>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -132,11 +191,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <ul id="understanding">
-                                    <li><strong>Significance Level (α)</strong>: In order to reject the null hypothesis (H<sub>0</sub>: θ = 0; where θ = μ<sub>1</sub> - μ<sub>2</sub>), we must observe a difference in sample means that falls in the α most extreme differences in sample means that we would expect to see if the null hypothesis is true.</li>
-                                    <li><strong>Statistical Power (1 - β)</strong>: Assuming the alternate hypothesis is true (H<sub>A</sub>: θ ≠ 0), repeated sampling would cause us to correctly reject the null hypothesis at a rate of 1 - β. This equates to a false negative (Type II error) rate of β.</li>
-                                    <li><strong>Effect Size (Cohen's d)</strong>: A standardized measure of the difference in the means (can be sample or population means depending on the context). The difference in means is divided by the <a href="https://en.wikipedia.org/wiki/Pooled_variance" target="_blank">pooled standard deviation</a> of the two samples/populations to make the number comparable across different experiments.</li>
-                                </ul>
+
                             </div>
                         </div>
                     </div>
