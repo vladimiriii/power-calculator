@@ -62,6 +62,6 @@ def generate_power_distributions_text(alpha, power, mu_1, sigma_1, mu_2, sigma_2
 def generate_test_distribution_text(alpha, n_1, n_2, df):
     text = [
         "The chart to the right shows the distribution of a t-statistic, t(υ={}), which is a function of the difference in the means of two samples (n<sub>1</sub>={}, n<sub>2</sub>={}).".format(df, n_1, n_2),
-        "The areas shaded in red represent the probability of observing differences in sample means that would lead to a rejection of H<sub>0</sub> at the {:.3f} level of significance (for a two tailed test). I.e. the shaded area represents {:.1%} of the total area under the null hypothesis distribution.".format(alpha, alpha),
+        "The areas shaded in red represent the probability of observing differences in sample means that would lead to a rejection of H<sub>0</sub> at the {:.3f} level of significance (for a two tailed test). I.e. the shaded area represents {:.1%} of the total area under the null hypothesis distribution.".format(alpha, alpha)
     ]
     return text
