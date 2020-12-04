@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, json, render_template, redirect, url_for, 
 import os
 import sys
 
-from app.lib.handlers import t_test
+from app.lib import testMap
 from app.lib import textInserts as txt
 
 # Define the blueprint:
@@ -27,20 +27,18 @@ def privacy_policy_page():
     return render_template('privacy-policy.html')
 
 
-@test_page.route('/t-test-independent-samples', methods=['GET'])
-def t_test_two_ind():
-    return render_template('t-test-two-ind.html',
-                           alpha=txt.alpha_text,
-                           power=txt.power_text,
-                           d=txt.d_text
-                           )
+@test_page.route('/tests/<test_type>', methods=['GET'])
+def test_page_renderer(test_type):
+    text = txt.generate_fixed_text(test_type)
+    return render_template('test-page.html', text=text)
 
 
-@api_endpoint.route('/t-test-independent-samples-calc', methods=['POST'])
-def t_test_ind():
+@api_endpoint.route('/tests/<test_type>-calc', methods=['POST'])
+def test_page_data(test_type):
     try:
         input = json.loads(request.data)
-        results = t_test.run_model(input)
+        f = testMap.map[test_type]
+        results = f.handler.run_model(input)
         return jsonify(results)
     except Exception as e:
         return Response("{'error': '" + str(e) + "'}", status=400, mimetype='application/json')

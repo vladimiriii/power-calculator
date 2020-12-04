@@ -47,3 +47,21 @@ def generate_p_value_notes(n_1, n_2, d, p_one_sided, p_two_sided, t_stat):
         "The p-value can also be understood as the area underneath the t-distribution where t is greater than {:.3f} for a one-sided test (p = {:.3f}); or greater than {:.3f} <i>and</i> less than {:.3f} for a two-sided test (p = {:.3f})".format(abs(t_stat), p_one_sided, abs(t_stat), -abs(t_stat), p_two_sided)
     ]
     return notes
+
+
+def generate_power_distributions_text(alpha, power, mu_1, sigma_1, mu_2, sigma_2, pooled_sd):
+    text = [
+        "The chart to the right shows two hypothetical distributions of sample means. The red function is the expected distribution of the difference in the means of two samples drawn from one population, N(μ=0, σ={:.3f}). This represents the null hypothesis (H<sub>0</sub>: μ<sub>1</sub>=μ<sub>2</sub>).".format(pooled_sd),
+        "The blue distribution is the expected distribution of the difference in the means of two samples drawn from two different populations, N(μ<sub>1</sub>={:.3f}, σ<sub>1</sub>={:.3f}) and N(μ<sub>2</sub>={:.3f}, σ<sub>2</sub>={:.3f}). This represents the alternative hypothesis (H<sub>A</sub>: μ<sub>2</sub>-μ<sub>1</sub>={:.3f}).".format(mu_1, sigma_1, mu_2, sigma_2, mu_2 - mu_1),
+        "The areas shaded in red represent the probability of observing differences in sample means that would lead to a rejection of H<sub>0</sub> at the {:.3f} level of significance (for a two tailed test). I.e. the shaded area represents {:.1%} of the total area under the null hypothesis distribution.".format(alpha, alpha),
+        "The area shaded in blue represents the probability of observing differences in sample means that would lead to a failure to reject of H<sub>0</sub> as they were found not to be statistically significant. This area represents {:.1%} of the total area under the alternative hypothesis distribution.".format(1 - power)
+    ]
+    return text
+
+
+def generate_test_distribution_text(alpha, n_1, n_2, df):
+    text = [
+        "The chart to the right shows the distribution of a t-statistic, t(υ={}), which is a function of the difference in the means of two samples (n<sub>1</sub>={}, n<sub>2</sub>={}).".format(df, n_1, n_2),
+        "The areas shaded in red represent the probability of observing differences in sample means that would lead to a rejection of H<sub>0</sub> at the {:.3f} level of significance (for a two tailed test). I.e. the shaded area represents {:.1%} of the total area under the null hypothesis distribution.".format(alpha, alpha),
+    ]
+    return text

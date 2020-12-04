@@ -1,7 +1,7 @@
-from app.lib.statistics.t_test import *
-from app.lib.charts.t_test import *
-from app.lib.formulae.t_test import *
-from app.lib.notes.t_test import *
+from app.lib.t_test_independent_samples.statistics import *
+from app.lib.t_test_independent_samples.charts import *
+from app.lib.t_test_independent_samples.formulae import *
+from app.lib.t_test_independent_samples.notes import *
 from app.lib import utils
 
 
@@ -32,14 +32,18 @@ def run_model(inputs):
             results['statistics'] = calculate_sample_size_from_cohens_d(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
             results['formulae'] = create_sample_size_from_d_formula(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
 
-        # Notes
-        results['notes'] = generate_sample_size_notes(alpha, power)
-
-        # Charts
+        # Calculate vars
         n_1 = results['statistics'][0][1]
         n_2 = results['statistics'][1][1]
         if d is None:
             d = utils.calculate_cohens_d(mu_1=mu_1, sigma_1=sigma_1, n_1=n_1, mu_2=mu_2, sigma_2=sigma_2, n_2=n_2)
+        pooled_sd = utils.calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
+
+        # Notes
+        results['notes'] = generate_sample_size_notes(alpha, power)
+        results['chartText'] = generate_power_distributions_text(alpha, power, mu_1, sigma_1, mu_2, sigma_2, pooled_sd)
+
+        # Charts
         results['charts']['chartOne'] = generate_power_vs_sample_size_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
         results['charts']['chartTwo'] = generate_effect_size_vs_sample_size_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
         results['charts']['chartThree'] = generate_sampling_distributions_chart_data(mu_1=mu_1, mu_2=mu_2, sigma_1=sigma_1, sigma_2=sigma_2, n_1=n_1, n_2=n_2, alpha=alpha)
@@ -73,13 +77,17 @@ def run_model(inputs):
             results['statistics'] = calculate_power_from_cohens_d(d=d, n_1=n_1, n_2=n_2, alpha=alpha)
             results['formulae'] = create_power_from_d_formula(d=d, n_1=n_1, n_2=n_2, alpha=alpha)
 
-        # Notes
-        results['notes'] = generate_power_notes(alpha)
-
-        # Charts
+        # Calculate vars
         power = results['statistics'][1][0]
         if d is None:
             d = utils.calculate_cohens_d(mu_1=mu_1, sigma_1=sigma_1, n_1=n_1, mu_2=mu_2, sigma_2=sigma_2, n_2=n_2)
+        pooled_sd = utils.calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
+
+        # Notes
+        results['notes'] = generate_power_notes(alpha)
+        results['chartText'] = generate_power_distributions_text(alpha, power, mu_1, sigma_1, mu_2, sigma_2, pooled_sd)
+
+        # Charts
         results['charts']['chartOne'] = generate_sample_size_vs_power_chart_data(d=d, alpha=alpha, power=power, n_1=n_1, n_2=n_2)
         results['charts']['chartTwo'] = generate_effect_size_vs_power_chart_data(d=d, alpha=alpha, n_1=n_1, n_2=n_2)
         results['charts']['chartThree'] = generate_sampling_distributions_chart_data(mu_1=mu_1, mu_2=mu_2, sigma_1=sigma_1, sigma_2=sigma_2, n_1=n_1, n_2=n_2, alpha=alpha)
@@ -98,13 +106,19 @@ def run_model(inputs):
         power = float(inputs['power'])
         results['statistics'] = calculate_min_effect_size(n_1=n_1, n_2=n_2, alpha=alpha, power=power)
         results['formulae'] = create_min_effect_size_formula(n_1=n_1, n_2=n_2, alpha=alpha, power=power)
-        results['notes'] = generate_min_effect_size_notes(alpha=alpha, power=power)
 
-        # Charts
+        # Calculate Vars
         d = results['statistics'][1][0]
         mu_1 = 0
         mu_2 = mu_1 + d
         sigma_1, sigma_2 = 1, 1
+        pooled_sd = utils.calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
+
+        # Notes
+        results['notes'] = generate_min_effect_size_notes(alpha=alpha, power=power)
+        results['chartText'] = generate_power_distributions_text(alpha, power, mu_1, sigma_1, mu_2, sigma_2, pooled_sd)
+
+        # Charts
         results['charts']['chartOne'] = generate_sample_size_vs_effect_size_data(d=d, alpha=alpha, power=power, n_1=n_1, n_2=n_2)
         results['charts']['chartTwo'] = generate_power_vs_effect_size_data(d=d, alpha=alpha, power=power, n_1=n_1, n_2=n_2)
         results['charts']['chartThree'] = generate_sampling_distributions_chart_data(mu_1=mu_1, mu_2=mu_2, sigma_1=sigma_1, sigma_2=sigma_2, n_1=n_1, n_2=n_2, alpha=alpha)
@@ -148,12 +162,13 @@ def run_model(inputs):
 
         # Notes
         results['notes'] = generate_t_stat_notes(n_1, n_2, d, t_stat)
+        results['chartText'] = generate_test_distribution_text(alpha=alpha, n_1=n_1, n_2=n_2, df=int(welches_df))
 
         # Charts
         t_stat = results['statistics'][0][0]
-        results['charts']['chartOne'] = generate_t_distribution_chart_data(alpha=alpha, t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
+        results['charts']['chartOne'] = generate_t_statistic_vs_effect_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2, alpha=alpha)
         results['charts']['chartTwo'] = generate_t_statistic_vs_sample_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2, alpha=alpha)
-        results['charts']['chartThree'] = generate_t_statistic_vs_effect_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2, alpha=alpha)
+        results['charts']['chartThree'] = generate_t_distribution_chart_data(alpha=alpha, t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
 
         # Labels
         results['labels'] = {
@@ -193,11 +208,13 @@ def run_model(inputs):
                                                   p_one_sided=results['statistics'][0][0],
                                                   p_two_sided=results['statistics'][1][0],
                                                   t_stat=t_stat)
+        welches_df = utils.welches_degrees_of_freedom(s_1, n_1, s_2, n_2)
+        results['chartText'] = generate_test_distribution_text(alpha=alpha, n_1=n_1, n_2=n_2, df=int(welches_df))
 
         # Charts
-        results['charts']['chartOne'] = generate_t_distribution_chart_data(alpha=alpha, t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
+        results['charts']['chartOne'] = generate_p_value_vs_effect_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2, alpha=alpha)
         results['charts']['chartTwo'] = generate_p_value_vs_sample_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2, alpha=alpha)
-        results['charts']['chartThree'] = generate_p_value_vs_effect_size_chart_data(n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2, alpha=alpha)
+        results['charts']['chartThree'] = generate_t_distribution_chart_data(alpha=alpha, t_stat=t_stat, n_1=n_1, n_2=n_2, x_bar_1=x_bar_1, x_bar_2=x_bar_2, s_1=s_1, s_2=s_2)
 
         # Labels
         results['labels'] = {

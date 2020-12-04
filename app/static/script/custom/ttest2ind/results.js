@@ -11,6 +11,7 @@ async function getEstimates() {
         createChart('chart-3', response['charts']['chartThree']);
         renderFormulas(response['formulae']);
         addFormulaNotes(response['notes']);
+        addChartText(response['chartText']);
 
         // Scroll to results section
         const offset = $("#results-container").offset();
@@ -66,7 +67,7 @@ function calculateEstimates(inputs) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: '/t-test-independent-samples-calc',
+            url: '/tests/t-test-independent-samples-calc',
             data: JSON.stringify(inputs),
             contentType: 'application/json',
             success: (response) => {

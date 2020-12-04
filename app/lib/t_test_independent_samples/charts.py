@@ -3,7 +3,7 @@ import math
 from scipy.stats import norm, t
 
 from app.lib import utils, colors
-from app.lib.statistics import t_test as tt
+from app.lib.t_test_independent_samples import statistics as tt
 
 
 def generate_power_vs_sample_size_chart_data(d, alpha, power, enrolment_ratio):

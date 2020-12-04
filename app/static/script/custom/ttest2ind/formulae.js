@@ -21,3 +21,13 @@ function addFormulaNotes(notes) {
         }
     }
 }
+
+
+function addChartText(text) {
+    $("#description").empty();
+    if (text.length > 0){
+        for (var i = 0; i < text.length; i++) {
+            $("#description").append(`<p>${i + 1}. ${text[i]}</p>`);
+        }
+    }
+}
