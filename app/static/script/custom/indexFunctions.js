@@ -36,7 +36,6 @@ function filterTestList(inputs) {
 function generateLinks(tests, div) {
     $("#" + div).empty();
     for (let i = 0; i < tests.length; ++i) {
-        console.log(tests[i]);
         if (tests[i]['status'] === 'available') {
             $("#" + div).append(
                 '<p class="test-link"><a href="' + tests[i]['url'] + '">' + tests[i]['name'] + '</a></p>'
