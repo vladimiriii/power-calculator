@@ -13,7 +13,7 @@ function createChartConfig() {
         options: {
             title: {
                 display: true,
-                fontSize: 24,
+                fontSize: 18,
                 fontStyle: "normal",
                 text: ""
             },

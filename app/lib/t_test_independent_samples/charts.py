@@ -518,8 +518,8 @@ def generate_sampling_distributions_chart_data(mu_1, mu_2, sigma_1, sigma_2, n_1
     format_string = "{:." + str(decimal_points) + "f}"
 
     return {
-        "title": "Central and Noncentral Distributions (effect size: {:0.3f}, α: {:0.3f}, power (1 - β): {:.1%})".format(d, alpha, power),
-        "xAxisLabel": "Difference in population means",
+        "title": "Distributions of the Difference in Sample Means (effect size: {:0.3f}, α: {:0.3f}, power (1 - β): {:.1%})".format(d, alpha, power),
+        "xAxisLabel": "Difference in sample means",
         "yAxisLabel": "Density",
         "labels": [format_string.format(x) for x in x_axis_values],
         "verticalLine": {
@@ -578,7 +578,7 @@ def generate_t_distribution_chart_data(alpha, t_stat, n_1, n_2, x_bar_1, x_bar_2
             significant.append(t.pdf(value, df=welches_df))
 
     return {
-        "title": "Null Hypothesis t-distribution (effect size: {:.3f})".format(d),
+        "title": "t-statistic distribution (effect size: {:.3f})".format(d),
         "xAxisLabel": "t",
         "yAxisLabel": "Density",
         "labels": x_axis_values,
