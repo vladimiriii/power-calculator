@@ -2,14 +2,13 @@
 <html>
 
 <head>
-    <title>The Power Calculator</title>
+    <title>Stats Calculator</title>
 
     {% include 'includes/basic-meta.html' %}
     {% include 'includes/base-scripts.html' %}
 
     <!-- Page Specific Styling -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style/index.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style/calculator.css') }}">
 
     <!-- Custom JavaScript -->
     <script defer src="{{ url_for('static',filename='script/custom/indexFunctions.js') }}"></script>
@@ -27,7 +26,7 @@
             <div id="primary-image"></div>
             <div class="col-md-12" id="text-overlay">
                 <div class="row text-overlay-row">
-                    <h1 id="primary-header">The Power Calculator</h1>
+                    <h1 id="primary-header">Stats Calculator</h1>
                 </div>
                 <div class="row text-overlay-row">
                     <h2 id="tag-line">Helping you calculate and understand statistics</h2>
@@ -49,14 +48,14 @@
             </div>
         </div>
         <div class="row" id="setup-questions">
-            <div class="col-md-8 offset-md-2">
+            <div class="col-md-8 offset-lg-2">
                 <h2>Test Recommender</h3>
                 <div class="row">
                     <div class="col-md-8">
                         <h4 class="question">How many groups do you have?</h4>
                         <p class="question-explainer">How many treatment and/or control groups are in the study?</p>
                     </div>
-                    <div class="col-md-3 offset-md-1">
+                    <div class="col-md-3 offset-lg-1">
                         <div id="groups-select" class="form-group question-select">
                             <select id="groups-list" class="form-control eco-select">
                                 <option value='1'>1</option>
@@ -71,7 +70,7 @@
                         <h4 class="question">Are the groups independent or paired?</h4>
                         <p class="question-explainer">E.g. Is the study a before and after study (paired), or two different groups (independent)?</p>
                     </div>
-                    <div class="col-md-3 offset-md-1">
+                    <div class="col-md-3 offset-lg-1">
                         <div id="independence-select" class="form-group question-select">
                             <select id="independence-list" class="form-control eco-select">
                                 <option value='independent'>Independent</option>
@@ -88,7 +87,7 @@
                             due to the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target="_blank">central limit theorem</a>.
                         </p>
                     </div>
-                    <div class="col-md-3 offset-md-1">
+                    <div class="col-md-3 offset-lg-1">
                         <div id="normality-select" class="form-group question-select">
                             <select id="normality-list" class="form-control eco-select">
                                 <option value='yes'>Yes</option>
@@ -102,7 +101,7 @@
                         <h4 class="question">Can we assume equal variance?</h4>
                         <p class="question-explainer">You typically default to this assumption unless you have a strong reason to believe otherwise.</p>
                     </div>
-                    <div class="col-md-3 offset-md-1">
+                    <div class="col-md-3 offset-lg-1">
                         <div id="equal-variance-select" class="form-group question-select">
                             <select id="equal-variance-list" class="form-control eco-select">
                                 <option value='yes'>Yes</option>
@@ -120,21 +119,21 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-8 offset-md-2">
+            <div class="col-md-8 offset-lg-2">
                 <h3>Recommended Tests</h3>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-8 offset-md-2" id="filtered-test-list">
+            <div class="col-md-8 offset-lg-2" id="filtered-test-list">
             </div>
         </div>
         <div class="row" id="all-tests">
-            <div class="col-md-8 offset-md-2">
+            <div class="col-md-8 offset-lg-2">
                 <h2>All Tests</h2>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-8 offset-md-2" id="complete-test-list">
+            <div class="col-md-8 offset-lg-2" id="complete-test-list">
             </div>
         </div>
     </div>

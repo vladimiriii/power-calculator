@@ -46,19 +46,49 @@
     padding-bottom: 20px;
 }
 
+.question {
+    margin-bottom: 5px;
+}
+
+.question-explainer {
+    font-style: italic;
+    font-size: 15px;
+    margin-top: 0px;
+}
+
+.question-select {
+    margin-top: 55px;
+}
+
+#recommend-btn {
+    margin-top: 40px;
+}
+
+.test-link {
+    font-size: 15px;
+}
+
+.disabled {
+    color: grey;
+}
+
 /* Vertical Alignment for Phones and Tablets */
 @media screen and (max-width: 992px) {
 
     #primary-header {
-        font-size: 80px;
+        font-size: 70px;
     }
 
     .modal-dialog {
         width:95%;
     }
+
+    .question-select {
+        margin-top: 15px;
+    }
 }
 
-@media screen and (max-width: 350px) {
+@media screen and (max-width: 576px) {
     #primary-header {
         font-size: 50px;
     }
