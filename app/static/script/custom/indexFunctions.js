@@ -35,6 +35,9 @@ function filterTestList(inputs) {
 
 function generateLinks(tests, div) {
     $("#" + div).empty();
+    if (div == "filtered-test-list") {
+        $('#' + div).append("<h3>Recommended Tests</h3>")
+    }
     for (let i = 0; i < tests.length; ++i) {
         if (tests[i]['status'] === 'available') {
             $("#" + div).append(
