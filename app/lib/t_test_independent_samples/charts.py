@@ -741,6 +741,7 @@ def generate_t_statistic_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s
 
 def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2, alpha):
     d_actual = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
+    d_adjustment = utils.calculate_d_adjustment(s_1, n_1, s_2, n_2)
     n_raw = n_1 + n_2
     r_e = n_1 / n_2
     n_results = tt.calculate_sample_size_from_means(mu_1=x_bar_1, mu_2=x_bar_2, sigma_1=s_1, sigma_2=s_2, alpha=alpha, power=0.5, enrolment_ratio=r_e)
@@ -762,7 +763,7 @@ def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
         cn_2 = math.ceil(n - cn_1)
         welches_df = utils.welches_degrees_of_freedom(s_1, cn_1, s_2, cn_2)
         d = utils.calculate_cohens_d(x_bar_1, s_1, cn_1, x_bar_2, s_2, cn_2)
-        t_stat = tt.calculate_t_stat_from_cohens_d(d, cn_1, cn_2)
+        t_stat = tt.calculate_t_stat_from_cohens_d(d, cn_1, cn_2) * d_adjustment
         results = tt.calculate_p_value(t_stat, welches_df)
         if n <= n_target:
             os_lower.append(results[0][0])
@@ -828,8 +829,9 @@ def generate_p_value_vs_sample_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
 
 def generate_p_value_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, s_2, alpha):
     d_raw = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
+    d_adjustment = utils.calculate_d_adjustment(s_1, n_1, s_2, n_2)
     d_results = tt.calculate_min_effect_size(n_1=n_1, n_2=n_2, alpha=alpha, power=0.5)
-    d_target = d_results[1][0]
+    d_target = d_results[1][0] / d_adjustment
     ff = 0.5
     if d_raw < 0:
         x_min = min(-d_target, d_raw) * (1 + ff)
@@ -851,7 +853,7 @@ def generate_p_value_vs_effect_size_chart_data(n_1, n_2, x_bar_1, x_bar_2, s_1, 
     ts_higher = []
     for d in effect_sizes:
         welches_df = utils.welches_degrees_of_freedom(s_1, n_1, s_2, n_2)
-        t_stat = tt.calculate_t_stat_from_cohens_d(d, n_1, n_2)
+        t_stat = tt.calculate_t_stat_from_cohens_d(d, n_1, n_2) * d_adjustment
         results = tt.calculate_p_value(t_stat, welches_df)
         if d <= d_target:
             os_lower.append(results[0][0])
