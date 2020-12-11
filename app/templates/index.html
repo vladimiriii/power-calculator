@@ -8,12 +8,12 @@
     {% include 'includes/base-scripts.html' %}
 
     <!-- Page Specific Styling -->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style/index.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style/index.css') }}?v=001">
 
     <!-- Custom JavaScript -->
-    <script defer src="{{ url_for('static',filename='script/custom/indexFunctions.js') }}"></script>
-    <script defer src="{{ url_for('static',filename='script/custom/testMap.js') }}"></script>
-    <script defer src="{{ url_for('static',filename='script/custom/indexOnLoad.js') }}"></script>
+    <script defer src="{{ url_for('static',filename='script/custom/indexFunctions.js') }}?v=001"></script>
+    <script defer src="{{ url_for('static',filename='script/custom/testMap.js') }}?v=001"></script>
+    <script defer src="{{ url_for('static',filename='script/custom/indexOnLoad.js') }}?v=001"></script>
 
 </head>
 
