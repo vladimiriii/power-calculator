@@ -33,7 +33,7 @@ def generate_t_stat_notes(n_1, n_2, d, t_stat):
     notes = [
         "The difference in means (or the effect size) for this calculation (d={:.3f}) represents the observed difference in <i>sample</i> means. This is because we are calculating the probability of observing an effect size of {:.3f} or larger if the null hypothesis (H<sub>0</sub>) is true. In other words, the probability that we would incorrectly reject H<sub>0</sub> or the Type I error rate.".format(d, d),
         "The t-statistic can be compared to the critical value for a given level of alpha to assess whether or not to reject H<sub>0</sub>; or it can be used to determine the p-value, which is the probability of observing an effect size at least as large as the one observed if H<sub>0</sub> is true.",
-        "The p-value can also be understood as the area underneath the t-distribution shown above where t is greater than {:.3f} for a one-sided test; or greater than {:.3f} <i>and</i> less than {:.3f} for a two-sided test.".format(abs(t_stat), abs(t_stat), -abs(t_stat))
+        "The p-value can also be understood as the area underneath the t-distribution where t is greater than {:.3f} for a one-sided test; or greater than {:.3f} <i>and</i> less than {:.3f} for a two-sided test.".format(abs(t_stat), abs(t_stat), -abs(t_stat))
         ]
     return notes
 

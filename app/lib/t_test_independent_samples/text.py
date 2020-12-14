@@ -13,6 +13,19 @@ def generate_when_to_use_text():
         """
 
 
+def generate_options_text():
+    return """
+        <p>You can use this calculator to estimate:</p>
+        <ol>
+            <li>What sample size a planned study will need to detect an effect size at a given power level?</li>
+            <li>How much power will a planned study have based on my expected sample and effect sizes?<sup>1</sup></li>
+            <li>What is the smallest effect size a planned study can detect for a given power level and sample size?</li>
+            <li>What is the t-statistic and/or p-value for a completed study?</li>
+        </ol>
+        <p>[1] It is a common mistake to try to calculate the power of a completed study based on the <i>observed</i> effect size. You need to know (or estimate) the true effect size to calculate the power of a study.</p>
+    """
+
+
 def generate_assumptions_text():
     return """
         <p>When conducting a t-test with two independent samples, the following assumptions are made about your data:</p>
@@ -27,17 +40,4 @@ def generate_assumptions_text():
         <p>[1] This does not require your underlying data to be normally distributed. With larger samples, the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem" target='_blank'>Central Limit Theorem</a> typically means the sample means will be normally distributed.</p>
         <p>[2] This assumption holds if the underlying data are normally distributed, but not neccessarily if you are relying on the Central Limit Theorem for normally distributed sample means.</p>
         <p>[3] <a href='https://daniellakens.blogspot.com/2015/01/always-use-welchs-t-test-instead-of.html' target='_blank'>You probably should as well</a>.</p>
-    """
-
-
-def generate_options_text():
-    return """
-        <p>You can use this calculator to estimate:</p>
-        <ol>
-            <li>How large a sample will a planned study need to detect an expected effect size at a given power level?</li>
-            <li>How much power will a planned study have based on my expected sample and effect sizes?<sup>1</sup></li>
-            <li>What is the smallest effect size a planned study can detect for a given power level and sample size?</li>
-            <li>What is the t-statistic and/or p-value for a completed study?</li>
-        </ol>
-        <p>[1] It is a common mistake to try to calculate the power of a completed study based on the <i>observed</i> effect size. You need to know (or estimate) the true effect size to calculate the power of a study.</p>
     """
