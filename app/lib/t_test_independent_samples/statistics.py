@@ -52,21 +52,22 @@ def calculate_sample_size_from_means(mu_1, mu_2, sigma_1, sigma_2, alpha, power,
 
 def calculate_power_from_cohens_d(d, n_1, n_2, alpha):
     denominator = (1 / n_1 + 1 / n_2)**0.5
-    Z_os = norm.ppf(1 - alpha)
-    Z_ts = norm.ppf(1 - alpha/2)
-    power_os = norm.cdf(-Z_os + abs(d)/denominator)
-    power_ts = norm.cdf(-Z_ts + abs(d)/denominator)
+    T_os = t.ppf(q=1 - alpha, df=n_1 + n_2 - 2)
+    T_ts = t.ppf(q=1 - alpha/2, df=n_1 + n_2 - 2)
+    power_os = t.cdf(x=-T_os + abs(d)/denominator, df=n_1 + n_2 - 2)
+    power_ts = t.cdf(x=-T_ts + abs(d)/denominator, df=n_1 + n_2 - 2)
 
     return [[power_os], [power_ts]]
 
 
 def calculate_power_from_means(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2, alpha):
     diff = abs(mu_1 - mu_2)
+    df = utils.welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2)
     denominator = (sigma_1**2 / n_1 + sigma_2**2 / n_2)**0.5
-    Z_os = norm.ppf(1 - alpha)
-    Z_ts = norm.ppf(1 - alpha/2)
-    power_os = norm.cdf(-Z_os + diff/denominator)
-    power_ts = norm.cdf(-Z_ts + diff/denominator)
+    T_os = t.ppf(q=1 - alpha, df=df)
+    T_ts = t.ppf(q=1 - alpha/2, df=df)
+    power_os = t.cdf(x=-T_os + diff/denominator, df=df)
+    power_ts = t.cdf(x=-T_ts + diff/denominator, df=df)
 
     return [[power_os], [power_ts]]
 
@@ -76,15 +77,15 @@ def calculate_min_effect_size(n_1, n_2, alpha, power):
     alpha = alpha if alpha != 0 else 0.0000000001
 
     # Calculate with Normal distribution
-    z_a_one_sided = norm.ppf(1 - alpha)
-    z_a_two_sided = norm.ppf(1 - alpha/2)
-    z_b_one_sided = norm.ppf(power)
+    t_a_one_sided = t.ppf(q=1 - alpha, df=n_1 + n_2 - 2)
+    t_a_two_sided = t.ppf(q=1 - alpha/2, df=n_1 + n_2 - 2)
+    t_b_one_sided = t.ppf(q=power, df=n_1 + n_2 - 2)
 
-    z_total_os = (z_a_one_sided + z_b_one_sided)**2
-    z_total_ts = (z_a_two_sided + z_b_one_sided)**2
+    t_total_os = t_a_one_sided + t_b_one_sided
+    t_total_ts = t_a_two_sided + t_b_one_sided
 
-    d_os = ((1/n_1 + 1/n_2) * z_total_os)**0.5
-    d_ts = ((1/n_1 + 1/n_2) * z_total_ts)**0.5
+    d_os = t_total_os * (1/n_1 + 1/n_2)**0.5
+    d_ts = t_total_ts * (1/n_1 + 1/n_2)**0.5
 
     return [[d_os], [d_ts]]
 

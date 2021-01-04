@@ -84,7 +84,8 @@ def run_model(inputs):
         pooled_sd = utils.calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
 
         # Notes
-        results['notes'] = generate_power_notes(alpha)
+        welches_df = utils.welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2)
+        results['notes'] = generate_power_notes(alpha=alpha, df=welches_df)
         results['chartText'] = generate_power_distributions_text(alpha, power, mu_1, sigma_1, mu_2, sigma_2, pooled_sd)
 
         # Charts
@@ -115,7 +116,8 @@ def run_model(inputs):
         pooled_sd = utils.calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
 
         # Notes
-        results['notes'] = generate_min_effect_size_notes(alpha=alpha, power=power)
+        welches_df = utils.welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2)
+        results['notes'] = generate_min_effect_size_notes(alpha=alpha, power=power, df=welches_df)
         results['chartText'] = generate_power_distributions_text(alpha, power, mu_1, sigma_1, mu_2, sigma_2, pooled_sd)
 
         # Charts

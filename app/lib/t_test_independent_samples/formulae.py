@@ -53,64 +53,67 @@ def create_sample_size_from_d_formula(d, alpha, power, enrolment_ratio):
 
 def create_power_from_means_formula(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2, alpha):
     formulae = []
-    step_1 = "z_{{crit}} = -z_{{1-\\alpha/2}} + \\frac{{|\\mu_1 - \\mu_2|}}{{\\sqrt{{\\sigma_1^2/n_1 + \\sigma_2^2/n_2}}}}"
+    step_1 = "t_{{crit}} = -t_{{1-\\alpha/2,\ df}} + \\frac{{|\\mu_1 - \\mu_2|}}{{\\sqrt{{\\sigma_1^2/n_1 + \\sigma_2^2/n_2}}}}"
     formulae.append(step_1)
 
-    z_a = norm.ppf(1 - alpha/2)
-    step_2 = "z_{{crit}} = -{:.3f} + \\frac{{|{:.3f} - {:.3f}|}}{{\\sqrt{{\\frac{{{:.3f}^2}}{{{}}} + \\frac{{{:.3f}^2}}{{{}}}}}}}"
-    formulae.append(step_2.format(z_a, mu_1, mu_2, sigma_1, n_1, sigma_2, n_2))
+    df = utils.welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2)
+    t_a = t.ppf(q=1 - alpha/2, df=df)
+    step_2 = "t_{{crit}} = -{:.3f} + \\frac{{|{:.3f} - {:.3f}|}}{{\\sqrt{{\\frac{{{:.3f}^2}}{{{}}} + \\frac{{{:.3f}^2}}{{{}}}}}}}"
+    formulae.append(step_2.format(t_a, mu_1, mu_2, sigma_1, n_1, sigma_2, n_2))
 
-    step_3 = "z_{{crit}} = -{:.3f} + \\frac{{{:.3f}}}{{\\sqrt{{{:.3f}}}}} = {:.3f}"
+    step_3 = "t_{{crit}} = -{:.3f} + \\frac{{{:.3f}}}{{\\sqrt{{{:.3f}}}}} = {:.3f}"
     diff = abs(mu_1 - mu_2)
     pooled_variance = sigma_1**2/n_1 + sigma_2**2/n_2
-    z_crit = -z_a + (diff / pooled_variance**0.5)
-    formulae.append(step_3.format(z_a, diff, pooled_variance, z_crit))
+    t_crit = -t_a + (diff / pooled_variance**0.5)
+    formulae.append(step_3.format(t_a, diff, pooled_variance, t_crit))
 
-    power = norm.cdf(z_crit)
-    step_4 = "1 - \\beta = P(X <= {:.3f}) = {:.3f}"
-    formulae.append(step_4.format(z_crit, power))
+    power = t.cdf(x=t_crit, df=df)
+    step_4 = "1 - \\beta = P(T <= {:.3f}) = {:.3f}"
+    formulae.append(step_4.format(t_crit, power))
 
     return formulae
 
 
 def create_power_from_d_formula(d, n_1, n_2, alpha):
     formulae = []
-    step_1 = "z_{{crit}} = -z_{{1-\\alpha/2}} + \\frac{{|d|}}{{\\sqrt{{1/n_1 + 1/n_2}}}}"
+    step_1 = "t_{{crit}} = -t_{{1-\\alpha/2, \ df}} + \\frac{{|d|}}{{\\sqrt{{1/n_1 + 1/n_2}}}}"
     formulae.append(step_1)
 
-    z_a = norm.ppf(1 - alpha/2)
-    step_2 = "z_{{crit}} = -{:.3f} + \\frac{{|{:.3f}|}}{{\\sqrt{{1/{} + 1/{}}}}}"
-    formulae.append(step_2.format(z_a, d, n_1, n_2))
+    df = n_1 + n_2 - 2
+    t_a = t.ppf(q=1 - alpha/2, df=df)
+    step_2 = "t_{{crit}} = -{:.3f} + \\frac{{|{:.3f}|}}{{\\sqrt{{1/{} + 1/{}}}}}"
+    formulae.append(step_2.format(t_a, d, n_1, n_2))
 
-    step_3 = "z_{{crit}} = -{:.3f} + \\frac{{{:.3f}}}{{\\sqrt{{{:.3f}}}}} = {:.3f}"
+    step_3 = "t_{{crit}} = -{:.3f} + \\frac{{{:.3f}}}{{\\sqrt{{{:.3f}}}}} = {:.3f}"
     diff = abs(d)
-    df = 1/n_1 + 1/n_2
-    z_crit = -z_a + (diff / df**0.5)
-    formulae.append(step_3.format(z_a, diff, df, z_crit))
+    inv_n = 1/n_1 + 1/n_2
+    t_crit = -t_a + (diff / inv_n**0.5)
+    formulae.append(step_3.format(t_a, diff, inv_n, t_crit))
 
-    power = norm.cdf(z_crit)
-    step_4 = "1 - \\beta = P(X <= {:.3f}) = {:.3f}"
-    formulae.append(step_4.format(z_crit, power))
+    power = t.cdf(x=t_crit, df=df)
+    step_4 = "1 - \\beta = P(T <= {:.3f}) = {:.3f}"
+    formulae.append(step_4.format(t_crit, power))
 
     return formulae
 
 
 def create_min_effect_size_formula(alpha, power, n_1, n_2):
     formulae = []
-    step_1 = "d_{{min}} = \\sqrt{{(\\frac{{1}}{{n_1}} + \\frac{{1}}{{n_2}})(z_{{1-\\alpha/2}} + z_{{1-\\beta}})^2}}"
+    step_1 = "d_{{min}} = (t_{{1-\\alpha/2,\ df}} + t_{{1-\\beta,\ df}}) * \\sqrt{{(\\frac{{1}}{{n_1}} + \\frac{{1}}{{n_2}})}}"
     formulae.append(step_1)
 
-    step_2 = "d_{{min}} = \\sqrt{{(\\frac{{1}}{{{}}} + \\frac{{1}}{{{}}})(z_{{1-\\alpha/2}} + z_{{1-\\beta}})^2}}"
-    formulae.append(step_2.format(n_1, n_2, alpha, power, n_1))
+    step_2 = "d_{{min}} = (t_{{{:.3f},\ {}}} + t_{{{:.2f},\ {}}}) * \\sqrt{{(\\frac{{1}}{{{}}} + \\frac{{1}}{{{}}})}}"
+    df = n_1 + n_2 - 2
+    formulae.append(step_2.format(1 - alpha/2, df, power, df, n_1, n_2))
 
-    step_3 = "d_{{min}} = \\sqrt{{{:.3f}\\times({:.3f} + {:.3f})^2}}"
+    step_3 = "d_{{min}} = ({:.3f} + {:.3f})\\times\\sqrt{{{:.3f}}}"
     n_ratio = 1/n_1 + 1/n_2
-    z_a = norm.ppf(1 - alpha/2)
-    z_b = norm.ppf(power)
-    formulae.append(step_3.format(n_ratio, z_a, z_b))
+    t_a = t.ppf(q=1 - alpha/2, df=df)
+    t_b = t.ppf(q=power, df=df)
+    formulae.append(step_3.format(t_a, t_b, n_ratio))
 
     step_4 = "d_{{min}} = \\sqrt{{{:.3f}}} = {:.3f}"
-    effect_squared = (n_ratio * (z_a + z_b)**2)
+    effect_squared = (n_ratio * (t_a + t_b)**2)
     min_effect = effect_squared**0.5
     formulae.append(step_4.format(effect_squared, min_effect))
 

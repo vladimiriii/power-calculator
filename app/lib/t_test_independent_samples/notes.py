@@ -1,4 +1,4 @@
-from scipy.stats import norm
+from scipy.stats import norm, t
 
 
 def generate_sample_size_notes(alpha, power):
@@ -10,19 +10,19 @@ def generate_sample_size_notes(alpha, power):
     return notes
 
 
-def generate_power_notes(alpha):
+def generate_power_notes(alpha, df):
     notes = [
-        "X is a normally distributed random variable with mean 0 and standard deviation 1: X ~ N(0, 1).",
-        "The calculation shown is for a two-tailed test. However, from the formula, you can see the only term that will change for a one-sided test is z<sub>1−α/2</sub>​ = {:.3f}, which instead becomes z<sub>1−α</sub>​ = {:.3f}.".format(norm.ppf(1 - alpha/2), norm.ppf(1 - alpha)),
+        "T is a t distributed random variable with {} degrees of freedom: T ~ t({}).".format(int(df), int(df)),
+        "The calculation shown is for a two-tailed test. However, from the formula, you can see the only term that will change for a one-sided test is t<sub>1−α/2</sub>​ = {:.3f}, which instead becomes t<sub>1−α</sub>​ = {:.3f}.".format(t.ppf(1 - alpha/2, df=df), t.ppf(1 - alpha, df=df)),
         "The difference in means (or the effect size) for this calculation represents the difference in <i>population</i> means, or the true effect. This is because we are calculating the probability we will correctly reject H<sub>0</sub> (i.e. the 'power' of the experiment) if we repeatedly resampled from these populations with the specified sample sizes.",
         "Calculating the power of a study based on the observed difference in sample means is not recommended as it will not provide any meaningful information about the power of the study."
     ]
     return notes
 
 
-def generate_min_effect_size_notes(alpha, power):
+def generate_min_effect_size_notes(alpha, power, df):
     notes = [
-        "The calculation shown is for a two-tailed test. However, from the formula, you can see the only term that will change for a one-sided test is z<sub>1−α/2</sub>​ = {:.3f}, which instead becomes z<sub>1−α</sub>​ = {:.3f}.".format(norm.ppf(1 - alpha/2), norm.ppf(1 - alpha)),
+        "The calculation shown is for a two-tailed test. However, from the formula, you can see the only term that will change for a one-sided test is t<sub>1−α/2</sub>​ = {:.3f}, which instead becomes t<sub>1−α</sub>​ = {:.3f}.".format(t.ppf(q=1 - alpha/2, df=df), t.ppf(q=1 - alpha, df=df)),
         "The minimum effect size produced by this calculation represents the minimum difference in <i>population</i> means that will lead to the correct rejection of H<sub>0</sub> (i.e. a significant difference) in {:.2%} of experiments if we repeatedly resampled from these populations with the specified sample sizes.".format(power)
     ]
     return notes
