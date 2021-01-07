@@ -51,11 +51,17 @@ def calculate_sample_size_from_means(mu_1, mu_2, sigma_1, sigma_2, alpha, power,
 
 
 def calculate_power_from_cohens_d(d, n_1, n_2, alpha):
+    df = n_1 + n_2 - 2
     denominator = (1 / n_1 + 1 / n_2)**0.5
-    T_os = t.ppf(q=1 - alpha, df=n_1 + n_2 - 2)
-    T_ts = t.ppf(q=1 - alpha/2, df=n_1 + n_2 - 2)
-    power_os = t.cdf(x=-T_os + abs(d)/denominator, df=n_1 + n_2 - 2)
-    power_ts = t.cdf(x=-T_ts + abs(d)/denominator, df=n_1 + n_2 - 2)
+    t_crit_os = t.ppf(q=1 - alpha, df=df)
+    t_crit_ts = t.ppf(q=1 - alpha/2, df=df)
+
+    # Create Non-Centralized t-distribution
+    nc = abs(d) * (2 / (1/n_1 + 1/n_2) / 2)**0.5
+    nct_dist = utils.initialize_nct_distribution(df=df, nc=nc)
+
+    power_os = 1 - nct_dist.cdf(x=t_crit_os)
+    power_ts = 1 - nct_dist.cdf(x=t_crit_ts)
 
     return [[power_os], [power_ts]]
 
@@ -63,11 +69,16 @@ def calculate_power_from_cohens_d(d, n_1, n_2, alpha):
 def calculate_power_from_means(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2, alpha):
     diff = abs(mu_1 - mu_2)
     df = utils.welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2)
-    denominator = (sigma_1**2 / n_1 + sigma_2**2 / n_2)**0.5
-    T_os = t.ppf(q=1 - alpha, df=df)
-    T_ts = t.ppf(q=1 - alpha/2, df=df)
-    power_os = t.cdf(x=-T_os + diff/denominator, df=df)
-    power_ts = t.cdf(x=-T_ts + diff/denominator, df=df)
+    t_crit_os = t.ppf(q=1 - alpha, df=df)
+    t_crit_ts = t.ppf(q=1 - alpha/2, df=df)
+
+    # Create Non-Centralized t-distribution
+    d = utils.calculate_cohens_d(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2)
+    nc = d * (2 / (1/n_1 + 1/n_2) / 2)**0.5
+    nct_dist = utils.initialize_nct_distribution(df=df, nc=nc)
+
+    power_os = 1 - nct_dist.cdf(x=t_crit_os)
+    power_ts = 1 - nct_dist.cdf(x=t_crit_ts)
 
     return [[power_os], [power_ts]]
 
@@ -75,11 +86,12 @@ def calculate_power_from_means(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2, alpha):
 def calculate_min_effect_size(n_1, n_2, alpha, power):
     power = power if power < 1 else 0.99999999999
     alpha = alpha if alpha != 0 else 0.0000000001
+    df = n_1 + n_2 - 2
 
     # Calculate with Normal distribution
-    t_a_one_sided = t.ppf(q=1 - alpha, df=n_1 + n_2 - 2)
-    t_a_two_sided = t.ppf(q=1 - alpha/2, df=n_1 + n_2 - 2)
-    t_b_one_sided = t.ppf(q=power, df=n_1 + n_2 - 2)
+    t_a_one_sided = t.ppf(q=1 - alpha, df=df)
+    t_a_two_sided = t.ppf(q=1 - alpha/2, df=df)
+    t_b_one_sided = t.ppf(q=power, df=df)
 
     t_total_os = t_a_one_sided + t_b_one_sided
     t_total_ts = t_a_two_sided + t_b_one_sided

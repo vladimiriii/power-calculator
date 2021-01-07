@@ -1,4 +1,6 @@
 import math
+import numpy as np
+from scipy import stats
 
 
 def all_sample_info_provided(sample_inputs):
@@ -36,8 +38,16 @@ def determine_decimal_points(x):
 
 
 def welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2):
-    return (sigma_1**2/n_1 + sigma_2**2/n_2)**2 / ((sigma_1**2/n_1)**2/(n_1-1) + (sigma_2**2/n_2)**2/(n_2-1))
+    return int((sigma_1**2/n_1 + sigma_2**2/n_2)**2 / ((sigma_1**2/n_1)**2/(n_1-1) + (sigma_2**2/n_2)**2/(n_2-1)))
 
 
 def find_closest_value(lst, x):
     return lst[min(range(len(lst)), key=lambda i: abs(lst[i] - x))]
+
+
+def initialize_nct_distribution(df, nc):
+    test_value = stats.nct.pdf(x=nc, df=df, nc=nc)
+    if np.isnan(test_value):
+        return stats.t(df=df, loc=nc)
+    else:
+        return stats.nct(df=df, nc=nc)

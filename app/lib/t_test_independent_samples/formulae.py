@@ -53,69 +53,71 @@ def create_sample_size_from_d_formula(d, alpha, power, enrolment_ratio):
 
 def create_power_from_means_formula(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2, alpha):
     formulae = []
-    step_1 = "t_{{crit}} = -t_{{1-\\alpha/2,\ df}} + \\frac{{|\\mu_1 - \\mu_2|}}{{\\sqrt{{\\sigma_1^2/n_1 + \\sigma_2^2/n_2}}}}"
-    formulae.append(step_1)
+    df = int(utils.welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2))
+    sig = 1 - alpha/2
+    t_crit = t.ppf(q=sig, df=df)
+    step_1 = "t_{{crit}} = t_{{1-\\alpha/2, \ \\upsilon}} = t_{{{:.3f}, \ {}}} = {:.3f}"
+    formulae.append(step_1.format(sig, df, t_crit))
 
-    df = utils.welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2)
-    t_a = t.ppf(q=1 - alpha/2, df=df)
-    step_2 = "t_{{crit}} = -{:.3f} + \\frac{{|{:.3f} - {:.3f}|}}{{\\sqrt{{\\frac{{{:.3f}^2}}{{{}}} + \\frac{{{:.3f}^2}}{{{}}}}}}}"
-    formulae.append(step_2.format(t_a, mu_1, mu_2, sigma_1, n_1, sigma_2, n_2))
+    step_2 = "\\beta = P(T <= t_{{crit}})\ where\ T\ \\sim\ t_{{\\upsilon={},\ \\mu={:.3f}}}"
+    d = utils.calculate_cohens_d(mu_1, sigma_1, n_1, mu_2, sigma_2, n_2)
+    nc = abs(d) * (2 / (1/n_1 + 1/n_2) / 2)**0.5
+    formulae.append(step_2.format(df, nc))
 
-    step_3 = "t_{{crit}} = -{:.3f} + \\frac{{{:.3f}}}{{\\sqrt{{{:.3f}}}}} = {:.3f}"
-    diff = abs(mu_1 - mu_2)
-    pooled_variance = sigma_1**2/n_1 + sigma_2**2/n_2
-    t_crit = -t_a + (diff / pooled_variance**0.5)
-    formulae.append(step_3.format(t_a, diff, pooled_variance, t_crit))
+    nct_dist = utils.initialize_nct_distribution(df=df, nc=nc)
+    beta = nct_dist.cdf(x=t_crit)
+    step_3 = "\\beta = P(T <= {:.3f}) = {:.3f}"
+    formulae.append(step_3.format(t_crit, beta))
 
-    power = t.cdf(x=t_crit, df=df)
-    step_4 = "1 - \\beta = P(T <= {:.3f}) = {:.3f}"
-    formulae.append(step_4.format(t_crit, power))
+    step_4 = "1 - \\beta = 1 - {:.3f} = {:.3f}"
+    formulae.append(step_4.format(beta, 1 - beta))
 
     return formulae
 
 
 def create_power_from_d_formula(d, n_1, n_2, alpha):
     formulae = []
-    step_1 = "t_{{crit}} = -t_{{1-\\alpha/2, \ df}} + \\frac{{|d|}}{{\\sqrt{{1/n_1 + 1/n_2}}}}"
-    formulae.append(step_1)
-
     df = n_1 + n_2 - 2
-    t_a = t.ppf(q=1 - alpha/2, df=df)
-    step_2 = "t_{{crit}} = -{:.3f} + \\frac{{|{:.3f}|}}{{\\sqrt{{1/{} + 1/{}}}}}"
-    formulae.append(step_2.format(t_a, d, n_1, n_2))
+    sig = 1 - alpha/2
+    t_crit = t.ppf(q=sig, df=df)
+    step_1 = "t_{{crit}} = t_{{1-\\alpha/2, \ \\upsilon}} = t_{{{:.3f}, \ {}}} = {:.3f}"
+    formulae.append(step_1.format(sig, df, t_crit))
 
-    step_3 = "t_{{crit}} = -{:.3f} + \\frac{{{:.3f}}}{{\\sqrt{{{:.3f}}}}} = {:.3f}"
-    diff = abs(d)
-    inv_n = 1/n_1 + 1/n_2
-    t_crit = -t_a + (diff / inv_n**0.5)
-    formulae.append(step_3.format(t_a, diff, inv_n, t_crit))
+    step_2 = "\\beta = P(T <= t_{{crit}})\ where\ T\ \\sim\ t_{{\\upsilon={},\ \\mu={:.3f}}}"
+    nc = abs(d) * (2 / (1/n_1 + 1/n_2) / 2)**0.5
+    formulae.append(step_2.format(df, nc))
 
-    power = t.cdf(x=t_crit, df=df)
-    step_4 = "1 - \\beta = P(T <= {:.3f}) = {:.3f}"
-    formulae.append(step_4.format(t_crit, power))
+    nct_dist = utils.initialize_nct_distribution(df=df, nc=nc)
+    beta = nct_dist.cdf(x=t_crit)
+    step_3 = "\\beta = P(T <= {:.3f}) = {:.3f}"
+    formulae.append(step_3.format(t_crit, beta))
+
+    step_4 = "1 - \\beta = 1 - {:.3f} = {:.3f}"
+    formulae.append(step_4.format(beta, 1 - beta))
 
     return formulae
 
 
 def create_min_effect_size_formula(alpha, power, n_1, n_2):
     formulae = []
-    step_1 = "d_{{min}} = (t_{{1-\\alpha/2,\ df}} + t_{{1-\\beta,\ df}}) * \\sqrt{{(\\frac{{1}}{{n_1}} + \\frac{{1}}{{n_2}})}}"
+    step_1 = "d_{{min}} = (t_{{1-\\alpha/2,\ \\upsilon}} + t_{{1-\\beta,\ \\upsilon}}) \\cdot \\sqrt{{(\\frac{{1}}{{n_1}} + \\frac{{1}}{{n_2}})}}"
     formulae.append(step_1)
 
-    step_2 = "d_{{min}} = (t_{{{:.3f},\ {}}} + t_{{{:.2f},\ {}}}) * \\sqrt{{(\\frac{{1}}{{{}}} + \\frac{{1}}{{{}}})}}"
+    step_2 = "d_{{min}} = (t_{{{:.3f},\ {}}} + t_{{{:.3f},\ {}}}) \\cdot \\sqrt{{(\\frac{{1}}{{{}}} + \\frac{{1}}{{{}}})}}"
     df = n_1 + n_2 - 2
     formulae.append(step_2.format(1 - alpha/2, df, power, df, n_1, n_2))
 
-    step_3 = "d_{{min}} = ({:.3f} + {:.3f})\\times\\sqrt{{{:.3f}}}"
+    step_3 = "d_{{min}} = ({:.3f} + {:.3f})\\cdot\\sqrt{{{:.3f}}}"
     n_ratio = 1/n_1 + 1/n_2
     t_a = t.ppf(q=1 - alpha/2, df=df)
     t_b = t.ppf(q=power, df=df)
     formulae.append(step_3.format(t_a, t_b, n_ratio))
 
-    step_4 = "d_{{min}} = \\sqrt{{{:.3f}}} = {:.3f}"
-    effect_squared = (n_ratio * (t_a + t_b)**2)
-    min_effect = effect_squared**0.5
-    formulae.append(step_4.format(effect_squared, min_effect))
+    step_4 = "d_{{min}} = {:.3f} \\times {:.3f} = {:.3f}"
+    sqrt_n_ratio = n_ratio**0.5
+    t_total = t_a + t_b
+    min_effect = t_total * sqrt_n_ratio
+    formulae.append(step_4.format(t_total, sqrt_n_ratio, min_effect))
 
     return formulae
 

@@ -1,6 +1,7 @@
 import numpy as np
 import math
-from scipy.stats import norm, t
+import bisect
+from scipy.stats import norm, t, nct
 
 from app.lib import utils, colors
 from app.lib.t_test_independent_samples import statistics as tt
@@ -320,9 +321,9 @@ def generate_sample_size_vs_effect_size_data(d, alpha, power, n_1, n_2):
     enrolment_ratio = n_1/n_2
     n_raw = n_1 + n_2
 
-    ff = 0.1
-    x_min = 4
-    x_max = int(n_raw * (1 + ff))
+    ff = 0.5
+    x_min = max(4, int(n_raw * (1 - ff)))
+    x_max = max(int(n_raw * (1 + ff)), 100)
     step = int(max(1, (x_max - x_min) / 500))
     sample_sizes = np.arange(x_min, x_max, step)
     n_actual = utils.find_closest_value(sample_sizes, n_raw)
@@ -471,60 +472,71 @@ def generate_power_vs_effect_size_data(d, alpha, power, n_1, n_2):
 
 def generate_sampling_distributions_chart_data(mu_1, mu_2, sigma_1, sigma_2, n_1, n_2, alpha):
     n = n_1 + n_2 - 2
+    df = utils.welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2)
     H0_mean = 0
     HA_mean = mu_2 - mu_1
     sd_pooled = utils.calculate_pooled_standard_deviation(n_1, n_2, sigma_1, sigma_2)
     se = sd_pooled * (1/n_1 + 1/n_2)**0.5
     d = utils.calculate_cohens_d(mu_1=mu_1, sigma_1=sigma_1, n_1=n_1, mu_2=mu_2, sigma_2=sigma_2, n_2=n_2)
+    nc = d * (2 / (1/n_1 + 1/n_2) / 2)**0.5
+    if mu_1 > mu_2:
+        nc *= -1
 
     # Determine X axis range
-    x_min = min(H0_mean, HA_mean) - (se * 5)
-    x_max = max(H0_mean, HA_mean) + (se * 5)
-    x_axis_values = list(np.arange(x_min, x_max, (x_max - x_min) / 1000))
+    x_min = min(H0_mean, nc) - 4
+    x_max = max(H0_mean, nc) + 4
+    x_axis_values = list(np.linspace(start=x_min, stop=x_max, num=1000, endpoint=True))
 
-    alpha_lower = norm.ppf(alpha/2, loc=0, scale=se)
+    alpha_lower = t.ppf(q=alpha/2, df=df)
     alpha_upper = -1 * alpha_lower
+
+    # Insert key values
+    for val in [H0_mean, nc, alpha_lower, alpha_upper]:
+        if val not in x_axis_values:
+            bisect.insort(x_axis_values, val)
 
     H0_significant = []
     H0_not_significant = []
     HA_powered = []
     HA_unpowered = []
     threshold = alpha_upper if HA_mean >= H0_mean else alpha_lower
+
+    nct_dist = utils.initialize_nct_distribution(df=df, nc=nc)
     for value in x_axis_values:
         # Null Hypothesis
-        H0_not_significant.append(norm.pdf(value, loc=H0_mean, scale=se))
+        H0_not_significant.append(t.pdf(x=value, df=df))
         if value < alpha_lower or value > alpha_upper:
-            H0_significant.append(norm.pdf(value, loc=H0_mean, scale=se))
+            H0_significant.append(t.pdf(x=value, df=df))
         else:
             H0_significant.append(None)
 
         # Alternative Hypothesis
-        HA_powered.append(norm.pdf(value, loc=HA_mean, scale=se))
+        HA_powered.append(nct_dist.pdf(x=value))
         if HA_mean < H0_mean and value > alpha_lower:
-            HA_unpowered.append(norm.pdf(value, loc=HA_mean, scale=se))
+            HA_unpowered.append(nct_dist.pdf(x=value))
         elif HA_mean >= H0_mean and value < alpha_upper:
-            HA_unpowered.append(norm.pdf(value, loc=HA_mean, scale=se))
+            HA_unpowered.append(nct_dist.pdf(x=value))
         else:
             HA_unpowered.append(None)
 
     if HA_mean < H0_mean:
-        power = norm.cdf(alpha_lower, loc=HA_mean, scale=se)
+        power = nct_dist.cdf(x=alpha_lower)
         threshold = alpha_lower
     else:
-        power = 1 - norm.cdf(alpha_upper, loc=HA_mean, scale=se)
+        power = 1 - nct_dist.cdf(x=alpha_upper)
         threshold = alpha_upper
 
     decimal_points = utils.determine_decimal_points(x_max)
     format_string = "{:." + str(decimal_points) + "f}"
 
     return {
-        "title": "Distributions of the Difference in Sample Means (effect size: {:0.3f}, α: {:0.3f}, power (1 - β): {:.1%})".format(d, alpha, power),
-        "xAxisLabel": "Difference in sample means",
+        "title": "Central and Noncentral Distributions (effect size: {:0.3f}, α: {:0.3f}, power (1 - β): {:.1%})".format(d, alpha, power),
+        "xAxisLabel": "t statistic",
         "yAxisLabel": "Density",
         "labels": [format_string.format(x) for x in x_axis_values],
         "verticalLine": {
             "position": format_string.format(utils.find_closest_value(x_axis_values, threshold)),
-            "label": "Significance Cutoff: " + format_string.format(threshold)
+            "label": "t crit: " + format_string.format(threshold)
         },
         "hidePoints": True,
         "dataset": [

@@ -1,10 +1,12 @@
 from scipy.stats import norm, t
+from app.lib import utils
 
 
 def generate_sample_size_notes(alpha, power):
     notes = [
         "r<sub>n</sub> is the ratio of observations, n<sub>1</sub> / n<sub>2</sub>.",
         "The calculation shown is for a two-tailed test. However, from the formula, you can see the only term that will change for a one-sided test is z<sub>1−α/2</sub>​ = {:.3f}, which instead becomes z<sub>1−α</sub>​ = {:.3f}.".format(norm.ppf(1 - alpha/2), norm.ppf(1 - alpha)),
+        "Normal distributions are used instead of the t distribution in this calculation as the t distribution requires a degrees of freedom parameter, which is dependent on the sample size. In practice, this will lead to the required sample sizes being underestimated when they are small (n < 30).",
         "The difference in means (or the effect size) for this calculation represents the difference in <i>population</i> means, or the true effect. This is because we are calculating how big a sample we need to have a {:.1%} probability of finding a significant difference (i.e. the 'power' of the experiment) if we repeatedly resampled from these populations.".format(power)
     ]
     return notes
@@ -12,8 +14,8 @@ def generate_sample_size_notes(alpha, power):
 
 def generate_power_notes(alpha, df):
     notes = [
-        "T is a t distributed random variable with {} degrees of freedom: T ~ t({}).".format(int(df), int(df)),
         "The calculation shown is for a two-tailed test. However, from the formula, you can see the only term that will change for a one-sided test is t<sub>1−α/2</sub>​ = {:.3f}, which instead becomes t<sub>1−α</sub>​ = {:.3f}.".format(t.ppf(1 - alpha/2, df=df), t.ppf(1 - alpha, df=df)),
+        'Step 3 is calculated using the cumulative distribution function (CDF) for the specified <a href="https://en.wikipedia.org/wiki/Noncentral_t-distribution">noncentral t-distribution</a>.',
         "The difference in means (or the effect size) for this calculation represents the difference in <i>population</i> means, or the true effect. This is because we are calculating the probability we will correctly reject H<sub>0</sub> (i.e. the 'power' of the experiment) if we repeatedly resampled from these populations with the specified sample sizes.",
         "Calculating the power of a study based on the observed difference in sample means is not recommended as it will not provide any meaningful information about the power of the study."
     ]
@@ -23,6 +25,7 @@ def generate_power_notes(alpha, df):
 def generate_min_effect_size_notes(alpha, power, df):
     notes = [
         "The calculation shown is for a two-tailed test. However, from the formula, you can see the only term that will change for a one-sided test is t<sub>1−α/2</sub>​ = {:.3f}, which instead becomes t<sub>1−α</sub>​ = {:.3f}.".format(t.ppf(q=1 - alpha/2, df=df), t.ppf(q=1 - alpha, df=df)),
+        "This formula uses two central t distributions, when one should be a noncentral t distribution. However, the noncentral distribution requires a noncentrality parameter, which is dependent on the effect size. In practice, this will lead to the minimum effect sizes that can differ from the specified power when the samples are small (n < 30).",
         "The minimum effect size produced by this calculation represents the minimum difference in <i>population</i> means that will lead to the correct rejection of H<sub>0</sub> (i.e. a significant difference) in {:.2%} of experiments if we repeatedly resampled from these populations with the specified sample sizes.".format(power)
     ]
     return notes
@@ -49,10 +52,14 @@ def generate_p_value_notes(n_1, n_2, d, p_one_sided, p_two_sided, t_stat):
     return notes
 
 
-def generate_power_distributions_text(alpha, power, mu_1, sigma_1, mu_2, sigma_2, pooled_sd):
+def generate_power_distributions_text(d, mu_1, n_1, mu_2, n_2, alpha, power):
+    upsilon = n_1 + n_2 - 2
+    nc = d * (2 / (1/n_1 + 1/n_2) / 2)**0.5
+    if mu_1 > mu_2:
+        nc *= -1
     text = [
-        "The chart to the right shows two hypothetical distributions of the differences in sample means. The red function is the expected distribution of the difference in the means of two samples drawn from one population, N(μ=0, σ={:.3f}). This represents the null hypothesis (H<sub>0</sub>: μ<sub>1</sub>=μ<sub>2</sub>).".format(pooled_sd),
-        "The blue function is the expected distribution of the difference in the means of samples drawn from two different populations, N(μ<sub>1</sub>={:.3f}, σ<sub>1</sub>={:.3f}) and N(μ<sub>2</sub>={:.3f}, σ<sub>2</sub>={:.3f}). This represents the alternative hypothesis (H<sub>A</sub>: μ<sub>2</sub>-μ<sub>1</sub>={:.3f}).".format(mu_1, sigma_1, mu_2, sigma_2, mu_2 - mu_1),
+        "The chart to the right shows two distributions. The red function is the distribution of a t statistic calculated from the difference in the means of two samples drawn from one population. This is a t distribution t<sub>υ={}</sub>, where υ is the degrees of freedom, and represents the null hypothesis (H<sub>0</sub>: μ<sub>1</sub>=μ<sub>2</sub>).".format(upsilon),
+        'The blue function is the distribution of a t statistic calculated from the difference in the means of samples drawn from two different populations. This is a <a href="https://en.wikipedia.org/wiki/Noncentral_t-distribution" target="_blank">noncentral t distribution</a> t<sub>υ={}, μ={:.3f}</sub>, where μ is the noncentrality parameter, and represents the alternative hypothesis (H<sub>A</sub>: μ<sub>2</sub>-μ<sub>1</sub>={:.3f}).'.format(upsilon, nc, mu_2 - mu_1),
         "The areas shaded in red represent the probability of observing differences in sample means that would lead to a rejection of H<sub>0</sub> at the {:.2f} level of significance (for a two-tailed test). I.e. the shaded area represents {:.1%} of the total area under the null hypothesis distribution.".format(alpha, alpha),
         "The area shaded in blue represents the probability of observing differences in sample means that would lead to a failure to reject of H<sub>0</sub> as they were found not to be statistically significant. This area represents {:.1%} of the total area under the alternative hypothesis distribution.".format(1 - power)
     ]

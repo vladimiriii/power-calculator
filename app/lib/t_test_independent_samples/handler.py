@@ -41,7 +41,7 @@ def run_model(inputs):
 
         # Notes
         results['notes'] = generate_sample_size_notes(alpha, power)
-        results['chartText'] = generate_power_distributions_text(alpha, power, mu_1, sigma_1, mu_2, sigma_2, pooled_sd)
+        results['chartText'] = generate_power_distributions_text(d=d, mu_1=mu_1, n_1=n_1, mu_2=mu_2, n_2=n_2, alpha=alpha, power=power)
 
         # Charts
         results['charts']['chartOne'] = generate_power_vs_sample_size_chart_data(d=d, alpha=alpha, power=power, enrolment_ratio=enrolment_ratio)
@@ -86,7 +86,7 @@ def run_model(inputs):
         # Notes
         welches_df = utils.welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2)
         results['notes'] = generate_power_notes(alpha=alpha, df=welches_df)
-        results['chartText'] = generate_power_distributions_text(alpha, power, mu_1, sigma_1, mu_2, sigma_2, pooled_sd)
+        results['chartText'] = generate_power_distributions_text(d=d, mu_1=mu_1, n_1=n_1, mu_2=mu_2, n_2=n_2, alpha=alpha, power=power)
 
         # Charts
         results['charts']['chartOne'] = generate_sample_size_vs_power_chart_data(d=d, alpha=alpha, power=power, n_1=n_1, n_2=n_2)
@@ -118,7 +118,7 @@ def run_model(inputs):
         # Notes
         welches_df = utils.welches_degrees_of_freedom(sigma_1, n_1, sigma_2, n_2)
         results['notes'] = generate_min_effect_size_notes(alpha=alpha, power=power, df=welches_df)
-        results['chartText'] = generate_power_distributions_text(alpha, power, mu_1, sigma_1, mu_2, sigma_2, pooled_sd)
+        results['chartText'] = generate_power_distributions_text(d=d, mu_1=mu_1, n_1=n_1, mu_2=mu_2, n_2=n_2, alpha=alpha, power=power)
 
         # Charts
         results['charts']['chartOne'] = generate_sample_size_vs_effect_size_data(d=d, alpha=alpha, power=power, n_1=n_1, n_2=n_2)
