@@ -12,6 +12,11 @@ body {
 	font-size: 40px;
 }
 
+#navbarDropdownMenuLink {
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
 /* Body */
 .main-panel {
     padding-right: 100px;
@@ -83,11 +88,31 @@ p.document-links > a:hover {
         padding-right: 5px;
         padding-left: 5px;
     }
+
+    #navbarDropdownMenuLink {
+        margin-top: 0px;
+        margin-right: 0px;
+        margin-bottom: 10px;
+    }
+
+    div.dropdown-menu {
+        text-align: right;
+    }
 }
 
 @media screen and (max-width: 576px) {
     .navbar-brand {
         font-size: 30px;
+    }
+
+    #navbarDropdownMenuLink {
+        margin-top: 0px;
+        margin-right: 0px;
+        margin-bottom: 10px;
+    }
+
+    div.dropdown-menu {
+        text-align: right;
     }
 }
 

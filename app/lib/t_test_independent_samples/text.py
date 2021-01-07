@@ -4,7 +4,7 @@ header_text = "t-test: Two Independent Samples"
 
 def generate_when_to_use_text():
     return """
-        <p>A t-test is any hypothesis test where the test statistic follows a <a href="https://en.wikipedia.org/wiki/Student%27s_t-distribution" target="_blank">Studen't t-distribution</a>. In this version of a t-test, we are testing the probability that two independent samples were drawn from the same population based on the means (and variances) of those samples. More specifically, this version of a t-test is used when:</p>
+        <p>A t-test is any hypothesis test where the test statistic follows a <a href="https://en.wikipedia.org/wiki/Student%27s_t-distribution" target="_blank">Student's t-distribution</a>. In this version of a t-test, we are testing the probability that two independent samples were drawn from the same population based on the means (and variances) of those samples. More specifically, this version of a t-test is used when:</p>
         <ol>
             <li>You have two independent samples. E.g. a treatment group and a control group, not a before and after treatment comparison ("paired samples").</li>
             <li>You want to assess if a treatment led to some measureable difference in the groups (e.g. giving the treatment group a low fat diet led to a reduction in average weight).</li>
