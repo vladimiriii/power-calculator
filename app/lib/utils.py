@@ -46,6 +46,7 @@ def find_closest_value(lst, x):
 
 
 def initialize_nct_distribution(df, nc):
+    np.seterr(over='ignore', invalid='ignore')
     test_value = stats.nct.pdf(x=nc, df=df, nc=nc)
     if np.isnan(test_value):
         return stats.t(df=df, loc=nc)
