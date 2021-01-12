@@ -36,14 +36,6 @@ const fieldMap = {
             "label": 'Standard Deviation: ',
             "step": "any"
     },
-    "sampleMean": {
-            "label": "Sample Mean: ",
-            "step": "any"
-    },
-    "sampleStdDev": {
-            "label": "Sample Standard Deviation: ",
-            "step": "any"
-    },
     "n": {
             "label": "Sample Size (n): ",
             "step": 1,
@@ -55,6 +47,7 @@ const optionMap = {
     "planning": {
         "sample-size": {
             "displayName": "Minimum Sample Size",
+            "groupName": "Population",
             "compulsoryFields": {
                 "oneOf": ["alpha", "power", "enrolmentRatio"],
                 "perGroup": []
@@ -66,6 +59,7 @@ const optionMap = {
         },
         "power": {
             "displayName": "Statistical Power",
+            "groupName": "Population",
             "compulsoryFields": {
                 "oneOf": ["alpha"],
                 "perGroup": ["n"]
@@ -77,6 +71,7 @@ const optionMap = {
         },
         "min-effect": {
             "displayName": "Minimum Effect Size",
+            "groupName": "Population",
             "compulsoryFields": {
                 "oneOf": ['alpha', 'power'],
                 "perGroup": ["n"]
@@ -90,24 +85,26 @@ const optionMap = {
     "assessing": {
         "t-stat": {
             "displayName": "t-statistic",
+            "groupName": "Sample",
             "compulsoryFields": {
                 "oneOf": ['alpha'],
                 "perGroup": ["n"]
             },
             "orFields": {
                 "oneOf": ["effectSize"],
-                "perGroup": ["sampleMean", "sampleStdDev"]
+                "perGroup": ["mean", "stdDev"]
             }
         },
         "p-value": {
             "displayName": "p-value",
+            "groupName": "Sample",
             "compulsoryFields": {
                 "oneOf": ['alpha'],
                 "perGroup": ["n"]
             },
             "orFields": {
                 "oneOf": ["effectSize"],
-                "perGroup": ["sampleMean", "sampleStdDev"]
+                "perGroup": ["mean", "stdDev"]
             }
         }
     }

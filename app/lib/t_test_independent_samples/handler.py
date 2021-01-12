@@ -139,10 +139,10 @@ def run_model(inputs):
 
         # Statistics
         if utils.all_sample_info_provided(sample_fields):
-            x_bar_1 = float(sample_fields[0]['sampleMean'])
-            s_1 = float(sample_fields[0]['sampleStdDev'])
-            x_bar_2 = float(sample_fields[1]['sampleMean'])
-            s_2 = float(sample_fields[1]['sampleStdDev'])
+            x_bar_1 = float(sample_fields[0]['mean'])
+            s_1 = float(sample_fields[0]['stdDev'])
+            x_bar_2 = float(sample_fields[1]['mean'])
+            s_2 = float(sample_fields[1]['stdDev'])
             d = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
             t_stat = calculate_t_stat_from_means(x_bar_1=x_bar_1, s_1=s_1, n_1=n_1, x_bar_2=x_bar_2, s_2=s_2, n_2=n_2)
             results['formulae'] = create_t_stat_from_means_formula(x_bar_1=x_bar_1, s_1=s_1, n_1=n_1, x_bar_2=x_bar_2, s_2=s_2, n_2=n_2)
@@ -186,10 +186,10 @@ def run_model(inputs):
 
         # Statistics
         if utils.all_sample_info_provided(sample_fields):
-            x_bar_1 = float(sample_fields[0]['sampleMean'])
-            s_1 = float(sample_fields[0]['sampleStdDev'])
-            x_bar_2 = float(sample_fields[1]['sampleMean'])
-            s_2 = float(sample_fields[1]['sampleStdDev'])
+            x_bar_1 = float(sample_fields[0]['mean'])
+            s_1 = float(sample_fields[0]['stdDev'])
+            x_bar_2 = float(sample_fields[1]['mean'])
+            s_2 = float(sample_fields[1]['stdDev'])
             d = utils.calculate_cohens_d(x_bar_1, s_1, n_1, x_bar_2, s_2, n_2)
             welches_df = utils.welches_degrees_of_freedom(s_1, n_1, s_2, n_2)
             t_stat = calculate_t_stat_from_means(x_bar_1=x_bar_1, s_1=s_1, n_1=n_1, x_bar_2=x_bar_2, s_2=s_2, n_2=n_2)
