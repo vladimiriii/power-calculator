@@ -17,10 +17,10 @@ def generate_options_text():
     return """
         <p>You can use this calculator to estimate:</p>
         <ol>
-            <li>What sample size a planned study will need to detect an effect size at a given power level?</li>
-            <li>How much power will a planned study have based on my expected sample and effect sizes?<sup>1</sup></li>
-            <li>What is the smallest effect size a planned study can detect for a given power level and sample size?</li>
-            <li>What is the t-statistic and/or p-value for a completed study?</li>
+            <li>The sample size a planned study will need to detect an effect size at a given power level</li>
+            <li>The statistical power a planned study will have based on the expected sample and effect sizes<sup>1</sup></li>
+            <li>The smallest effect size a planned study can detect for a given power level and sample size</li>
+            <li>The t-statistic and/or p-value for a completed study</li>
         </ol>
         <p>[1] It is a common mistake to try to calculate the power of a completed study based on the <i>observed</i> effect size. You need to know (or estimate) the true effect size to calculate the power of a study.</p>
     """
