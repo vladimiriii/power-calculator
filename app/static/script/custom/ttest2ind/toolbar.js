@@ -74,12 +74,64 @@ function addOptionFields(status, target, div, orField) {
                 label += `<input type="number" id="${f + String(j)}" step=${String(fieldMap[f]['step'])}>`;
                 label += "</form>";
                 $("#" + div).append(label);
+                $("#" + div).on("change", updateCohensD);
             }
         }
     }
 }
 
 
+// AUTOMATED COHENS D
+function meanAndStdInputsValid(){
+    const values = [];
+    values.push($('#mean1').val());
+    values.push($('#mean2').val());
+    values.push($('#stdDev1').val());
+    values.push($('#stdDev2').val());
+    if (values.every(function(i) { return !isNaN(i) && i.trim() != "" })) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+function sampleSizeFieldsValid(){
+    const values = [];
+    values.push($('#n1').val());
+    values.push($('#n2').val());
+    if (values.every(function(i) { return !isNaN(i) && i.trim() != "" })) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+function updateCohensD() {
+    if (meanAndStdInputsValid()) {
+        $("#effectSize").prop('disabled', true);
+        const mean_diff = Math.abs(parseFloat($('#mean1').val()) - parseFloat($('#mean2').val()));
+        const sd1 = parseFloat($('#stdDev1').val());
+        const sd2 = parseFloat($('#stdDev2').val());
+        if (sampleSizeFieldsValid()) {
+            const n1 = parseInt($('#n1').val());
+            const n2 = parseInt($('#n2').val());
+            sdPooled = (((n1 - 1) * sd1**2 + (n2 - 1) * sd2**2) / (n1 + n2 - 2))**0.5;
+        } else {
+            sdPooled = ((sd1**2 + sd2**2)/2)**0.5;
+        }
+
+        const d = (mean_diff / sdPooled).toFixed(8);
+        $("#effectSize").val(d);
+    }
+    else {
+        $("#effectSize").prop('disabled', false);
+    }
+}
+
+
+// BINARY FIELD FUNCTIONS
 function addCheckBox(id, label) {
     let checkbox = `<div class="form-check">`
     checkbox += `<input class="form-check-input" type="checkbox" value="binary" id="${id}">`
@@ -114,6 +166,7 @@ function updateStdDev(i) {
 }
 
 
+// RESET FIELDS
 function resetOptionsAndResults() {
     $("#results-table").empty();
     $("#formulae").empty();
